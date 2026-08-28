@@ -18,7 +18,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'DM Sans', sans-serif; color: #fff;
-            background: linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
+            background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
         }
         .bg-effects { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }

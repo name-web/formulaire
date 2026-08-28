@@ -129,6 +129,7 @@
 
         .hero-title {
             max-width: 700px;
+            font-family: 'Segoe UI', sans-serif;
             font-size: clamp(3.4rem, 5.5vw, 5.7rem);
             line-height: .98;
             font-weight: 800;
@@ -613,6 +614,20 @@
         .glow-on-scroll.visible { animation: pulseGlow 2s ease-in-out 1; }
 
         .parallax-bg { will-change: transform; transition: transform 0.1s linear; }
+
+        /* =====================================================
+           SECTION HEADINGS — Segoe UI ExtraBold
+        ===================================================== */
+
+        #services h2,
+        #services h3,
+        .step-card h3,
+        .glow-on-scroll h2 {
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 800;
+        }
+
+
     </style>
 </head>
 <body class="bg-[#071426] text-white font-sans antialiased">
@@ -784,7 +799,7 @@
     {{-- ============================================
          SERVICES
     ============================================ --}}
-    <section id="services" class="py-24 sm:py-32 relative" style="background: linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
+    <section id="services" class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50 Q25 30 50 50 T100 50' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 70 Q25 50 50 70 T100 70' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 30 Q25 10 50 30 T100 30' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E&quot;); background-size: 200px 100px;"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-10">
 
@@ -901,7 +916,7 @@
     {{-- ============================================
          HOW IT WORKS
     ============================================ --}}
-    <section class="py-24 sm:py-32 relative" style="background: linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
+    <section class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50 Q25 30 50 50 T100 50' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 70 Q25 50 50 70 T100 70' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 30 Q25 10 50 30 T100 30' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E&quot;); background-size: 200px 100px;"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-10">
 
@@ -952,7 +967,7 @@
     {{-- ============================================
          FINAL CTA
     ============================================ --}}
-    <section class="py-24 sm:py-32 relative" style="background: linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
+    <section class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50 Q25 30 50 50 T100 50' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 70 Q25 50 50 70 T100 70' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 30 Q25 10 50 30 T100 30' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E&quot;); background-size: 200px 100px;"></div>
         <div class="relative z-10 max-w-3xl mx-auto px-6 lg:px-10 text-center reveal-scale glow-on-scroll">
             <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
