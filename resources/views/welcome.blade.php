@@ -8,6 +8,19 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        :root {
+            --navy: #071426;
+            --navy-2: #0b1b31;
+            --blue: #122c4d;
+            --blue-light: #193b65;
+            --yellow: #ffb703;
+            --yellow-light: #ffc72c;
+            --white: #ffffff;
+            --text: #e6edf5;
+            --muted: #91a1b5;
+            --line: rgba(255,255,255,.12);
+        }
+
         /* =====================================================
            HERO SECTION
         ===================================================== */
@@ -497,6 +510,18 @@
         }
 
         /* =====================================================
+           UNIFIED YELLOW — All sections
+        ===================================================== */
+
+        .text-yellow-400 { color: var(--yellow) !important; }
+        .hover\:text-yellow-300:hover { color: var(--yellow-light) !important; }
+        .bg-yellow-500 { background-color: var(--yellow) !important; }
+        .hover\:bg-yellow-400:hover { background-color: var(--yellow-light) !important; }
+        .bg-yellow-500\/10 { background-color: rgba(255,183,3,.10) !important; }
+        .hover\:shadow-yellow-500\/30 { --tw-shadow-color: rgba(255,183,3,.30); }
+        .border-yellow-500 { border-color: var(--yellow) !important; }
+
+        /* =====================================================
            SHARED SCROLL REVEAL
         ===================================================== */
 
@@ -542,21 +567,53 @@
          NAVIGATION
     ============================================ --}}
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="main-nav">
-        <div class="max-w-7xl mx-auto px-6 lg:px-10 h-18 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-3">
-                <img src="{{ asset('IMAGES/Logo dominium.png') }}" alt="DOMINIUM TECH" class="h-10 w-auto" id="nav-logo">
-                <span class="text-lg font-bold tracking-tight text-white transition-colors duration-300" id="nav-brand">DOMINIUM TECH</span>
-            </a>
-            <div class="flex items-center gap-3">
-                <a href="{{ route('questionnaire.index') }}"
-                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300"
-                   id="nav-cta">
-                    Démarrer un projet
-                    <i class="fa-solid fa-arrow-right w-4 h-4"></i>
-                </a>
+    <div
+        class="flex items-center justify-between"
+        style="padding-left: 7%; padding-right: 4%; min-height: 110px;"
+    >
+
+        <a href="/" class="flex items-center">
+
+            <img
+    src="{{ asset('IMAGES/Logo dominium.png') }}"
+    alt="DOMINIUM TECH"
+    class="h-24 w-auto opacity-100"
+    style="filter: brightness(0) saturate(100%) invert(67%) sepia(96%) saturate(1200%) hue-rotate(2deg) brightness(94%) contrast(93%);"
+>
+
+            <div class="flex flex-col justify-center -ml-5 mt-1">
+                <span
+                    class="text-2xl font-black tracking-tight text-white transition-colors duration-300 leading-none"
+                    id="nav-brand"
+                >
+                    DOMINIUM
+                </span>
+
+                <span
+                    class="text-[10px] font-bold tracking-[0.3em] uppercase leading-none mt-1"
+                    style="color: var(--yellow);"
+                >
+                    TECH
+                </span>
             </div>
+
+        </a>
+
+        <div class="flex items-center gap-4">
+
+            <a
+                href="{{ route('questionnaire.index') }}"
+                class="inline-flex items-center gap-2.5 px-6 py-3 rounded-lg text-sm font-bold transition-all duration-300"
+                id="nav-cta"
+            >
+                Démarrer un projet
+                <i class="fa-solid fa-arrow-right w-4 h-4"></i>
+            </a>
+
         </div>
-    </nav>
+
+    </div>
+</nav>
 
 
     {{-- ============================================
@@ -849,16 +906,38 @@
          FOOTER
     ============================================ --}}
     <footer class="py-8 border-t border-white/10" style="background: #071426;">
-        <div class="max-w-7xl mx-auto px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <img src="{{ asset('IMAGES/Logo dominium.png') }}" alt="DOMINIUM TECH" class="h-6 w-auto opacity-60">
-                <span class="text-sm font-bold text-white/60 tracking-tight">DOMINIUM TECH</span>
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-1">
+
+        <div class="flex items-center">
+
+            <img
+                src="{{ asset('IMAGES/Logo dominium.png') }}"
+                alt="DOMINIUM TECH"
+                class="h-40 w-auto opacity-100"
+                style="filter: brightness(0) saturate(100%) invert(67%) sepia(96%) saturate(1200%) hue-rotate(2deg) brightness(94%) contrast(93%);"
+            >
+
+            <div class="flex flex-col justify-center -ml-10 mt-2">
+                <span class="text-sm font-bold text-white/60 tracking-tight leading-none">
+                    DOMINIUM
+                </span>
+
+                <span
+                    class="text-[10px] font-bold tracking-[0.3em] uppercase leading-none mt-1"
+                    style="color: var(--yellow);"
+                >
+                    TECH
+                </span>
             </div>
-            <p class="text-xs text-white/30">
-                &copy; {{ date('Y') }} DOMINIUM TECH. Tous droits réservés.
-            </p>
+
         </div>
-    </footer>
+
+        <p class="text-xs text-white/30">
+            &copy; {{ date('Y') }} DOMINIUM TECH. Tous droits réservés.
+        </p>
+
+    </div>
+</footer>
 
 
     {{-- ============================================
@@ -870,6 +949,7 @@
         const nav = document.getElementById('main-nav');
         const navCta = document.getElementById('nav-cta');
         const navBrand = document.getElementById('nav-brand');
+        const navTech = navBrand ? navBrand.nextElementSibling : null;
 
         function updateNav() {
             if (window.scrollY > 60) {
@@ -879,6 +959,7 @@
                 navCta.classList.remove('bg-white/10', 'text-white', 'border', 'border-white/20');
                 navBrand.classList.add('text-slate-900');
                 navBrand.classList.remove('text-white');
+                if (navTech) { navTech.style.color = '#071426'; }
             } else {
                 nav.classList.remove('bg-white/95', 'backdrop-blur-xl', 'border-b', 'border-[var(--color-border-subtle)]', 'shadow-sm');
                 nav.classList.add('bg-transparent');
@@ -886,6 +967,7 @@
                 navCta.classList.add('bg-white/10', 'text-white', 'border', 'border-white/20');
                 navBrand.classList.remove('text-slate-900');
                 navBrand.classList.add('text-white');
+                if (navTech) { navTech.style.color = ''; }
             }
         }
         updateNav();
