@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DOMINIUM TECH — Agence digitale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -21,6 +24,8 @@
             --line: rgba(255,255,255,.12);
         }
 
+        body { font-family: 'DM Sans', sans-serif; }
+
         /* =====================================================
            HERO SECTION
         ===================================================== */
@@ -33,8 +38,8 @@
             overflow: hidden;
             padding: 130px 7% 120px;
             background:
-                radial-gradient(circle at 82% 45%, rgba(35, 76, 122, .45), transparent 34%),
-                radial-gradient(circle at 15% 20%, rgba(255,183,3,.05), transparent 28%),
+                radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%),
+                radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%),
                 linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
         }
 
@@ -673,6 +678,7 @@
         {{-- Decorations --}}
         <div class="background-ring"></div>
         <div class="background-line"></div>
+        <div class="absolute inset-0 opacity-[0.025] pointer-events-none" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50 Q25 30 50 50 T100 50' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 70 Q25 50 50 70 T100 70' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 30 Q25 10 50 30 T100 30' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E&quot;); background-size: 200px 100px;"></div>
 
         {{-- ==========================================
              CONTENU

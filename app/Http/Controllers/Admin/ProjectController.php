@@ -20,7 +20,8 @@ class ProjectController extends Controller
         }
 
         if ($request->filled('type')) {
-            $query->whereRaw('project_type LIKE ?', ['%"'.$request->type.'"%']);
+            $type = str_replace(['%', '_'], ['\\%', '\\_'], $request->type);
+            $query->whereRaw('project_type LIKE ? ESCAPE ?', ['%"'.$type.'"%', '\\']);
         }
 
         if ($request->filled('search')) {

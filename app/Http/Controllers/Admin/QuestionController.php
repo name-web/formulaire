@@ -124,7 +124,7 @@ class QuestionController extends Controller
 
         $question->update($validated);
 
-        if (isset($options)) {
+        if (! empty($options)) {
             $existingIds = collect($options)->pluck('id')->filter()->toArray();
 
             $question->options()->whereNotIn('id', $existingIds)->delete();

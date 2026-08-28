@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -38,7 +37,6 @@ class UserController extends Controller
             'role' => ['required', 'in:'.implode(',', array_keys(config('user_roles.roles')))],
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
         $validated['is_active'] = true;
 
         User::create($validated);

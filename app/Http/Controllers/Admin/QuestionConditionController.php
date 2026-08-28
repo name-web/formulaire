@@ -19,7 +19,7 @@ class QuestionConditionController extends Controller
             'text_value' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $validated['sort_order'] = $question->conditions()->max('sort_order') + 1;
+        $validated['sort_order'] = ($question->conditions()->max('sort_order') ?? 0) + 1;
 
         $question->conditions()->create($validated);
 
