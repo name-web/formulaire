@@ -31,7 +31,7 @@
             display: flex;
             align-items: center;
             overflow: hidden;
-            padding: 90px 7% 120px;
+            padding: 130px 7% 120px;
             background:
                 radial-gradient(circle at 82% 45%, rgba(35, 76, 122, .45), transparent 34%),
                 radial-gradient(circle at 15% 20%, rgba(255,183,3,.05), transparent 28%),
@@ -299,6 +299,55 @@
             inset: 0;
             background: linear-gradient(180deg, rgba(7,20,38,.02) 30%, rgba(7,20,38,.18) 60%, rgba(7,20,38,.86) 100%);
             pointer-events: none;
+            z-index: 1;
+        }
+
+        /* =====================================================
+           IMAGE SLIDESHOW
+        ===================================================== */
+
+        .hero-slideshow {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 0;
+            animation: heroSlideFade 18s linear infinite;
+        }
+
+        .hero-slide:first-child {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .hero-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(.88) contrast(1.08);
+            transition: transform .7s ease;
+        }
+
+        .hero-slide:nth-child(1) { animation-delay: 0s; }
+        .hero-slide:nth-child(2) { animation-delay: 3.6s; }
+        .hero-slide:nth-child(3) { animation-delay: 7.2s; }
+        .hero-slide:nth-child(4) { animation-delay: 10.8s; }
+        .hero-slide:nth-child(5) { animation-delay: 14.4s; }
+
+        @keyframes heroSlideFade {
+            0%    { opacity: 0; }
+            2%    { opacity: 1; }
+            18%   { opacity: 1; }
+            20%   { opacity: 0; }
+            100%  { opacity: 0; }
         }
 
         /* =====================================================
@@ -424,7 +473,7 @@
         @media (max-width: 850px) {
             .hero-section {
                 min-height: auto;
-                padding: 85px 7% 120px;
+                padding: 120px 7% 120px;
                 flex-direction: column;
             }
             .hero-content {
@@ -463,7 +512,7 @@
 
         @media (max-width: 600px) {
             .hero-section {
-                padding: 65px 20px 90px;
+                padding: 100px 20px 90px;
             }
             .hero-title {
                 font-size: 2.85rem;
@@ -685,10 +734,23 @@
 
         <div class="hero-visual">
             <div class="image-container">
-                <img
-                    src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=90"
-                    alt="Équipe travaillant sur un projet numérique"
-                >
+                <div class="hero-slideshow">
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&q=85&auto=format&fit=crop" alt="Équipe travaillant sur un projet">
+                    </div>
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=85&auto=format&fit=crop" alt="Collaboration digitale">
+                    </div>
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=1200&q=85&auto=format&fit=crop" alt="Réunion de projet">
+                    </div>
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=85&auto=format&fit=crop" alt="Travail en équipe">
+                    </div>
+                    <div class="hero-slide">
+                        <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&q=85&auto=format&fit=crop" alt="Stratégie digitale">
+                    </div>
+                </div>
                 <div class="image-pattern"></div>
                 <div class="image-caption">
                     <span class="caption-line"></span>
