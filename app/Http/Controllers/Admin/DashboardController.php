@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Project;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -31,6 +32,7 @@ class DashboardController extends Controller
             ->get();
 
         $recentClients = Client::withCount('projects')
+            ->whereHas('projects', fn ($q) => $q->where('status', 'submitted'))
             ->latest()
             ->take(config('dashboard.recent_clients_count', 5))
             ->get();
@@ -51,25 +53,17 @@ class DashboardController extends Controller
         ));
     }
 
-    private function getProjectsByType()
+    private function getProjectsByType(): Collection
     {
-        return Project::selectRaw('project_type, COUNT(*) as count')
-            ->groupBy('project_type')
-            ->get()
-            ->flatMap(function ($item) {
-                $types = is_array($item->project_type) ? $item->project_type : [$item->project_type];
-
-                return collect($types)->map(fn ($t) => ['type' => $t, 'count' => 1]);
-            })
-            ->groupBy('type')
-            ->map(fn ($group) => $group->count())
-            ->mapWithKeys(fn ($count, $type) => [
-                $type => [
-                    'label' => config("project_types.types.{$type}.label", $type),
-                    'icon' => config("project_types.types.{$type}.icon", 'fa-solid fa-folder'),
-                    'color' => config("project_types.types.{$type}.color", '#3b82f6'),
-                    'count' => $count,
-                ],
+        return Project::get(['project_type'])
+            ->flatMap(fn (Project $project) => is_array($project->project_type) ? $project->project_type : [$project->project_type])
+            ->countBy()
+            ->map(fn (int $count, string $type) => [
+                'type' => $type,
+                'label' => config("project_types.types.{$type}.label", $type),
+                'icon' => config("project_types.types.{$type}.icon", 'fa-solid fa-folder'),
+                'color' => config("project_types.types.{$type}.color", '#3b82f6'),
+                'count' => $count,
             ])
             ->sortByDesc('count')
             ->values();
@@ -92,17 +86,16 @@ class DashboardController extends Controller
             ]);
     }
 
-    private function getSubmissionsByMonth()
+    private function getSubmissionsByMonth(): Collection
     {
         $months = config('dashboard.months', []);
         $monthsBack = config('dashboard.months_back', 6);
 
         return Project::where('created_at', '>=', Carbon::now()->subMonths($monthsBack)->startOfMonth())
-            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count")
-            ->groupBy('month')
-            ->orderBy('month')
-            ->pluck('count', 'month')
-            ->mapWithKeys(fn ($count, $month) => [
+            ->get(['created_at'])
+            ->countBy(fn (Project $project) => $project->created_at->format('Y-m'))
+            ->sortKeys()
+            ->mapWithKeys(fn (int $count, string $month) => [
                 $months[substr($month, 5)] ?? $month => $count,
             ]);
     }

@@ -11,7 +11,6 @@ class QuestionService
     public function getForProjectType(string $projectType): Collection
     {
         return Question::where('is_active', true)
-            ->whereNull('deleted_at')
             ->whereJsonContains('project_types', $projectType)
             ->orderBy('sort_order')
             ->get();
@@ -20,7 +19,6 @@ class QuestionService
     public function getForProjectTypes(array $projectTypes): Collection
     {
         $query = Question::where('is_active', true)
-            ->whereNull('deleted_at')
             ->orderBy('sort_order');
 
         $query->where(function ($q) use ($projectTypes) {
@@ -61,7 +59,6 @@ class QuestionService
     {
         return Question::where('id', $questionId)
             ->where('is_active', true)
-            ->whereNull('deleted_at')
             ->first();
     }
 }

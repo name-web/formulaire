@@ -27,7 +27,7 @@ class QuestionController extends Controller
             $query->where('is_active', $request->status === 'active');
         }
 
-        $questions = $query->orderBy('sort_order')->paginate(20)->withQueryString();
+        $questions = $query->orderBy('sort_order')->paginate(10)->withQueryString();
 
         return view('admin.questions.index', compact('questions'));
     }

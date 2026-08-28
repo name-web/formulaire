@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\Question;
 use Database\Seeders\QuestionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class UserQuestionnaireFlowTest extends TestCase
@@ -20,23 +20,25 @@ class UserQuestionnaireFlowTest extends TestCase
 
     private function seedCountriesCache(): void
     {
-        Cache::shouldReceive('remember')
-            ->once()
-            ->with('countriesnow_all', 86400, \Mockery::type('callable'))
-            ->andReturn([
-                [
-                    'iso2' => 'CI',
-                    'iso3' => 'CIV',
-                    'country' => "Côte d'Ivoire",
-                    'cities' => ['Abidjan', 'Bouaké', 'Yamoussoukro'],
+        Http::fake([
+            'countriesnow.space/api/v0.1/countries' => Http::response([
+                'error' => false,
+                'data' => [
+                    [
+                        'iso2' => 'CI',
+                        'iso3' => 'CIV',
+                        'country' => "Côte d'Ivoire",
+                        'cities' => ['Abidjan', 'Bouaké', 'Yamoussoukro'],
+                    ],
+                    [
+                        'iso2' => 'FR',
+                        'iso3' => 'FRA',
+                        'country' => 'France',
+                        'cities' => ['Paris', 'Marseille', 'Lyon'],
+                    ],
                 ],
-                [
-                    'iso2' => 'FR',
-                    'iso3' => 'FRA',
-                    'country' => 'France',
-                    'cities' => ['Paris', 'Marseille', 'Lyon'],
-                ],
-            ]);
+            ]),
+        ]);
     }
 
     public function test_index_page_loads(): void

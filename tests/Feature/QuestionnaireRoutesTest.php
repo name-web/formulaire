@@ -8,7 +8,6 @@ use App\Models\Project;
 use App\Models\Question;
 use App\Models\QuestionOption;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -17,28 +16,30 @@ class QuestionnaireRoutesTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Seed the CountriesNow API cache so tests can submit country/city
+     * Fake the CountriesNow API so tests can submit country/city
      * without hitting the real external API.
      */
     private function seedCountriesCache(): void
     {
-        Cache::shouldReceive('remember')
-            ->once()
-            ->with('countriesnow_all', 86400, \Mockery::type('callable'))
-            ->andReturn([
-                [
-                    'iso2' => 'CI',
-                    'iso3' => 'CIV',
-                    'country' => "Côte d'Ivoire",
-                    'cities' => ['Abidjan', 'Bouaké', 'Yamoussoukro'],
+        Http::fake([
+            'countriesnow.space/api/v0.1/countries' => Http::response([
+                'error' => false,
+                'data' => [
+                    [
+                        'iso2' => 'CI',
+                        'iso3' => 'CIV',
+                        'country' => "Côte d'Ivoire",
+                        'cities' => ['Abidjan', 'Bouaké', 'Yamoussoukro'],
+                    ],
+                    [
+                        'iso2' => 'FR',
+                        'iso3' => 'FRA',
+                        'country' => 'France',
+                        'cities' => ['Paris', 'Marseille', 'Lyon'],
+                    ],
                 ],
-                [
-                    'iso2' => 'FR',
-                    'iso3' => 'FRA',
-                    'country' => 'France',
-                    'cities' => ['Paris', 'Marseille', 'Lyon'],
-                ],
-            ]);
+            ]),
+        ]);
     }
 
     public function test_questionnaire_index_page_loads(): void

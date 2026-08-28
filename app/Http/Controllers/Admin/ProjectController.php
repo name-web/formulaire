@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Project::with('client');
+        $query = Project::with('client')->withCount('answers');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -24,12 +25,14 @@ class ProjectController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('client', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('company_name', 'like', "%{$search}%");
-            })->orWhere('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('client', function ($client) use ($search) {
+                    $client->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('company_name', 'like', "%{$search}%");
+                })->orWhere('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
         }
 
         if ($request->filled('date_from')) {
@@ -40,18 +43,20 @@ class ProjectController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $projects = $query->latest()->paginate(15)->withQueryString();
-
         $totalResults = $query->count();
+        $projects = $query->latest()->paginate(10)->withQueryString();
 
         return view('admin.projects.index', compact('projects', 'totalResults'));
     }
 
-    public function show(Project $project): View
+    public function show(Request $request, Project $project): View
     {
         $project->load(['client', 'answers.question', 'answers.answerOptions.questionOption', 'files', 'notes.user']);
 
-        $answers = $project->answers->map(function ($answer) {
+        $perPage = 10;
+        $page = $request->input('answers_page', 1);
+
+        $allAnswers = $project->answers->map(function ($answer) {
             $question = $answer->question;
             $displayValue = $answer->getDisplayValue();
             $selectValues = $answer->getSelectValues();
@@ -59,9 +64,22 @@ class ProjectController extends Controller
             return compact('answer', 'question', 'displayValue', 'selectValues');
         });
 
+        $total = $allAnswers->count();
+        $answers = $allAnswers->forPage($page, $perPage);
         $groupedAnswers = $answers->groupBy(fn ($item) => $item['question']->group_label ?? 'Informations');
 
-        return view('admin.projects.show', compact('project', 'answers', 'groupedAnswers'));
+        $answersPaginator = new Paginator(
+            $answers,
+            $total,
+            $perPage,
+            $page,
+            [
+                'path' => route('admin.projects.show', $project),
+                'pageName' => 'answers_page',
+            ]
+        );
+
+        return view('admin.projects.show', compact('project', 'answers', 'groupedAnswers', 'answersPaginator'));
     }
 
     public function updateStatus(Request $request, Project $project): RedirectResponse

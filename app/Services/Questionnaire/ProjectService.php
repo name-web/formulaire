@@ -78,7 +78,6 @@ class ProjectService
             }
         })
             ->where('is_active', true)
-            ->whereNull('deleted_at')
             ->pluck('id');
 
         $newQuestions = Question::where(function ($query) use ($newTypes) {
@@ -87,7 +86,6 @@ class ProjectService
             }
         })
             ->where('is_active', true)
-            ->whereNull('deleted_at')
             ->pluck('id');
 
         $incompatibleQuestionIds = $oldQuestions->diff($newQuestions);

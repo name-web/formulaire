@@ -1,111 +1,137 @@
 <x-layouts.admin :title="'Dashboard'">
-    <div class="admin-header">
-        <div>
-            <h1 class="admin-title">Dashboard</h1>
-            <p class="admin-subtitle">Vue d'ensemble</p>
-        </div>
-    </div>
 
+    {{-- Intro --}}
+    <section class="intro">
+        <div>
+            <div class="intro-label">
+                <span></span>
+                Vue générale
+            </div>
+            <h1>Tableau de bord</h1>
+            <p>Suivez les demandes et les cahiers des charges.</p>
+        </div>
+        <div style="color:var(--muted);font-size:13px;">{{ now()->translatedFormat('l d M Y') }}</div>
+    </section>
+
+    {{-- Stats --}}
     @php
         $statCards = [];
         foreach(config('dashboard.stat_cards') as $cardConfig) {
-            if (($stats[$cardConfig['key']] ?? 0) > 0) {
-                $statCards[] = [
-                    'icon'  => $cardConfig['icon'],
-                    'color' => $cardConfig['color'],
-                    'bg'    => $cardConfig['bg'],
-                    'value' => $stats[$cardConfig['key']],
-                    'label' => $cardConfig['label'],
-                ];
-            }
+            $statCards[] = [
+                'icon'  => $cardConfig['icon'],
+                'value' => $stats[$cardConfig['key']] ?? 0,
+                'label' => $cardConfig['label'],
+            ];
         }
+        $total = $stats['total_projects'] ?? 0;
+        $submitted = $stats['submitted_projects'] ?? 0;
+        $pct = $total > 0 ? round(($submitted / $total) * 100) : 0;
     @endphp
 
-    @if(count($statCards) > 0)
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:32px;">
-            @foreach($statCards as $card)
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:{{ $card['bg'] }};color:{{ $card['color'] }};"><i class="{{ $card['icon'] }}"></i></div>
-                    <div class="stat-value">{{ $card['value'] }}</div>
-                    <div class="stat-label">{{ $card['label'] }}</div>
+    <section class="stats">
+        @foreach($statCards as $i => $card)
+            <article class="stat {{ $i === 0 ? 'main-stat' : '' }}">
+                <div class="stat-label">{{ $card['label'] }}</div>
+                <div class="stat-number">{{ $card['value'] }}</div>
+                <div class="stat-info">
+                    @if($i === 0 && $total > 0)
+                        {{ $pct }}% finalisés
+                    @elseif($i === 1)
+                        Prêts pour développement
+                    @elseif($i === 2)
+                        À traiter
+                    @else
+                        Formulaires complets
+                    @endif
                 </div>
-            @endforeach
-        </div>
-    @endif
+            </article>
+        @endforeach
+    </section>
 
-    <div style="display:grid; grid-template-columns:2fr 1fr; gap:24px;">
-        <div class="admin-card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-                <h3 style="font-size:14px;font-weight:800;color:white;">Projets récents</h3>
-                <a href="{{ route('admin.projects.index') }}" class="admin-btn btn-secondary btn-sm">Voir tout</a>
+    {{-- Content --}}
+    <section class="content">
+
+        {{-- Projects table --}}
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Dernières demandes</div>
+                    <div class="card-subtitle">Les demandes les plus récentes</div>
+                </div>
+                <a href="{{ route('admin.projects.index') }}" class="view-all">Voir tout →</a>
             </div>
+
+            <div class="table-head">
+                <div>Client</div>
+                <div>Projet</div>
+                <div>Date</div>
+                <div>Statut</div>
+                <div></div>
+            </div>
+
             @if($recentProjects->isEmpty())
-                <div style="text-align:center;padding:32px 0;">
-                    <i class="fa-solid fa-folder-open" style="font-size:28px;color:var(--muted);margin-bottom:10px;display:block;"></i>
-                    <p style="color:var(--muted);font-size:12px;">Aucun projet.</p>
+                <div class="empty-state">
+                    <i class="fa-regular fa-folder-open"></i>
+                    <p>Aucune demande pour le moment.</p>
                 </div>
             @else
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Client</th>
-                            <th>Type</th>
-                            <th>Statut</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($recentProjects as $project)
-                            <tr style="cursor:pointer;" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
-                                <td>
-                                    <span style="color:rgba(255,255,255,0.85);font-weight:600;">
-                                        {{ $project->client->name ?? '—' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @php $typeLabels = $project->type_labels; @endphp
-                                    <span style="font-size:11px;color:var(--text);">{{ $typeLabels ?: '—' }}</span>
-                                </td>
-                                <td>
-                                    @php $sc = \App\Models\Project::getStatusConfig($project->status); @endphp
-                                    <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>
-                                </td>
-                                <td style="font-size:11px;color:var(--muted);">{{ $project->created_at->format('d/m/Y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                @foreach($recentProjects as $project)
+                    <div class="table-row" style="cursor:pointer;" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
+                        <div class="client">
+                            <div class="client-avatar">{{ strtoupper(substr($project->client->name ?? '?', 0, 2)) }}</div>
+                            <div>
+                                <div class="client-name">{{ $project->client->name ?? '—' }}</div>
+                                <div class="client-email">{{ $project->client->email ?? '' }}</div>
+                            </div>
+                        </div>
+                        <div class="project">{{ $project->type_labels ?: '—' }}</div>
+                        <div class="date">{{ $project->created_at->format('d M') }}</div>
+                        <div>
+                            @php $sc = \App\Models\Project::getStatusConfig($project->status); @endphp
+                            <span class="status {{ in_array($project->status, ['completed','submitted']) ? 'done' : '' }}">{{ $sc['label'] }}</span>
+                        </div>
+                        <a href="{{ route('admin.projects.show', $project) }}" class="open">↗</a>
+                    </div>
+                @endforeach
             @endif
         </div>
 
-        <div class="admin-card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-                <h3 style="font-size:14px;font-weight:800;color:white;">Clients récents</h3>
-                <a href="{{ route('admin.clients.index') }}" class="admin-btn btn-secondary btn-sm">Voir tout</a>
-            </div>
-            @if($recentClients->isEmpty())
-                <div style="text-align:center;padding:32px 0;">
-                    <i class="fa-solid fa-users" style="font-size:28px;color:var(--muted);margin-bottom:10px;display:block;"></i>
-                    <p style="color:var(--muted);font-size:12px;">Aucun client.</p>
+        {{-- Right panel --}}
+        <aside class="card">
+            {{-- Progression --}}
+            <div class="side-section">
+                <div class="side-heading">Progression</div>
+                <div class="completion-number">
+                    <strong>{{ $pct }}%</strong>
+                    <span>{{ $submitted }}/{{ $total }} demandes</span>
                 </div>
-            @else
-                <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="progress"><span style="width:{{ $pct }}%"></span></div>
+            </div>
+
+            {{-- Clients --}}
+            <div class="side-section">
+                <div class="side-heading">Clients récents</div>
+                @if($recentClients->isEmpty())
+                    <p style="color:var(--muted);font-size:13px;">Aucun client.</p>
+                @else
                     @foreach($recentClients as $client)
-                        <a href="{{ route('admin.clients.show', $client) }}" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
-                            <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:#a78bfa;font-weight:800;">
-                                {{ strtoupper(substr($client->name, 0, 1)) }}
-                            </div>
-                            <div style="flex:1;min-width:0;">
-                                <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $client->name }}</div>
-                                <div style="font-size:11px;color:var(--muted);">{{ $client->email }}</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="font-size:11px;color:var(--muted);">{{ $client->projects_count }} projet{{ $client->projects_count > 1 ? 's' : '' }}</div>
+                        <a href="{{ route('admin.clients.show', $client) }}" class="activity" style="text-decoration:none;">
+                            <div class="activity-dot"></div>
+                            <div>
+                                <div class="activity-title">{{ $client->name }}</div>
+                                <div class="activity-time">{{ $client->email }}</div>
                             </div>
                         </a>
                     @endforeach
-                </div>
-            @endif
-        </div>
-    </div>
+                @endif
+            </div>
+
+            {{-- Action --}}
+            <div class="side-section">
+                <a href="{{ route('admin.projects.index') }}" class="quick-action">+ Voir tous les projets</a>
+            </div>
+        </aside>
+
+    </section>
+
 </x-layouts.admin>

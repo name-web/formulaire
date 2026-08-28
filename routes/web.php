@@ -8,24 +8,19 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\QuestionOptionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CountryController;
-use App\Http\Controllers\DeepSeekController;
 use App\Http\Controllers\QuestionnaireController;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-Route::post('/api/deepseek/chat', [DeepSeekController::class, 'chat'])->withoutMiddleware([VerifyCsrfToken::class]);
-Route::post('/api/deepseek/ask', [DeepSeekController::class, 'ask'])->withoutMiddleware([VerifyCsrfToken::class]);
-
 Route::get('/api/countries', [CountryController::class, 'index'])->name('api.countries');
 Route::get('/api/countries/{iso2}/cities', [CountryController::class, 'cities'])->name('api.cities');
 
 Route::prefix('questionnaire')->name('questionnaire.')->group(function () {
     Route::get('/', [QuestionnaireController::class, 'index'])->name('index');
-    Route::post('/start', [QuestionnaireController::class, 'start'])->name('start');
+    Route::post('/start', [QuestionnaireController::class, 'start'])->middleware('throttle:5,1')->name('start');
 
     Route::get('/wizard', [QuestionnaireController::class, 'wizard'])->name('wizard');
     Route::post('/wizard', [QuestionnaireController::class, 'submitWizard'])->name('wizard.submit');
@@ -60,9 +55,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('users', UserController::class)->only(['index', 'store', 'update']);
     Route::patch('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
 
-    Route::resource('questions', QuestionController::class);
     Route::patch('questions/reorder', [QuestionController::class, 'reorder'])->name('questions.reorder');
     Route::patch('questions/{question}/toggle', [QuestionController::class, 'toggleActive'])->name('questions.toggle');
+    Route::resource('questions', QuestionController::class)->except(['show']);
 
     Route::resource('questions/{question}/options', QuestionOptionController::class)->only(['store', 'update', 'destroy']);
     Route::resource('questions/{question}/conditions', QuestionConditionController::class)->only(['store', 'update', 'destroy']);

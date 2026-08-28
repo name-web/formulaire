@@ -109,9 +109,31 @@ class QuestionnaireController extends Controller
         $projectType = session('project_type');
         abort_unless($projectId && $projectType, 404);
 
-        $answers = $request->input('answers', []);
+        $answers = collect($request->input('answers', []))
+            ->map(function ($data) {
+                if (isset($data['option_ids']) && is_array($data['option_ids'])) {
+                    $data['option_ids'] = array_values(array_filter(
+                        $data['option_ids'],
+                        fn ($id) => $id !== null && $id !== ''
+                    ));
+                }
 
-        DB::transaction(function () use ($projectId, $answers) {
+                return $data;
+            })
+            ->all();
+
+        $request->merge(['answers' => $answers]);
+
+        $request->validate([
+            'answers' => ['nullable', 'array'],
+            'answers.*' => ['array'],
+            'answers.*.value' => ['nullable', 'string', 'max:5000'],
+            'answers.*.other_value' => ['nullable', 'string', 'max:500'],
+            'answers.*.option_ids' => ['nullable', 'array'],
+            'answers.*.option_ids.*' => ['integer'],
+        ]);
+
+        DB::transaction(function () use ($request, $projectId, $answers) {
             foreach ($answers as $questionId => $data) {
                 $questionId = (int) $questionId;
                 $question = Question::find($questionId);
@@ -122,12 +144,24 @@ class QuestionnaireController extends Controller
                 $questionData = $data;
 
                 if ($question->type === 'file' && $request->hasFile("answers.{$questionId}.file")) {
+                    $request->validate([
+                        "answers.{$questionId}.file" => ['required', 'file', 'max:5120', 'mimes:png,jpg,jpeg,gif,pdf,svg,doc,docx,xls,xlsx,zip'],
+                    ]);
                     $filePath = $this->fileService->storeAnswerFile(
                         $request->file("answers.{$questionId}.file"),
                         $projectId
                     );
                     $questionData['file_path'] = $filePath;
                     unset($questionData['file']);
+                }
+
+                // Only keep option ids that actually belong to this question
+                if (isset($questionData['option_ids']) && is_array($questionData['option_ids'])) {
+                    $validOptionIds = $question->options()
+                        ->whereIn('id', $questionData['option_ids'])
+                        ->pluck('id')
+                        ->all();
+                    $questionData['option_ids'] = $validOptionIds;
                 }
 
                 $hasContent = false;

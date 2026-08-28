@@ -75,9 +75,4 @@ class Project extends Model
     {
         return self::getStatusConfig($this->status)['class'];
     }
-
-    public function getAnswersCountAttribute(): int
-    {
-        return $this->answers->count();
-    }
 }
