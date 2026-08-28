@@ -3,20 +3,18 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     public function run(): void
     {
         User::updateOrCreate(
             ['email' => 'kamallareleve233@gmail.com'],
             [
                 'name' => 'Kamal Admin',
-                'password' => 'Kamal222.com',
+                'password' => Hash::make('Kamal222.com'),
                 'role' => 'admin',
                 'is_active' => true,
             ]

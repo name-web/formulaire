@@ -15,17 +15,17 @@
             @if($answers->isEmpty())
                 <div class="admin-card">
                     <div style="text-align:center;padding:36px 0;">
-                        <i class="fa-solid fa-clipboard-question" style="font-size:32px;color:var(--text-muted);margin-bottom:12px;display:block;"></i>
-                        <p style="color:var(--text-muted);font-size:13px;">Aucune réponse enregistrée.</p>
+                        <i class="fa-solid fa-clipboard-question" style="font-size:32px;color:var(--muted);margin-bottom:12px;display:block;"></i>
+                        <p style="color:var(--muted);font-size:13px;">Aucune réponse enregistrée.</p>
                     </div>
                 </div>
             @else
                 @foreach($groupedAnswers as $sectionLabel => $sectionAnswers)
                     <div class="admin-card">
                         <h3 style="font-size:15px;font-weight:800;color:white;margin-bottom:18px;">
-                            <i class="fa-solid {{ \App\Models\Project::getSectionIcon($sectionLabel) }}" style="color:var(--blue-light);margin-right:8px;"></i>
+                            <i class="fa-solid {{ \App\Models\Project::getSectionIcon($sectionLabel) }}" style="color:var(--yellow);margin-right:8px;"></i>
                             {{ $sectionLabel }}
-                            <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-left:8px;">{{ $sectionAnswers->count() }}</span>
+                            <span style="font-size:11px;color:var(--muted);font-weight:600;margin-left:8px;">{{ $sectionAnswers->count() }}</span>
                         </h3>
 
                         @foreach($sectionAnswers as $item)
@@ -70,7 +70,7 @@
 
                                         {{-- File: link to download --}}
                                         @elseif($question->type === 'file' && $answer->file_path)
-                                            <a href="{{ asset('storage/' . $answer->file_path) }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:var(--blue-light);text-decoration:none;font-weight:600;">
+                                            <a href="{{ asset('storage/' . $answer->file_path) }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:var(--yellow);text-decoration:none;font-weight:600;">
                                                 <i class="fa-solid fa-paperclip"></i> Fichier joint
                                             </a>
 
@@ -83,16 +83,16 @@
                                             {{ $displayValue }}
                                         @endif
                                     @else
-                                        <span style="color:var(--text-muted);font-style:italic;font-size:12px;">Non répondu</span>
+                                        <span style="color:var(--muted);font-style:italic;font-size:12px;">Non répondu</span>
                                     @endif
                                 </div>
                                 @if(!empty($answer->other_value) && $question->type !== 'multiselect')
-                                    <div style="margin-top:6px;font-size:12px;color:var(--text-muted);">
+                                    <div style="margin-top:6px;font-size:12px;color:var(--muted);">
                                         Précision : <span style="color:rgba(255,255,255,0.7);">{{ $answer->other_value }}</span>
                                     </div>
                                 @endif
                                 @if($question->help_text)
-                                    <div style="margin-top:4px;font-size:11px;color:var(--text-muted);">
+                                    <div style="margin-top:4px;font-size:11px;color:var(--muted);">
                                         <i class="fa-solid fa-circle-info" style="margin-right:4px;"></i>{{ $question->help_text }}
                                     </div>
                                 @endif
@@ -106,18 +106,18 @@
             @if($project->files->isNotEmpty())
                 <div class="admin-card">
                     <h3 style="font-size:15px;font-weight:800;color:white;margin-bottom:18px;">
-                        <i class="fa-solid fa-paperclip" style="color:var(--blue-light);margin-right:8px;"></i>
+                        <i class="fa-solid fa-paperclip" style="color:var(--yellow);margin-right:8px;"></i>
                         Fichiers joints ({{ $project->files->count() }})
                     </h3>
                     <div style="display:flex;flex-direction:column;gap:8px;">
                         @foreach($project->files as $file)
                             <a href="{{ asset('storage/' . $file->stored_path) }}" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
-                                <i class="fa-solid fa-file" style="color:var(--blue-light);font-size:16px;"></i>
+                                <i class="fa-solid fa-file" style="color:var(--yellow);font-size:16px;"></i>
                                 <div style="flex:1;">
                                     <div style="font-size:13px;color:rgba(255,255,255,0.85);font-weight:600;">{{ $file->original_name }}</div>
-                                    <div style="font-size:11px;color:var(--text-muted);">{{ $file->mime_type }} — {{ round($file->size / 1024) }} KB</div>
+                                    <div style="font-size:11px;color:var(--muted);">{{ $file->mime_type }} — {{ round($file->size / 1024) }} KB</div>
                                 </div>
-                                <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--text-muted);font-size:12px;"></i>
+                                <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--muted);font-size:12px;"></i>
                             </a>
                         @endforeach
                     </div>
@@ -129,7 +129,7 @@
             {{-- Status Management --}}
             <div class="admin-card">
                 <h3 style="font-size:15px;font-weight:800;color:white;margin-bottom:16px;">
-                    <i class="fa-solid fa-gear" style="color:var(--blue-light);margin-right:8px;"></i>
+                    <i class="fa-solid fa-gear" style="color:var(--yellow);margin-right:8px;"></i>
                     Gestion
                 </h3>
                 <form method="POST" action="{{ route('admin.projects.update-status', $project) }}">
@@ -156,54 +156,54 @@
             {{-- Client Info --}}
             <div class="admin-card">
                 <h3 style="font-size:15px;font-weight:800;color:white;margin-bottom:16px;">
-                    <i class="fa-solid fa-user" style="color:var(--blue-light);margin-right:8px;"></i>
+                    <i class="fa-solid fa-user" style="color:var(--yellow);margin-right:8px;"></i>
                     Client
                 </h3>
                 @if($project->client)
                     <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
                         <div>
-                            <span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Nom</span>
+                            <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Nom</span>
                             <div style="color:rgba(255,255,255,0.85);font-weight:600;">{{ $project->client->name }}</div>
                         </div>
                         <div>
-                            <span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Email</span>
+                            <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Email</span>
                             <div style="color:rgba(255,255,255,0.75);">{{ $project->client->email }}</div>
                         </div>
                         @if($project->client->phone)
                             <div>
-                                <span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Téléphone</span>
+                                <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Téléphone</span>
                                 <div style="color:rgba(255,255,255,0.75);">{{ $project->client->phone }}</div>
                             </div>
                         @endif
                         @if($project->client->whatsapp)
                             <div>
-                                <span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">WhatsApp</span>
+                                <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">WhatsApp</span>
                                 <div style="color:rgba(255,255,255,0.75);">{{ $project->client->whatsapp }}</div>
                             </div>
                         @endif
                         @if($project->client->company_name)
                             <div>
-                                <span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Entreprise</span>
+                                <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Entreprise</span>
                                 <div style="color:rgba(255,255,255,0.75);">{{ $project->client->company_name }}</div>
                             </div>
                         @endif
                         @if($project->client->city || $project->client->country)
                             <div>
-                                <span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Localisation</span>
+                                <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Localisation</span>
                                 <div style="color:rgba(255,255,255,0.75);">{{ $project->client->city }}{{ $project->client->city && $project->client->country ? ', ' : '' }}{{ $project->client->country }}</div>
                             </div>
                         @endif
                     </div>
                     <a href="{{ route('admin.clients.show', $project->client) }}" class="admin-btn btn-secondary btn-sm" style="width:100%;justify-content:center;margin-top:16px;"><i class="fa-solid fa-arrow-right"></i> Voir le profil client</a>
                 @else
-                    <p style="color:var(--text-muted);font-size:13px;">Client inconnu</p>
+                    <p style="color:var(--muted);font-size:13px;">Client inconnu</p>
                 @endif
             </div>
 
             {{-- Project Type --}}
             <div class="admin-card">
                 <h3 style="font-size:15px;font-weight:800;color:white;margin-bottom:16px;">
-                    <i class="fa-solid fa-tags" style="color:var(--blue-light);margin-right:8px;"></i>
+                    <i class="fa-solid fa-tags" style="color:var(--yellow);margin-right:8px;"></i>
                     Type de projet
                 </h3>
                 @php
@@ -227,34 +227,34 @@
             {{-- Project Summary --}}
             <div class="admin-card">
                 <h3 style="font-size:15px;font-weight:800;color:white;margin-bottom:16px;">
-                    <i class="fa-solid fa-chart-simple" style="color:var(--blue-light);margin-right:8px;"></i>
+                    <i class="fa-solid fa-chart-simple" style="color:var(--yellow);margin-right:8px;"></i>
                     Résumé
                 </h3>
                 <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
                     <div style="display:flex;justify-content:space-between;">
-                        <span style="color:var(--text-muted);">Statut</span>
+                        <span style="color:var(--muted);">Statut</span>
                         @php $sc = \App\Models\Project::getStatusConfig($project->status); @endphp
                         <span class="admin-badge {{ $sc['class'] }}" style="font-size:10px;">{{ $sc['label'] }}</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;">
-                        <span style="color:var(--text-muted);">Réponses</span>
+                        <span style="color:var(--muted);">Réponses</span>
                         <span style="color:rgba(255,255,255,0.75);font-weight:600;">{{ $project->answers_count }}</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;">
-                        <span style="color:var(--text-muted);">Fichiers</span>
+                        <span style="color:var(--muted);">Fichiers</span>
                         <span style="color:rgba(255,255,255,0.75);font-weight:600;">{{ $project->files->count() }}</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;">
-                        <span style="color:var(--text-muted);">Sections</span>
+                        <span style="color:var(--muted);">Sections</span>
                         <span style="color:rgba(255,255,255,0.75);font-weight:600;">{{ $groupedAnswers->count() }}</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;">
-                        <span style="color:var(--text-muted);">Créé le</span>
+                        <span style="color:var(--muted);">Créé le</span>
                         <span style="color:rgba(255,255,255,0.75);">{{ $project->created_at->format('d/m/Y') }}</span>
                     </div>
                     @if($project->submitted_at)
                         <div style="display:flex;justify-content:space-between;">
-                            <span style="color:var(--text-muted);">Soumis le</span>
+                            <span style="color:var(--muted);">Soumis le</span>
                             <span style="color:rgba(255,255,255,0.75);">{{ $project->submitted_at->format('d/m/Y H:i') }}</span>
                         </div>
                     @endif

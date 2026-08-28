@@ -10,7 +10,7 @@
     <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px;align-items:start;">
         <div class="admin-card">
             <h3 style="font-size:15px;font-weight:800;color:white;margin-bottom:20px;">
-                <i class="fa-solid fa-user" style="color:var(--blue-light);margin-right:8px;"></i>
+                <i class="fa-solid fa-user" style="color:var(--yellow);margin-right:8px;"></i>
                 Informations
             </h3>
             <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;">
@@ -53,7 +53,7 @@
 
         <div class="admin-card">
             <h3 style="font-size:15px;font-weight:800;color:white;margin-bottom:20px;">
-                <i class="fa-solid fa-folder-open" style="color:var(--blue-light);margin-right:8px;"></i>
+                <i class="fa-solid fa-folder-open" style="color:var(--yellow);margin-right:8px;"></i>
                 Projets ({{ $client->projects->count() }})
             </h3>
 
@@ -68,7 +68,7 @@
                         @endphp
                         <a href="{{ route('admin.projects.show', $project) }}" style="display:flex;align-items:center;gap:16px;padding:16px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
                             <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,183,3,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="fa-solid fa-folder" style="color:var(--blue-light);font-size:15px;"></i>
+                                <i class="fa-solid fa-folder" style="color:var(--yellow);font-size:15px;"></i>
                             </div>
                             <div style="flex:1;">
                                 <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.85);margin-bottom:4px;">Projet #{{ $project->id }}</div>

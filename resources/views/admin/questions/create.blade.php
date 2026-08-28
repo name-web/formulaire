@@ -80,7 +80,7 @@
             <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
                     <h3 style="font-size:15px;font-weight:800;color:white;">
-                        <i class="fa-solid fa-list" style="color:var(--blue-light);margin-right:8px;"></i>
+                        <i class="fa-solid fa-list" style="color:var(--yellow);margin-right:8px;"></i>
                         Options
                     </h3>
                     <button type="button" onclick="addOption()" class="admin-btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> Ajouter</button>

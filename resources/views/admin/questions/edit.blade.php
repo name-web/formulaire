@@ -86,7 +86,7 @@
     <div class="admin-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
             <h3 style="font-size:15px;font-weight:800;color:white;">
-                <i class="fa-solid fa-list" style="color:var(--blue-light);margin-right:8px;"></i>
+                <i class="fa-solid fa-list" style="color:var(--yellow);margin-right:8px;"></i>
                 Options ({{ $question->options->count() }})
             </h3>
             <button onclick="document.getElementById('addOptionForm').style.display = document.getElementById('addOptionForm').style.display === 'none' ? 'block' : 'none'" class="admin-btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> Ajouter</button>
@@ -135,7 +135,7 @@
     <div class="admin-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
             <h3 style="font-size:15px;font-weight:800;color:white;">
-                <i class="fa-solid fa-code-branch" style="color:var(--blue-light);margin-right:8px;"></i>
+                <i class="fa-solid fa-code-branch" style="color:var(--yellow);margin-right:8px;"></i>
                 Conditions de visibilité ({{ $question->conditions->count() }})
             </h3>
             <button onclick="document.getElementById('addConditionForm').style.display = document.getElementById('addConditionForm').style.display === 'none' ? 'block' : 'none'" class="admin-btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> Ajouter</button>
@@ -178,7 +178,7 @@
             <div style="display:flex;flex-direction:column;gap:8px;">
                 @foreach($question->conditions as $condition)
                     <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
-                        <i class="fa-solid fa-code-branch" style="color:var(--blue-light);font-size:13px;"></i>
+                        <i class="fa-solid fa-code-branch" style="color:var(--yellow);font-size:13px;"></i>
                         <div style="flex:1;font-size:13px;color:rgba(255,255,255,0.75);">
                             Si <strong style="color:rgba(255,255,255,0.9);">« {{ $condition->dependsOnQuestion->title ?? '???' }} »</strong>
                             <span class="admin-badge badge-in_progress" style="font-size:9px;margin:0 4px;">{{ $condition->operator }}</span>
