@@ -6,19 +6,7 @@
             <img src="{{ asset('IMAGES/Logo dominium.png') }}" alt="DOMINIUM">
             <span>DOMINIUM TECH</span>
         </div>
-        @if(!empty($project->project_type))
-            @php
-                $types = is_array($project->project_type) ? $project->project_type : [$project->project_type];
-                $typeLabels = collect($types)->map(fn($t) => config("project_types.types.{$t}.label", $t))->implode(', ');
-            @endphp
-            <div class="project-badge">
-                <div class="project-badge-icon"><i class="fa-solid fa-building"></i></div>
-                <div>
-                    <div class="project-badge-label">Type de projet</div>
-                    <div class="project-badge-value">{{ $typeLabels }}</div>
-                </div>
-            </div>
-        @endif
+
     </div>
 
     <div class="sidebar-label">VOTRE PROGRESSION</div>

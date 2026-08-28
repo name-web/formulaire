@@ -196,7 +196,7 @@
                 </div>
             </div>
 
-            <input type="hidden" name="project_types" id="projectTypesInput" value="{{ json_encode(old('project_types', ['site_vitrine'])) }}">
+            <input type="hidden" name="project_types" id="projectTypesInput" value="{{ json_encode(old('project_types', array_keys($projectTypes))) }}">
 
             <div class="card-bottom anim-up d3">
                 <div></div>

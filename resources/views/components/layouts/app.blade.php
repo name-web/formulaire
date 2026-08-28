@@ -136,7 +136,7 @@
         }
 
         .sidebar-header {
-            margin-bottom: 55px;
+            margin-bottom: 24px;
         }
         .sidebar-logo {
             display: flex;
