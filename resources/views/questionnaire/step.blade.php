@@ -302,7 +302,8 @@
         });
 
         document.querySelectorAll('.opt-card[data-toggle="true"]').forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
                 card.classList.toggle('selected');
                 const cb = card.querySelector('input[type=checkbox]');
                 if(cb) cb.checked = card.classList.contains('selected');

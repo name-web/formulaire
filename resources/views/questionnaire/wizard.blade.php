@@ -521,7 +521,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Multiselect toggle cards
     document.querySelectorAll('.opt-card[data-toggle="true"]').forEach(card => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
             card.classList.toggle('selected');
             const cb = card.querySelector('input[type=checkbox]');
             if(cb) cb.checked = card.classList.contains('selected');
@@ -539,7 +540,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const otherOptionId = selectEl.dataset.otherOption;
                     otherField.style.display = selectEl.value == otherOptionId ? 'block' : 'none';
                 } else {
-                    // Check if this is the "autre" option
                     const otherInput = otherField.querySelector('input[type="text"]');
                     if (otherInput) {
                         const parentSelect = document.querySelector(`select[data-qid="${qid}"]`);
