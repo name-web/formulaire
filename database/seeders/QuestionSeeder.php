@@ -38,17 +38,11 @@ class QuestionSeeder extends Seeder
 
         QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Développer mon activité', 'value' => 'developper', 'sort_order' => 1, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Trouver davantage de clients', 'value' => 'clients', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Vendre davantage', 'value' => 'vendre', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Gagner du temps', 'value' => 'temps', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Automatiser certaines tâches', 'value' => 'automatiser', 'sort_order' => 5, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Mieux organiser mon activité', 'value' => 'organiser', 'sort_order' => 6, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Améliorer mon service', 'value' => 'ameliorer', 'sort_order' => 7, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Créer un nouveau service', 'value' => 'nouveau_service', 'sort_order' => 8, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Remplacer une méthode actuelle', 'value' => 'remplacer', 'sort_order' => 9, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Améliorer une solution existante', 'value' => 'ameliorer_existant', 'sort_order' => 10, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Réaliser une nouvelle idée', 'value' => 'nouvelle_idee', 'sort_order' => 11, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 12, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 13, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Gagner du temps', 'value' => 'temps', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Automatiser certaines tâches', 'value' => 'automatiser', 'sort_order' => 4, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Améliorer mon service', 'value' => 'ameliorer', 'sort_order' => 5, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 6, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 7, 'is_active' => true]);
 
         // --- Quel problème (adaptatif par type de projet) ---
         // Options universelles + options par type de projet
@@ -65,41 +59,11 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Site vitrine
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Les visiteurs ne trouvent pas mon activité en ligne', 'value' => 'sv_pas_visible', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Mon site actuel ne me satisfait pas', 'value' => 'sv_site_insatisfaisant', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "J'ai du mal à attirer de nouveaux clients", 'value' => 'sv_attirer_clients', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Mes concurrents ont un meilleur site', 'value' => 'sv_concurrence', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "Je n'ai pas de site professionnel", 'value' => 'sv_pas_de_site', 'sort_order' => 5, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "Mon activité n'est pas visible sur Internet", 'value' => 'sv_invisible', 'sort_order' => 6, 'is_active' => true]);
-
-        // E-commerce
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Les commandes sont gérées manuellement', 'value' => 'ec_commandes_manuelles', 'sort_order' => 10, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Les clients ont du mal à commander', 'value' => 'ec_clients_difficulte', 'sort_order' => 11, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Il est difficile de suivre les commandes', 'value' => 'ec_suivi_difficile', 'sort_order' => 12, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Les paiements sont compliqués', 'value' => 'ec_paiements', 'sort_order' => 13, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Les produits sont difficiles à gérer', 'value' => 'ec_gestion_produits', 'sort_order' => 14, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "L'entreprise veut vendre sur Internet", 'value' => 'ec_vente_en_ligne', 'sort_order' => 15, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "Je n'ai pas encore de boutique en ligne", 'value' => 'ec_pas_de_boutique', 'sort_order' => 16, 'is_active' => true]);
-
-        // Application mobile
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "Mes clients n'ont pas accès facilement à mon service", 'value' => 'am_acces_difficile', 'sort_order' => 20, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Je veux offrir une expérience mobile à mes clients', 'value' => 'am_experience_mobile', 'sort_order' => 21, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Je veux envoyer des notifications à mes clients', 'value' => 'am_notifications', 'sort_order' => 22, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "Mon service n'est pas encore sur mobile", 'value' => 'am_pas_sur_mobile', 'sort_order' => 23, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Les interactions avec mes clients sont limitées', 'value' => 'am_interactions', 'sort_order' => 24, 'is_active' => true]);
-
-        // Logiciel
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Mes processus sont trop manuels', 'value' => 'lg_processus_manuels', 'sort_order' => 30, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "J'ai trop d'outils dispersés", 'value' => 'lg_outils_dispersion', 'sort_order' => 31, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "Je n'ai pas de suivi de mon activité", 'value' => 'lg_pas_de_suivi', 'sort_order' => 32, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Mes employés perdent du temps', 'value' => 'lg_temps_perdu', 'sort_order' => 33, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Je veux automatiser certaines tâches', 'value' => 'lg_automatiser', 'sort_order' => 34, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'La gestion des informations est désorganisée', 'value' => 'lg_desorganisation', 'sort_order' => 35, 'is_active' => true]);
-
-        // Universels
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 90, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 91, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qProblem->id, 'label' => "Mon activité n'est pas visible sur Internet", 'value' => 'sv_invisible', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Mes processus sont trop manuels', 'value' => 'lg_processus_manuels', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Je veux automatiser certaines tâches', 'value' => 'lg_automatiser', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qProblem->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
 
         // --- Comment actuellement ---
         $qHow = Question::create([
@@ -119,13 +83,8 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Appels téléphoniques', 'value' => 'appels', 'sort_order' => 2, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Réseaux sociaux', 'value' => 'reseaux', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Cahier / Papier', 'value' => 'cahier', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Excel ou tableur', 'value' => 'excel', 'sort_order' => 5, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Site internet existant', 'value' => 'site_exist', 'sort_order' => 6, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Application existante', 'value' => 'app_exist', 'sort_order' => 7, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Plusieurs outils différents', 'value' => 'plusieurs_outils', 'sort_order' => 8, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Rien pour le moment', 'value' => 'rien', 'sort_order' => 9, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 10, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 11, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 5, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qHow->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 6, 'is_active' => true]);
 
         // ============================================================
         // QUESTION 1 : Solutions souhaitez-vous créer (SÉLECTION MULTIPLE)

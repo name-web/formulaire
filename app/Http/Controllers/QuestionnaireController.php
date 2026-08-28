@@ -74,7 +74,7 @@ class QuestionnaireController extends Controller
         $project = $this->projectService->find($projectId);
         abort_unless($project, 404);
 
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $projectType);
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $project->project_type ?? $projectType);
         $answeredAnswers = Answer::where('project_id', $projectId)
             ->with('answerOptions')
             ->get()
@@ -160,7 +160,7 @@ class QuestionnaireController extends Controller
         $project = $this->projectService->find($projectId);
         abort_unless($project, 404);
 
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $projectType);
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $project->project_type ?? $projectType);
         $answeredIds = $this->answerService->getAnsweredQuestionIds($projectId);
         $isEditing = request()->query('edit') === '1';
 
@@ -190,7 +190,7 @@ class QuestionnaireController extends Controller
         }
 
         $existingAnswer = $this->answerService->getForQuestion($projectId, $currentQuestion->id);
-        $progress = $this->questionnaireService->getProgress($projectId, $projectType);
+        $progress = $this->questionnaireService->getProgress($projectId, $project->project_type ?? $projectType);
 
         return view('questionnaire.step', [
             'question' => $currentQuestion,
@@ -213,7 +213,10 @@ class QuestionnaireController extends Controller
 
         abort_unless($projectId && $projectType, 404);
 
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $projectType);
+        $project = $this->projectService->find($projectId);
+        $effectiveType = $project->project_type ?? $projectType;
+
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $effectiveType);
         $answeredIds = $this->answerService->getAnsweredQuestionIds($projectId);
         $isEditing = request()->query('edit') === '1';
 
@@ -272,13 +275,16 @@ class QuestionnaireController extends Controller
 
         abort_unless($projectId && $projectType, 404);
 
-        $previousQuestion = $this->questionnaireService->getPreviousQuestion($projectId, $projectType);
+        $project = $this->projectService->find($projectId);
+        $effectiveType = $project->project_type ?? $projectType;
+
+        $previousQuestion = $this->questionnaireService->getPreviousQuestion($projectId, $effectiveType);
 
         if (! $previousQuestion) {
             return redirect()->route('questionnaire.wizard');
         }
 
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $projectType);
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $effectiveType);
         $previousStep = ($visibleQuestions->search(fn ($q) => $q->id === $previousQuestion->id) ?? 0) + 1;
 
         return redirect()->route('questionnaire.step', $previousStep);
@@ -293,7 +299,8 @@ class QuestionnaireController extends Controller
 
         $summary = $this->questionnaireService->getSummary($projectId);
         $files = $this->fileService->getForProject($projectId);
-        $progress = $this->questionnaireService->getProgress($projectId, $projectType);
+        $project = $summary['project'] ?? $this->projectService->find($projectId);
+        $progress = $this->questionnaireService->getProgress($projectId, $project->project_type ?? $projectType);
 
         return view('questionnaire.summary', [
             'summary' => $summary,
