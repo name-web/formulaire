@@ -190,11 +190,10 @@
                             </div>
                             @if($otherOption)
                                 <div class="other-field" style="display:{{ $showOther ? 'block' : 'none' }};" data-other-for="{{ $question->id }}">
-                                    <div class="input-icon-wrap">
-                                        <i class="fa-solid fa-pen input-icon"></i>
-                                        <input type="text" name="answers[{{ $question->id }}][other_value]" class="glass-input"
-                                               placeholder="Précisez votre réponse…"
-                                               value="{{ old("answers.{$question->id}.other_value", $existingAnswer?->other_value ?? '') }}">
+                                    <div class="textarea-wrap">
+                                        <textarea name="answers[{{ $question->id }}][other_value]" class="glass-input" rows="3"
+                                                  placeholder="Précisez votre réponse…">{{ old("answers.{$question->id}.other_value", $existingAnswer?->other_value ?? '') }}</textarea>
+                                        <span class="char-counter"><span class="current">0</span>/500</span>
                                     </div>
                                 </div>
                             @endif
@@ -227,11 +226,10 @@
                             </div>
                             @if($otherOption)
                                 <div class="other-field" style="display:{{ $showOther ? 'block' : 'none' }};" data-other-for="{{ $question->id }}">
-                                    <div class="input-icon-wrap">
-                                        <i class="fa-solid fa-pen input-icon"></i>
-                                        <input type="text" name="answers[{{ $question->id }}][other_value]" class="glass-input"
-                                               placeholder="Précisez votre réponse…"
-                                               value="{{ old("answers.{$question->id}.other_value", $existingAnswer?->other_value ?? '') }}">
+                                    <div class="textarea-wrap">
+                                        <textarea name="answers[{{ $question->id }}][other_value]" class="glass-input" rows="3"
+                                                  placeholder="Précisez votre réponse…">{{ old("answers.{$question->id}.other_value", $existingAnswer?->other_value ?? '') }}</textarea>
+                                        <span class="char-counter"><span class="current">0</span>/500</span>
                                     </div>
                                 </div>
                             @endif
