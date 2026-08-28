@@ -98,4 +98,15 @@ class AdminSearchAndStatsTest extends TestCase
         $this->assertSame(2, $result->firstWhere('type', 'site_vitrine')['count']);
         $this->assertSame(2, $result->firstWhere('type', 'ecommerce')['count']);
     }
+
+    public function test_admin_layout_displays_real_logo(): void
+    {
+        $admin = $this->createAdmin();
+
+        $response = $this->actingAs($admin)->get('/admin');
+
+        $response->assertStatus(200);
+        $response->assertSee('brand-logo', false);
+        $response->assertSee('IMAGES/Logo dominium.png', false);
+    }
 }

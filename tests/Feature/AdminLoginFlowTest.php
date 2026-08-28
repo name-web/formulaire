@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class AdminLoginFlowTest extends TestCase
@@ -107,6 +108,40 @@ class AdminLoginFlowTest extends TestCase
         $response = $this->actingAs($user)->post('/logout');
         $this->assertGuest();
         $response->assertRedirect('/');
+    }
+
+    public function test_admin_login_sets_remember_cookie(): void
+    {
+        $user = $this->createAdmin();
+
+        $response = $this->post('/login', [
+            'email' => 'kamallareleve233@gmail.com',
+            'password' => 'Kamal222.com',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertCookie(Auth::guard()->getRecallerName());
+    }
+
+    public function test_admin_stays_authenticated_across_requests_without_relogin(): void
+    {
+        $user = $this->createAdmin();
+
+        $this->post('/login', [
+            'email' => 'kamallareleve233@gmail.com',
+            'password' => 'Kamal222.com',
+        ])->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticatedAs($user);
+
+        $this->get('/admin')->assertOk();
+        $this->get('/admin/projects')->assertOk();
+        $this->get('/admin/clients')->assertOk();
+        $this->get('/admin/questions')->assertOk();
+        $this->get('/admin/users')->assertOk();
+
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_full_flow_end_to_end(): void

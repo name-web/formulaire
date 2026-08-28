@@ -116,8 +116,8 @@
                 </div>
 
                 <div class="remember-row">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember">Se souvenir de moi</label>
+                    <input type="checkbox" id="remember" name="remember" value="1" checked>
+                    <label for="remember">Rester connecté</label>
                 </div>
 
                 <button type="submit" class="btn-login">

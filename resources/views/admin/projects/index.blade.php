@@ -81,7 +81,7 @@
                 </div>
             @else
                 <div class="table-head" style="grid-template-columns:.5fr 1.4fr 1.2fr .6fr .7fr .8fr 52px;">
-                    <div>#</div>
+                    <div>N°</div>
                     <div>Client</div>
                     <div>Type de projet</div>
                     <div>Réponses</div>
@@ -92,7 +92,7 @@
 
                 @foreach($projects as $project)
                     <div class="table-row" style="grid-template-columns:.5fr 1.4fr 1.2fr .6fr .7fr .8fr 52px;cursor:pointer;" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
-                        <div class="date" style="font-weight:700;">#{{ $project->id }}</div>
+                        <div class="date" style="font-weight:700;">{{ $project->id }}</div>
                         <div class="client">
                             <div class="client-avatar">{{ strtoupper(substr($project->client->name ?? '?', 0, 2)) }}</div>
                             <div>

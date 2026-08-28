@@ -1,4 +1,4 @@
-<x-layouts.admin :title="'Projet #' . $project->id">
+<x-layouts.admin :title="'Projet '.$project->id">
 
     {{-- Intro --}}
     <section class="intro">
@@ -7,7 +7,7 @@
                 <span></span>
                 Détail
             </div>
-            <h1>Projet #{{ $project->id }}</h1>
+            <h1>Projet {{ $project->id }}</h1>
             <p>{{ $project->client->name ?? 'Client inconnu' }} — {{ $project->created_at->format('d/m/Y H:i') }}</p>
         </div>
         <a href="{{ route('admin.projects.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>

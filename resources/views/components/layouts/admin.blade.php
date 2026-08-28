@@ -77,18 +77,10 @@
             border-bottom: 1px solid #292929;
         }
 
-        .brand-icon {
-            width: 27px; height: 27px; flex-shrink: 0;
-            border: 3px solid var(--yellow); border-radius: 50%;
-            position: relative;
-            transition: transform .3s ease;
-        }
-        .brand-icon:hover { transform: rotate(180deg); }
-        .brand-icon::after {
-            content: ""; position: absolute;
-            width: 3px; height: 12px; top: 4px; left: 50%;
-            transform: translateX(-50%);
-            background: var(--yellow); border-radius: 3px;
+        .brand-logo {
+            height: 48px; width: auto; max-width: 100%; flex-shrink: 0;
+            object-fit: contain;
+            display: block;
         }
 
         .brand-name { font-size: 14px; font-weight: 800; letter-spacing: 2px; }
@@ -490,6 +482,7 @@
         @media (max-width: 800px) {
             .sidebar { width: 65px; }
             .brand { justify-content: center; padding: 0; }
+            .brand-logo { height: 34px; max-width: 50px; }
             .brand-name, .nav-heading, .nav-item span, .user-info { display: none; }
             .navigation { padding-left: 8px; padding-right: 8px; }
             .nav-item { justify-content: center; padding: 0; }
@@ -518,7 +511,8 @@
 
 <aside class="sidebar">
     <div class="brand">
-        <div class="brand-icon"></div>
+        <img src="{{ asset(config('admin_brand.logo', 'IMAGES/Logo dominium.png')) }}"
+             alt="{{ config('admin_brand.brand_name', 'DOMINIUM') }}" class="brand-logo">
         <div class="brand-name">{{ config('admin_brand.brand_name', 'DOMINIUM') }}</div>
     </div>
 

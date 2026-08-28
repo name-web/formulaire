@@ -18,6 +18,9 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Always persist admin sessions (long-lived session + remember cookie).
+        $request->merge(['remember' => true]);
+
         $request->authenticate();
         $request->session()->regenerate();
 

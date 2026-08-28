@@ -92,7 +92,7 @@
                                     <i class="fa-solid fa-folder" style="color:var(--black);font-size:14px;"></i>
                                 </div>
                                 <div style="flex:1;">
-                                    <div style="font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;">Projet #{{ $project->id }}</div>
+                                    <div style="font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;">Projet {{ $project->id }}</div>
                                     <div style="font-size:13px;color:var(--text-secondary);">{{ $typeLabels }}</div>
                                 </div>
                                 <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>

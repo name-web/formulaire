@@ -64,7 +64,7 @@
                 </div>
             @else
                 <div class="table-head" style="grid-template-columns:.5fr 2fr .8fr .6fr .7fr 100px;">
-                    <div>#</div>
+                    <div>N°</div>
                     <div>Titre</div>
                     <div>Type</div>
                     <div>Options</div>
@@ -74,7 +74,7 @@
 
                 @foreach($questions as $question)
                     <div class="table-row" style="grid-template-columns:.5fr 2fr .8fr .6fr .7fr 100px;">
-                        <div class="date" style="font-weight:700;">{{ $question->sort_order }}</div>
+                        <div class="date" style="font-weight:700;">{{ ($questions->firstItem() ?? 1) - 1 + $loop->iteration }}</div>
                         <div>
                             <div class="client-name" style="font-size:15px;">{{ $question->title }}</div>
                             @if($question->group_label)

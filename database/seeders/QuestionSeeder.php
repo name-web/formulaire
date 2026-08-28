@@ -783,5 +783,14 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qRemarques->id, 'label' => 'Solution évolutive', 'value' => 'evolutive', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qRemarques->id, 'label' => 'Exigences spécifiques', 'value' => 'exigences', 'sort_order' => 4, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qRemarques->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 5, 'is_active' => true]);
+
+        // Renumber questions sequentially (1..N) preserving relative order,
+        // so the admin displays clean numbers without gaps.
+        Question::query()
+            ->orderBy('sort_order')
+            ->get()
+            ->each(function (Question $question, int $index): void {
+                $question->update(['sort_order' => $index + 1]);
+            });
     }
 }
