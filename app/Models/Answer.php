@@ -39,34 +39,51 @@ class Answer extends Model
             return $this->text_value;
         }
 
-        if ($question->type === 'file') {
-            return $this->file_path ? 'Fichier joint' : null;
-        }
-
-        if ($question->type === 'yes_no') {
-            return match (strtolower((string) $this->text_value)) {
+        return match ($question->type) {
+            'file' => $this->file_path ? $this->file_path : null,
+            'yes_no' => match (strtolower((string) $this->text_value)) {
                 'yes', 'oui' => 'Oui',
                 'no', 'non' => 'Non',
-                default => $this->text_value ?? '—',
-            };
+                default => $this->text_value ?? null,
+            },
+            'select', 'multiselect' => $this->getSelectDisplayValue(),
+            'number' => $this->text_value !== null ? number_format((float) $this->text_value, 0, ',', ' ') : null,
+            default => $this->text_value,
+        };
+    }
+
+    public function getSelectDisplayValue(): ?string
+    {
+        $optionLabels = $this->answerOptions
+            ->map(fn (AnswerOption $ao) => $ao->questionOption?->label)
+            ->filter()
+            ->values();
+
+        if ($optionLabels->isEmpty()) {
+            return $this->other_value ?: null;
         }
 
-        if (in_array($question->type, ['select', 'multiselect'])) {
-            $optionLabels = $this->answerOptions
-                ->map(fn (AnswerOption $ao) => $ao->questionOption?->label)
-                ->filter()
-                ->values();
+        $result = $optionLabels->implode(', ');
 
-            if ($optionLabels->isNotEmpty()) {
-                $result = $optionLabels->implode(', ');
-                if ($this->other_value) {
-                    $result .= ', '.$this->other_value;
-                }
-
-                return $result;
-            }
+        if ($this->other_value) {
+            $result .= ', '.$this->other_value;
         }
 
-        return $this->text_value;
+        return $result;
+    }
+
+    public function getSelectValues(): array
+    {
+        $labels = $this->answerOptions
+            ->map(fn (AnswerOption $ao) => $ao->questionOption?->label)
+            ->filter()
+            ->values()
+            ->all();
+
+        if ($this->other_value) {
+            $labels[] = $this->other_value;
+        }
+
+        return $labels;
     }
 }

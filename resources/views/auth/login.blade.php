@@ -9,29 +9,29 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
-            --blue: #3b82f6; --blue-light: #60a5fa; --bg-dark: #020617;
+            --blue: #ffb703; --blue-light: #ffc72c; --bg-dark: #071426;
             --text-muted: rgba(255,255,255,0.48);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: Arial, sans-serif; color: #fff;
-            background: linear-gradient(135deg, #020617 0%, #0c1e3a 40%, #0f2847 70%, #0a1628 100%);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; color: #fff;
+            background: linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
         }
         .bg-effects { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
         .orb { position: absolute; border-radius: 50%; filter: blur(90px); }
-        .orb-1 { width: 400px; height: 400px; top: -100px; right: -80px; background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%); }
-        .orb-2 { width: 350px; height: 350px; bottom: -120px; left: 10%; background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%); }
+        .orb-1 { width: 400px; height: 400px; top: -100px; right: -80px; background: radial-gradient(circle, rgba(255,183,3,0.2) 0%, transparent 70%); }
+        .orb-2 { width: 350px; height: 350px; bottom: -120px; left: 10%; background: radial-gradient(circle, rgba(255,183,3,0.15) 0%, transparent 70%); }
 
         .login-wrapper { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 20px; }
         .login-card {
-            background: linear-gradient(145deg, rgba(15,40,71,0.85), rgba(5,18,36,0.95));
+            background: linear-gradient(145deg, rgba(18,44,77,0.85), rgba(7,20,38,0.95));
             border: 1px solid rgba(255,255,255,0.08); border-radius: 24px;
             padding: 48px 40px; backdrop-filter: blur(20px);
             box-shadow: 0 35px 80px rgba(0,0,0,0.4);
         }
         .login-brand { text-align: center; margin-bottom: 36px; }
-        .login-brand img { height: 60px; width: auto; filter: drop-shadow(0 0 12px rgba(59,130,246,0.25)); }
+        .login-brand img { height: 60px; width: auto; filter: drop-shadow(0 0 12px rgba(255,183,3,0.25)); }
         .login-brand h1 { font-size: 16px; font-weight: 800; color: rgba(255,255,255,0.7); letter-spacing: 1px; margin-top: 10px; text-transform: uppercase; }
         .login-brand p { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
@@ -45,7 +45,7 @@
             border-radius: 12px; color: white; font-size: 14px;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .form-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+        .form-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(255,183,3,0.12); }
         .form-input::placeholder { color: var(--text-muted); }
 
         .remember-row { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; }
@@ -57,7 +57,7 @@
             background: var(--blue); color: white; font-size: 14px; font-weight: 800;
             cursor: pointer; transition: all 0.25s ease; position: relative; overflow: hidden;
         }
-        .btn-login:hover { background: var(--blue-light); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(59,130,246,0.25); }
+        .btn-login:hover { background: var(--blue-light); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,183,3,0.25); }
         .btn-login:active { transform: translateY(0) scale(0.98); }
 
         .error-box { padding: 12px 16px; border-radius: 12px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.15); margin-bottom: 20px; }

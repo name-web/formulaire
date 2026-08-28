@@ -6,42 +6,143 @@
         </div>
     </div>
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:32px;">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;"><i class="fa-solid fa-folder-open"></i></div>
-            <div class="stat-value">{{ $stats['total_projects'] }}</div>
-            <div class="stat-label">Projets totaux</div>
+    {{-- Stats cards - dynamically built from config --}}
+    @php
+        $statCards = [];
+        foreach(config('dashboard.stat_cards') as $cardConfig) {
+            if (($stats[$cardConfig['key']] ?? 0) > 0) {
+                $statCards[] = [
+                    'icon'  => $cardConfig['icon'],
+                    'color' => $cardConfig['color'],
+                    'bg'    => $cardConfig['bg'],
+                    'value' => $stats[$cardConfig['key']],
+                    'label' => $cardConfig['label'],
+                ];
+            }
+        }
+    @endphp
+
+    @if(count($statCards) > 0)
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:28px;">
+            @foreach($statCards as $card)
+                <div class="stat-card" style="transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                    <div class="stat-icon" style="background:{{ $card['bg'] }};color:{{ $card['color'] }};"><i class="{{ $card['icon'] }}"></i></div>
+                    <div class="stat-value">{{ $card['value'] }}</div>
+                    <div class="stat-label">{{ $card['label'] }}</div>
+                </div>
+            @endforeach
         </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;"><i class="fa-solid fa-clock"></i></div>
-            <div class="stat-value">{{ $stats['pending_projects'] }}</div>
-            <div class="stat-label">En attente</div>
+    @endif
+
+    {{-- Charts row: Status breakdown + Type breakdown + Monthly submissions --}}
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:24px;">
+        {{-- Status Breakdown --}}
+        <div class="admin-card">
+            <h3 style="font-size:14px;font-weight:800;color:white;margin-bottom:18px;">
+                <i class="fa-solid fa-chart-pie" style="color:var(--blue-light);margin-right:8px;"></i>
+                Répartition par statut
+            </h3>
+            @php $hasStatusData = $projectsByStatus->some(fn($d) => $d['count'] > 0); @endphp
+            @if(!$hasStatusData)
+                <p style="color:var(--text-muted);font-size:12px;text-align:center;padding:24px 0;">Aucune donnée disponible.</p>
+            @else
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    @foreach($projectsByStatus as $status => $data)
+                        @if($data['count'] > 0)
+                            @php
+                                $total = max($stats['total_projects'], 1);
+                                $pct = round(($data['count'] / $total) * 100);
+                            @endphp
+                            <div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                                    <span style="font-size:12px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px;">
+                                        <i class="fa-solid {{ $data['icon'] }}" style="font-size:10px;"></i>
+                                        {{ $data['label'] }}
+                                    </span>
+                                    <span style="font-size:11px;color:var(--blue-light);font-weight:700;">{{ $data['count'] }}</span>
+                                </div>
+                                <div style="height:5px;border-radius:20px;background:rgba(255,255,255,0.06);overflow:hidden;">
+                                    <div style="height:100%;border-radius:20px;background:linear-gradient(90deg,#e6a400,#ffc72c);width:{{ $pct }}%;transition:width 0.6s ease;"></div>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
         </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background:rgba(59,130,246,0.12);color:#60a5fa;"><i class="fa-solid fa-spinner"></i></div>
-            <div class="stat-value">{{ $stats['in_progress_projects'] }}</div>
-            <div class="stat-label">En cours</div>
+
+        {{-- Type Breakdown --}}
+        <div class="admin-card">
+            <h3 style="font-size:14px;font-weight:800;color:white;margin-bottom:18px;">
+                <i class="fa-solid fa-tags" style="color:var(--blue-light);margin-right:8px;"></i>
+                Répartition par type
+            </h3>
+            @if($projectsByType->isEmpty())
+                <p style="color:var(--text-muted);font-size:12px;text-align:center;padding:24px 0;">Aucune donnée disponible.</p>
+            @else
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    @foreach($projectsByType as $type => $data)
+                        @php
+                            $total = max($stats['total_projects'], 1);
+                            $pct = round(($data['count'] / $total) * 100);
+                        @endphp
+                        <div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                                <span style="font-size:12px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px;">
+                                    <i class="{{ $data['icon'] }}" style="color:{{ $data['color'] }};font-size:10px;"></i>
+                                    {{ $data['label'] }}
+                                </span>
+                                <span style="font-size:11px;color:var(--blue-light);font-weight:700;">{{ $data['count'] }}</span>
+                            </div>
+                            <div style="height:5px;border-radius:20px;background:rgba(255,255,255,0.06);overflow:hidden;">
+                                <div style="height:100%;border-radius:20px;background:linear-gradient(90deg,{{ $data['color'] }},{{ $data['color'] }}88);width:{{ $pct }}%;transition:width 0.6s ease;"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background:rgba(16,185,129,0.12);color:#34d399;"><i class="fa-solid fa-check-circle"></i></div>
-            <div class="stat-value">{{ $stats['completed_projects'] }}</div>
-            <div class="stat-label">Terminés</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background:rgba(139,92,246,0.12);color:#a78bfa;"><i class="fa-solid fa-users"></i></div>
-            <div class="stat-value">{{ $stats['total_clients'] }}</div>
-            <div class="stat-label">Clients</div>
+
+        {{-- Monthly Submissions --}}
+        <div class="admin-card">
+            <h3 style="font-size:14px;font-weight:800;color:white;margin-bottom:18px;">
+                <i class="fa-solid fa-chart-bar" style="color:var(--blue-light);margin-right:8px;"></i>
+                Soumissions mensuelles
+            </h3>
+            @if($submissionsByMonth->isEmpty())
+                <p style="color:var(--text-muted);font-size:12px;text-align:center;padding:24px 0;">Aucune donnée disponible.</p>
+            @else
+                @php
+                    $maxMonth = max($submissionsByMonth->values()->toArray());
+                @endphp
+                <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:10px;">
+                    @foreach($submissionsByMonth as $month => $count)
+                        @php
+                            $barHeight = $maxMonth > 0 ? max(($count / $maxMonth) * 100, 8) : 8;
+                        @endphp
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                            <span style="font-size:10px;color:var(--blue-light);font-weight:700;">{{ $count }}</span>
+                            <div style="width:100%;height:{{ $barHeight }}%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#ffb703,#e6a400);transition:height 0.5s ease;"></div>
+                            <span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;">{{ $month }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 
+    {{-- Recent projects + Recent clients --}}
     <div style="display:grid; grid-template-columns:2fr 1fr; gap:24px;">
         <div class="admin-card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-                <h3 style="font-size:15px;font-weight:800;color:white;">Derniers projets</h3>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+                <h3 style="font-size:14px;font-weight:800;color:white;">Derniers projets</h3>
                 <a href="{{ route('admin.projects.index') }}" class="admin-btn btn-secondary btn-sm">Voir tout</a>
             </div>
             @if($recentProjects->isEmpty())
-                <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0;">Aucun projet pour le moment.</p>
+                <div style="text-align:center;padding:32px 0;">
+                    <i class="fa-solid fa-folder-open" style="font-size:28px;color:var(--text-muted);margin-bottom:10px;display:block;"></i>
+                    <p style="color:var(--text-muted);font-size:12px;">Aucun projet pour le moment.</p>
+                </div>
             @else
                 <table class="admin-table">
                     <thead>
@@ -54,37 +155,21 @@
                     </thead>
                     <tbody>
                         @foreach($recentProjects as $project)
-                            <tr>
+                            <tr style="cursor:pointer;" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
                                 <td>
-                                    <a href="{{ route('admin.projects.show', $project) }}" style="color:rgba(255,255,255,0.85);text-decoration:none;font-weight:600;">
+                                    <span style="color:rgba(255,255,255,0.85);font-weight:600;">
                                         {{ $project->client->name ?? '—' }}
-                                    </a>
+                                    </span>
                                 </td>
                                 <td>
-                                    @php
-                                        $types = is_array($project->project_type) ? $project->project_type : [$project->project_type];
-                                        $typeLabels = collect($types)->map(fn($t) => config("project_types.types.{$t}.label", $t))->implode(', ');
-                                    @endphp
-                                    <span style="font-size:12px;color:var(--text-secondary);">{{ $typeLabels ?: '—' }}</span>
+                                    @php $typeLabels = $project->type_labels; @endphp
+                                    <span style="font-size:11px;color:var(--text-secondary);">{{ $typeLabels ?: '—' }}</span>
                                 </td>
                                 <td>
-                                    @php
-                                        $statusClass = match($project->status) {
-                                            'pending' => 'badge-pending',
-                                            'in_progress' => 'badge-in_progress',
-                                            'completed' => 'badge-completed',
-                                            default => 'badge-cancelled',
-                                        };
-                                        $statusLabel = match($project->status) {
-                                            'pending' => 'En attente',
-                                            'in_progress' => 'En cours',
-                                            'completed' => 'Terminé',
-                                            default => 'Annulé',
-                                        };
-                                    @endphp
-                                    <span class="admin-badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                                    @php $sc = \App\Models\Project::getStatusConfig($project->status); @endphp
+                                    <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>
                                 </td>
-                                <td style="font-size:12px;color:var(--text-muted);">{{ $project->created_at->format('d/m/Y') }}</td>
+                                <td style="font-size:11px;color:var(--text-muted);">{{ $project->created_at->format('d/m/Y') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -93,67 +178,33 @@
         </div>
 
         <div class="admin-card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-                <h3 style="font-size:15px;font-weight:800;color:white;">Répartition par type</h3>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+                <h3 style="font-size:14px;font-weight:800;color:white;">Derniers clients</h3>
+                <a href="{{ route('admin.clients.index') }}" class="admin-btn btn-secondary btn-sm">Voir tout</a>
             </div>
-            @if($projectsByType->isEmpty())
-                <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0;">Aucune donnée.</p>
+            @if($recentClients->isEmpty())
+                <div style="text-align:center;padding:32px 0;">
+                    <i class="fa-solid fa-users" style="font-size:28px;color:var(--text-muted);margin-bottom:10px;display:block;"></i>
+                    <p style="color:var(--text-muted);font-size:12px;">Aucun client pour le moment.</p>
+                </div>
             @else
-                <div style="display:flex;flex-direction:column;gap:14px;">
-                    @foreach($projectsByType as $type => $data)
-                        @php
-                            $total = $stats['total_projects'] ?: 1;
-                            $pct = round(($data['count'] / $total) * 100);
-                        @endphp
-                        <div>
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                                <span style="font-size:13px;color:rgba(255,255,255,0.75);">{{ $data['label'] }}</span>
-                                <span style="font-size:12px;color:var(--blue-light);font-weight:700;">{{ $data['count'] }}</span>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    @foreach($recentClients as $client)
+                        <a href="{{ route('admin.clients.show', $client) }}" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                            <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:#a78bfa;font-weight:800;">
+                                {{ strtoupper(substr($client->name, 0, 1)) }}
                             </div>
-                            <div style="height:6px;border-radius:20px;background:rgba(255,255,255,0.06);overflow:hidden;">
-                                <div style="height:100%;border-radius:20px;background:linear-gradient(90deg,#2563eb,#60a5fa);width:{{ $pct }}%;transition:width 0.6s;"></div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $client->name }}</div>
+                                <div style="font-size:11px;color:var(--text-muted);">{{ $client->email }}</div>
                             </div>
-                        </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:11px;color:var(--text-muted);">{{ $client->projects_count }} projet{{ $client->projects_count > 1 ? 's' : '' }}</div>
+                            </div>
+                        </a>
                     @endforeach
                 </div>
             @endif
         </div>
-    </div>
-
-    <div class="admin-card" style="margin-top:24px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-            <h3 style="font-size:15px;font-weight:800;color:white;">Derniers clients</h3>
-            <a href="{{ route('admin.clients.index') }}" class="admin-btn btn-secondary btn-sm">Voir tout</a>
-        </div>
-        @if($recentClients->isEmpty())
-            <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0;">Aucun client pour le moment.</p>
-        @else
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Email</th>
-                        <th>Entreprise</th>
-                        <th>Projets</th>
-                        <th>Inscrit le</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($recentClients as $client)
-                        <tr>
-                            <td>
-                                <a href="{{ route('admin.clients.show', $client) }}" style="color:rgba(255,255,255,0.85);text-decoration:none;font-weight:600;">
-                                    {{ $client->name }}
-                                </a>
-                            </td>
-                            <td style="color:var(--text-secondary);">{{ $client->email }}</td>
-                            <td style="color:var(--text-secondary);">{{ $client->company_name ?? '—' }}</td>
-                            <td><span class="admin-badge badge-in_progress">{{ $client->projects_count }}</span></td>
-                            <td style="font-size:12px;color:var(--text-muted);">{{ $client->created_at->format('d/m/Y') }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
     </div>
 </x-layouts.admin>

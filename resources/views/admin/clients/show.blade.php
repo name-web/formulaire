@@ -63,30 +63,18 @@
                 <div style="display:flex;flex-direction:column;gap:12px;">
                     @foreach($client->projects as $project)
                         @php
-                            $types = is_array($project->project_type) ? $project->project_type : [$project->project_type];
-                            $typeLabels = collect($types)->map(fn($t) => config("project_types.types.{$t}.label", $t))->implode(', ');
-                            $statusClass = match($project->status) {
-                                'pending' => 'badge-pending',
-                                'in_progress' => 'badge-in_progress',
-                                'completed' => 'badge-completed',
-                                default => 'badge-cancelled',
-                            };
-                            $statusLabel = match($project->status) {
-                                'pending' => 'En attente',
-                                'in_progress' => 'En cours',
-                                'completed' => 'Terminé',
-                                default => 'Annulé',
-                            };
+                            $typeLabels = $project->type_labels;
+                            $sc = \App\Models\Project::getStatusConfig($project->status);
                         @endphp
-                        <a href="{{ route('admin.projects.show', $project) }}" style="display:flex;align-items:center;gap:16px;padding:16px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-decoration:none;transition:all 0.2s;">
-                            <div style="width:42px;height:42px;border-radius:12px;background:rgba(59,130,246,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <a href="{{ route('admin.projects.show', $project) }}" style="display:flex;align-items:center;gap:16px;padding:16px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                            <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,183,3,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="fa-solid fa-folder" style="color:var(--blue-light);font-size:15px;"></i>
                             </div>
                             <div style="flex:1;">
                                 <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.85);margin-bottom:4px;">Projet #{{ $project->id }}</div>
                                 <div style="font-size:12px;color:var(--text-secondary);">{{ $typeLabels }}</div>
                             </div>
-                            <span class="admin-badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                            <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>
                             <span style="font-size:11px;color:var(--text-muted);">{{ $project->created_at->format('d/m/Y') }}</span>
                         </a>
                     @endforeach

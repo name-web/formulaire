@@ -4,14 +4,14 @@
 #wizardForm { display:flex; flex-direction:column; flex:1; }
 .content-card { overflow:visible !important; }
 .searchable-dropdown { position:relative; width:100%; overflow:visible; }
-.dropdown-list { display:none; position:relative; width:100%; max-height:220px; overflow-y:auto; margin-top:8px; background:#0c1e3a; border:1px solid rgba(255,255,255,0.12); border-radius:12px; z-index:10; box-shadow:0 12px 35px rgba(0,0,0,0.4); box-sizing:border-box; }
+.dropdown-list { display:none; position:relative; width:100%; max-height:220px; overflow-y:auto; margin-top:8px; background:#0b1b31; border:1px solid rgba(255,255,255,0.12); border-radius:12px; z-index:10; box-shadow:0 12px 35px rgba(0,0,0,0.4); box-sizing:border-box; }
 .dropdown-list::-webkit-scrollbar { width:4px; }
 .dropdown-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:10px; }
 .dropdown-list .dropdown-item { padding:10px 16px; font-size:13px; color:rgba(255,255,255,0.75); cursor:pointer; transition:background 0.15s, color 0.15s; }
-.dropdown-list .dropdown-item:hover, .dropdown-list .dropdown-item.active { background:rgba(59,130,246,0.15); color:white; }
+.dropdown-list .dropdown-item:hover, .dropdown-list .dropdown-item.active { background:rgba(255,183,3,0.15); color:white; }
 .dropdown-list .dropdown-item.no-results { color:var(--text-muted); cursor:default; font-style:italic; }
 .dropdown-list .dropdown-item.no-results:hover { background:transparent; }
-.sidebar { position:fixed; top:0; left:0; bottom:0; width:270px; padding:34px 24px; background:rgba(2,6,23,.92); border-right:1px solid rgba(255,255,255,.08); backdrop-filter:blur(20px); display:flex; flex-direction:column; z-index:100; }
+.sidebar { position:fixed; top:0; left:0; bottom:0; width:270px; padding:34px 24px; background:rgba(7,20,38,.92); border-right:1px solid rgba(255,255,255,.08); backdrop-filter:blur(20px); display:flex; flex-direction:column; z-index:100; }
 .sidebar-header { margin-bottom:40px; }
 .sidebar-logo { display:flex; align-items:center; gap:12px; }
 .sidebar-logo img { height:45px; width:auto; object-fit:contain; }
@@ -21,27 +21,27 @@
 .step-item { position:relative; display:flex; align-items:center; gap:10px; min-height:40px; padding:6px 8px; border-radius:10px; color:rgba(255,255,255,.35); transition:background .25s ease, color .25s ease; }
 .step-dot { width:28px; height:28px; flex-shrink:0; display:grid; place-items:center; border-radius:50%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.06); color:rgba(255,255,255,.35); font-size:9px; font-weight:800; }
 .step-label { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.step-item.active { background:linear-gradient(90deg,rgba(59,130,246,.14),rgba(59,130,246,.04)); color:white; border:1px solid rgba(59,130,246,.12); }
-.step-dot.active { background:var(--blue); border-color:var(--blue); color:white; box-shadow:0 0 20px rgba(59,130,246,.25); }
+.step-item.active { background:linear-gradient(90deg,rgba(255,183,3,.14),rgba(255,183,3,.04)); color:white; border:1px solid rgba(255,183,3,.12); }
+.step-dot.active { background:var(--blue); border-color:var(--blue); color:white; box-shadow:0 0 20px rgba(255,183,3,.25); }
 .step-arrow { margin-left:auto; color:var(--blue-light); font-size:11px; }
 .progress-section { margin-top:auto; padding-top:12px; }
 .progress-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .progress-label { font-size:11px; color:rgba(255,255,255,.35); }
 .progress-value { font-size:11px; color:var(--blue-light); font-weight:700; }
 .progress-bar-track { height:5px; width:100%; overflow:hidden; border-radius:20px; background:rgba(255,255,255,.08); }
-.progress-bar-fill { display:block; height:100%; border-radius:20px; background:linear-gradient(90deg,#2563eb,#3b82f6,#60a5fa); box-shadow:0 0 15px rgba(59,130,246,.4); transition:width .6s cubic-bezier(0.16,1,0.3,1); }
+.progress-bar-fill { display:block; height:100%; border-radius:20px; background:linear-gradient(90deg,#e6a400,#ffb703,#ffc72c); box-shadow:0 0 15px rgba(255,183,3,.4); transition:width .6s cubic-bezier(0.16,1,0.3,1); }
 .progress-step-text { margin-top:8px; font-size:10px; color:rgba(255,255,255,.28); }
 .main-content { position:relative; z-index:1; min-height:100vh; margin-left:270px; padding:40px 55px; display:flex; align-items:center; justify-content:center; }
-.content-card { width:100%; max-width:950px; min-height:650px; padding:55px 60px; border-radius:30px; background:linear-gradient(145deg,rgba(15,40,71,.88),rgba(5,18,36,.94)); border:1px solid rgba(255,255,255,.08); box-shadow:0 35px 100px rgba(0,0,0,.35); backdrop-filter:blur(20px); display:flex; flex-direction:column; transform-style:preserve-3d; }
+.content-card { width:100%; max-width:950px; min-height:650px; padding:55px 60px; border-radius:30px; background:linear-gradient(145deg,rgba(18,44,77,.88),rgba(7,20,38,.94)); border:1px solid rgba(255,255,255,.08); box-shadow:0 35px 100px rgba(0,0,0,.35); backdrop-filter:blur(20px); display:flex; flex-direction:column; transform-style:preserve-3d; }
 .top { display:flex; align-items:center; justify-content:space-between; }
 .eyebrow { color:var(--blue-light); font-size:11px; font-weight:800; letter-spacing:2px; }
-.counter { width:58px; height:58px; display:grid; place-items:center; border-radius:50%; background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.18); color:var(--blue-light); font-size:13px; font-weight:800; }
+.counter { width:58px; height:58px; display:grid; place-items:center; border-radius:50%; background:rgba(255,183,3,.1); border:1px solid rgba(255,183,3,.18); color:var(--blue-light); font-size:13px; font-weight:800; }
 .question-title { max-width:750px; margin:50px 0 15px; font-size:clamp(40px,5vw,64px); line-height:1; letter-spacing:-2.5px; color:white; }
 .question-desc { max-width:700px; margin:0 0 35px; color:rgba(255,255,255,.48); font-size:14px; line-height:1.7; }
 .option-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:15px; }
 .opt-card { position:relative; padding:22px; border:1px solid rgba(255,255,255,.09); border-radius:18px; background:rgba(255,255,255,.035); color:rgba(255,255,255,.8); cursor:pointer; transition:transform .25s ease, border .25s ease, background .25s ease, box-shadow .25s ease; }
-.opt-card:hover { transform:translateY(-4px); background:rgba(59,130,246,.06); border-color:rgba(59,130,246,.35); }
-.opt-card.selected { transform:translateY(-4px); background:linear-gradient(135deg,rgba(59,130,246,.14),rgba(59,130,246,.04)); border-color:rgba(59,130,246,.7); color:white; box-shadow:0 15px 35px rgba(0,0,0,.18),0 0 25px rgba(59,130,246,.08); }
+.opt-card:hover { transform:translateY(-4px); background:rgba(255,183,3,.06); border-color:rgba(255,183,3,.35); }
+.opt-card.selected { transform:translateY(-4px); background:linear-gradient(135deg,rgba(255,183,3,.14),rgba(255,183,3,.04)); border-color:rgba(255,183,3,.7); color:white; box-shadow:0 15px 35px rgba(0,0,0,.18),0 0 25px rgba(255,183,3,.08); }
 .opt-check { position:absolute; top:14px; right:14px; width:22px; height:22px; display:grid; place-items:center; border-radius:50%; background:var(--blue); color:white; opacity:0; transform:scale(0); transition:opacity .2s ease, transform .2s ease; }
 .opt-card.selected .opt-check { opacity:1; transform:scale(1); }
 .opt-icon-wrap { width:40px; height:40px; display:grid; place-items:center; border-radius:12px; font-size:15px; }
@@ -53,11 +53,11 @@
 .input-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,.35); font-size:13px; pointer-events:none; z-index:2; }
 .glass-input { width:100%; height:48px; padding:0 16px 0 45px; border:1px solid rgba(255,255,255,.09); border-radius:12px; outline:none; background:rgba(255,255,255,.035); color:white; font-size:13px; transition:border-color .2s ease, background .2s ease, box-shadow .2s ease; }
 .glass-input::placeholder { color:rgba(255,255,255,.28); }
-.glass-input:focus { border-color:rgba(59,130,246,.55); background:rgba(59,130,246,.05); box-shadow:0 0 0 3px rgba(59,130,246,.08); }
+.glass-input:focus { border-color:rgba(255,183,3,.55); background:rgba(255,183,3,.05); box-shadow:0 0 0 3px rgba(255,183,3,.08); }
 .glass-input:disabled { opacity:.55; cursor:not-allowed; }
 .card-bottom { margin-top:auto; padding-top:35px; display:flex; align-items:center; gap:25px; }
-.btn-continue { display:inline-flex; align-items:center; gap:10px; padding:16px 25px; border:none; border-radius:13px; background:#3b82f6; color:white; font-size:14px; font-weight:800; cursor:pointer; transition:transform .25s ease, background .25s ease, box-shadow .25s ease; }
-.btn-continue:hover { background:#60a5fa; transform:translateY(-2px); box-shadow:0 12px 30px rgba(59,130,246,.25); }
+.btn-continue { display:inline-flex; align-items:center; gap:10px; padding:16px 25px; border:none; border-radius:13px; background:#ffb703; color:white; font-size:14px; font-weight:800; cursor:pointer; transition:transform .25s ease, background .25s ease, box-shadow .25s ease; }
+.btn-continue:hover { background:#ffc72c; transform:translateY(-2px); box-shadow:0 12px 30px rgba(255,183,3,.25); }
 .btn-continue:disabled { opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
 .error-box { margin-bottom:20px; padding:15px; border-radius:12px; background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.15); }
 .error-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; color:#f87171; font-size:13px; font-weight:700; }
@@ -93,7 +93,7 @@
     <nav class="step-list">
         <div class="step-item active" data-step="1">
             <div class="step-dot active">01</div>
-            <span class="step-label">Type de projet</span>
+            <span class="step-label">Vos informations</span>
             <i class="fa-solid fa-chevron-right step-arrow"></i>
         </div>
     </nav>
@@ -129,112 +129,74 @@
             <div class="top">
                 <div class="eyebrow">PARLONS DE VOTRE PROJET</div>
             </div>
-            <h1 class="question-title anim-slide-in">Quelle solution souhaitez-vous créer ?</h1>
-            <p class="question-desc anim-up d1">Sélectionnez le type de projet, puis remplissez vos coordonnées.</p>
+            <h1 class="question-title anim-slide-in">Vos informations</h1>
+            <p class="question-desc anim-up d1">Commençons par vos coordonnées.</p>
 
-            @php
-                $currentTypes = old('project_types', []);
-                if (!is_array($currentTypes)) { $currentTypes = []; }
-            @endphp
-            <input type="hidden" name="project_types" id="projectTypesInput" value="{{ json_encode($currentTypes) }}">
-
-            <div class="option-grid" style="max-width:100%;">
-                @foreach($projectTypes as $key => $type)
-                    <label class="opt-card {{ in_array($key, $currentTypes) ? 'selected' : '' }}" data-group="project_types" data-value="{{ $key }}">
-                        <div class="opt-check"><i class="fa-solid fa-check" style="font-size:9px;"></i></div>
-                        <div class="flex items-center gap-3">
-                            <div class="opt-icon-wrap" style="background:{{ $type['color'] }}18;color:{{ $type['color'] }};">
-                                <i class="{{ $type['icon'] }}"></i>
-                            </div>
-                            <div class="opt-label">{{ $type['label'] }}</div>
-                        </div>
-                        <div class="opt-desc">{{ $type['description'] }}</div>
-                    </label>
-                @endforeach
-            </div>
-
-            @if(in_array('autre', $currentTypes))
-                <div class="other-field" id="otherField" style="display:block;margin-top:16px;">
+            <div style="display:flex;flex-direction:column;gap:20px;">
+                <div>
+                    <label class="form-label">Nom complet <span style="color:#f87171;">*</span></label>
                     <div class="input-icon-wrap">
-                        <i class="fa-solid fa-pen input-icon"></i>
-                        <input type="text" name="other_description" class="glass-input" placeholder="Précisez votre besoin…" value="{{ old('other_description') }}" required>
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" name="name" value="{{ old('name') }}" class="glass-input" placeholder="Jean Dupont" required>
                     </div>
                 </div>
-            @else
-                <div class="other-field" id="otherField" style="display:none;margin-top:16px;">
+                <div>
+                    <label class="form-label">Email <span style="color:#f87171;">*</span></label>
                     <div class="input-icon-wrap">
-                        <i class="fa-solid fa-pen input-icon"></i>
-                        <input type="text" name="other_description" class="glass-input" placeholder="Précisez votre besoin…" value="{{ old('other_description') }}">
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                        <input type="email" name="email" value="{{ old('email') }}" class="glass-input" placeholder="jean@entreprise.com" required>
                     </div>
                 </div>
-            @endif
-
-            <div style="margin-top:40px;padding-top:30px;border-top:1px solid rgba(255,255,255,.08);">
-                <h2 style="font-size:20px;font-weight:800;color:white;margin-bottom:24px;">Vos informations</h2>
-                <div style="display:flex;flex-direction:column;gap:20px;">
+                <div class="option-grid" style="grid-template-columns:1fr 1fr;">
                     <div>
-                        <label class="form-label">Nom complet <span style="color:#f87171;">*</span></label>
+                        <label class="form-label">Téléphone <span style="color:#f87171;">*</span></label>
                         <div class="input-icon-wrap">
-                            <i class="fa-solid fa-user input-icon"></i>
-                            <input type="text" name="name" value="{{ old('name') }}" class="glass-input" placeholder="Jean Dupont" required>
+                            <i class="fa-solid fa-phone input-icon"></i>
+                            <input type="tel" name="phone" value="{{ old('phone') }}" class="glass-input" placeholder="+212 6..." required>
                         </div>
                     </div>
                     <div>
-                        <label class="form-label">Email <span style="color:#f87171;">*</span></label>
+                        <label class="form-label">WhatsApp</label>
                         <div class="input-icon-wrap">
-                            <i class="fa-solid fa-envelope input-icon"></i>
-                            <input type="email" name="email" value="{{ old('email') }}" class="glass-input" placeholder="jean@entreprise.com" required>
+                            <i class="fa-brands fa-whatsapp input-icon"></i>
+                            <input type="tel" name="whatsapp" value="{{ old('whatsapp') }}" class="glass-input" placeholder="+212 6...">
                         </div>
                     </div>
-                    <div class="option-grid" style="grid-template-columns:1fr 1fr;">
-                        <div>
-                            <label class="form-label">Téléphone <span style="color:#f87171;">*</span></label>
+                </div>
+                <div>
+                    <label class="form-label">Société</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-solid fa-building input-icon"></i>
+                        <input type="text" name="company_name" value="{{ old('company_name') }}" class="glass-input" placeholder="Nom de votre société">
+                    </div>
+                </div>
+                <div class="option-grid" style="grid-template-columns:1fr 1fr;">
+                    <div>
+                        <label class="form-label">Pays <span style="color:#f87171;">*</span></label>
+                        <div class="searchable-dropdown" id="countryDropdown">
                             <div class="input-icon-wrap">
-                                <i class="fa-solid fa-phone input-icon"></i>
-                                <input type="tel" name="phone" value="{{ old('phone') }}" class="glass-input" placeholder="+212 6..." required>
+                                <i class="fa-solid fa-earth-africa input-icon"></i>
+                                <input type="text" class="glass-input dropdown-search" placeholder="Chargement des pays…" autocomplete="off" value="{{ old('country') }}" disabled>
+                                <input type="hidden" name="country" id="countryNameInput" value="{{ old('country') }}">
                             </div>
-                        </div>
-                        <div>
-                            <label class="form-label">WhatsApp</label>
-                            <div class="input-icon-wrap">
-                                <i class="fa-brands fa-whatsapp input-icon"></i>
-                                <input type="tel" name="whatsapp" value="{{ old('whatsapp') }}" class="glass-input" placeholder="+212 6...">
-                            </div>
+                            <div class="dropdown-list" id="countryDropdownList"></div>
                         </div>
                     </div>
                     <div>
-                        <label class="form-label">Société</label>
-                        <div class="input-icon-wrap">
-                            <i class="fa-solid fa-building input-icon"></i>
-                            <input type="text" name="company_name" value="{{ old('company_name') }}" class="glass-input" placeholder="Nom de votre société">
-                        </div>
-                    </div>
-                    <div class="option-grid" style="grid-template-columns:1fr 1fr;">
-                        <div>
-                            <label class="form-label">Pays <span style="color:#f87171;">*</span></label>
-                            <div class="searchable-dropdown" id="countryDropdown">
-                                <div class="input-icon-wrap">
-                                    <i class="fa-solid fa-earth-africa input-icon"></i>
-                                    <input type="text" class="glass-input dropdown-search" placeholder="Chargement des pays…" autocomplete="off" value="{{ old('country') }}" disabled>
-                                    <input type="hidden" name="country" id="countryNameInput" value="{{ old('country') }}">
-                                </div>
-                                <div class="dropdown-list" id="countryDropdownList"></div>
+                        <label class="form-label">Ville <span style="color:#f87171;">*</span></label>
+                        <div class="searchable-dropdown" id="cityDropdown">
+                            <div class="input-icon-wrap">
+                                <i class="fa-solid fa-location-dot input-icon"></i>
+                                <input type="text" class="glass-input dropdown-search" placeholder="Sélectionnez d'abord un pays…" autocomplete="off" value="{{ old('city') }}" disabled>
+                                <input type="hidden" name="city" id="cityNameInput" value="{{ old('city') }}">
                             </div>
-                        </div>
-                        <div>
-                            <label class="form-label">Ville <span style="color:#f87171;">*</span></label>
-                            <div class="searchable-dropdown" id="cityDropdown">
-                                <div class="input-icon-wrap">
-                                    <i class="fa-solid fa-location-dot input-icon"></i>
-                                    <input type="text" class="glass-input dropdown-search" placeholder="Sélectionnez d'abord un pays…" autocomplete="off" value="{{ old('city') }}" disabled>
-                                    <input type="hidden" name="city" id="cityNameInput" value="{{ old('city') }}">
-                                </div>
-                                <div class="dropdown-list" id="cityDropdownList"></div>
-                            </div>
+                            <div class="dropdown-list" id="cityDropdownList"></div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <input type="hidden" name="project_types" id="projectTypesInput" value="{{ json_encode(old('project_types', ['site_vitrine'])) }}">
 
             <div class="card-bottom anim-up d3">
                 <div></div>

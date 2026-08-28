@@ -96,6 +96,98 @@ class QuestionnaireRoutesTest extends TestCase
         $this->assertEquals(['site_vitrine', 'ecommerce', 'application_mobile'], $project->project_type);
     }
 
+    public function test_project_type_site_vitrine_stored_correctly(): void
+    {
+        $this->seedCountriesCache();
+
+        $this->post(route('questionnaire.start'), [
+            'name' => 'Test Vitrine',
+            'email' => 'vitrine@test.com',
+            'phone' => '+22501020304',
+            'country' => "Côte d'Ivoire",
+            'city' => 'Abidjan',
+            'project_types' => ['site_vitrine'],
+        ]);
+
+        $project = Project::first();
+        $this->assertEquals(['site_vitrine'], $project->project_type);
+        $this->assertEquals('Site vitrine', $project->type_labels);
+    }
+
+    public function test_project_type_ecommerce_stored_correctly(): void
+    {
+        $this->seedCountriesCache();
+
+        $this->post(route('questionnaire.start'), [
+            'name' => 'Test E-commerce',
+            'email' => 'ecom@test.com',
+            'phone' => '+22501020304',
+            'country' => "Côte d'Ivoire",
+            'city' => 'Abidjan',
+            'project_types' => ['ecommerce'],
+        ]);
+
+        $project = Project::first();
+        $this->assertEquals(['ecommerce'], $project->project_type);
+        $this->assertEquals('Boutique en ligne', $project->type_labels);
+    }
+
+    public function test_project_type_application_mobile_stored_correctly(): void
+    {
+        $this->seedCountriesCache();
+
+        $this->post(route('questionnaire.start'), [
+            'name' => 'Test Mobile',
+            'email' => 'mobile@test.com',
+            'phone' => '+22501020304',
+            'country' => "Côte d'Ivoire",
+            'city' => 'Abidjan',
+            'project_types' => ['application_mobile'],
+        ]);
+
+        $project = Project::first();
+        $this->assertEquals(['application_mobile'], $project->project_type);
+        $this->assertEquals('Application mobile', $project->type_labels);
+    }
+
+    public function test_project_type_logiciel_stored_correctly(): void
+    {
+        $this->seedCountriesCache();
+
+        $this->post(route('questionnaire.start'), [
+            'name' => 'Test Logiciel',
+            'email' => 'logiciel@test.com',
+            'phone' => '+22501020304',
+            'country' => "Côte d'Ivoire",
+            'city' => 'Abidjan',
+            'project_types' => ['logiciel'],
+        ]);
+
+        $project = Project::first();
+        $this->assertEquals(['logiciel'], $project->project_type);
+        $this->assertEquals('Logiciel / ERP / CRM', $project->type_labels);
+    }
+
+    public function test_project_type_autre_stored_correctly(): void
+    {
+        $this->seedCountriesCache();
+
+        $this->post(route('questionnaire.start'), [
+            'name' => 'Test Autre',
+            'email' => 'autre@test.com',
+            'phone' => '+22501020304',
+            'country' => "Côte d'Ivoire",
+            'city' => 'Abidjan',
+            'project_types' => ['autre'],
+            'other_description' => 'Un projet sur mesure',
+        ]);
+
+        $project = Project::first();
+        $this->assertEquals(['autre'], $project->project_type);
+        $this->assertEquals('Autre', $project->type_labels);
+        $this->assertEquals('Un projet sur mesure', $project->description);
+    }
+
     public function test_start_requires_at_least_one_project_type(): void
     {
         $this->seedCountriesCache();

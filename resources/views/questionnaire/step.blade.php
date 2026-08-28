@@ -89,7 +89,7 @@
                 <p class="question-desc anim-up d2">{{ $question->description }}</p>
             @endif
 
-            <form action="{{ route('questionnaire.step.store', $step) }}" method="POST" enctype="multipart/form-data" id="stepForm">
+            <form action="{{ route('questionnaire.step.store', $step) }}{{ ($isEditing ?? false) ? '?edit=1' : '' }}" method="POST" enctype="multipart/form-data" id="stepForm">
                 @csrf
                 @php $otherOption = null; @endphp
 
@@ -151,14 +151,14 @@
                     <div class="option-grid anim-up d2">
                         <label class="opt-card yesno-card {{ $currentVal === 'yes' ? 'selected' : '' }}" data-group="value" data-value="yes">
                             <div class="opt-check"><i class="fa-solid fa-check" style="font-size:10px;"></i></div>
-                            <div class="yesno-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;">
+                            <div class="yesno-icon" style="background:rgba(255,183,3,0.12);color:#ffb703;">
                                 <i class="fa-solid fa-check"></i>
                             </div>
                             <div class="opt-label">Oui</div>
                         </label>
                         <label class="opt-card yesno-card {{ $currentVal === 'no' ? 'selected' : '' }}" data-group="value" data-value="no">
                             <div class="opt-check" style="background:#f87171;"><i class="fa-solid fa-xmark" style="font-size:10px;"></i></div>
-                            <div class="yesno-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;">
+                            <div class="yesno-icon" style="background:rgba(255,183,3,0.12);color:#ffb703;">
                                 <i class="fa-solid fa-xmark"></i>
                             </div>
                             <div class="opt-label">Non</div>
@@ -253,7 +253,7 @@
                         <div id="fileList" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
                         @if(!empty($answer) && !empty($answer->file_path))
                             <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;margin-top:8px;border-radius:var(--radius-xs);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);">
-                                <i class="fa-solid fa-file-check" style="color:#3b82f6;"></i>
+                                <i class="fa-solid fa-file-check" style="color:#ffb703;"></i>
                                 <span style="color:var(--text-secondary);">Fichier déjà envoyé</span>
                             </div>
                         @endif
@@ -358,7 +358,7 @@
             Array.from(files).forEach(f => {
                 const div = document.createElement('div');
                 div.style.cssText = 'padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);';
-                div.innerHTML = '<i class="fa-solid fa-file" style="color:#60a5fa;"></i><span style="color:white;">' + f.name + '</span><span style="margin-left:auto;color:var(--text-muted);font-size:11px;">' + (f.size/1024).toFixed(0) + ' KB</span>';
+                div.innerHTML = '<i class="fa-solid fa-file" style="color:#ffc72c;"></i><span style="color:white;">' + f.name + '</span><span style="margin-left:auto;color:var(--text-muted);font-size:11px;">' + (f.size/1024).toFixed(0) + ' KB</span>';
                 fl.appendChild(div);
             });
         }

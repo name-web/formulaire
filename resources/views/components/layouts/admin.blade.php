@@ -4,31 +4,31 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Admin' }} — DOMINIUM TECH</title>
+    <title>{{ $title ?? 'Admin' }} — {{ config('admin_brand.app_name', 'DOMINIUM TECH') }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
-            --blue: #3b82f6;
-            --blue-light: #60a5fa;
+            --blue: #ffb703;
+            --blue-light: #ffc72c;
             --cyan: #0ea5e9;
-            --bg-dark: #020617;
-            --bg-blue-dark: #0c1e3a;
-            --bg-blue: #0f2847;
+            --bg-dark: #071426;
+            --bg-blue-dark: #0b1b31;
+            --bg-blue: #102b4c;
             --bg-card: #081a31;
             --white: #ffffff;
             --text-muted: rgba(255,255,255,0.48);
             --text-secondary: rgba(255,255,255,0.65);
             --border: rgba(255,255,255,0.09);
-            --accent-surface: rgba(59,130,246,0.12);
-            --accent-light: #60a5fa;
+            --accent-surface: rgba(255,183,3,0.12);
+            --accent-light: #ffc72c;
             --radius: 16px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             color: var(--white);
-            background: linear-gradient(135deg, #020617 0%, #0c1e3a 40%, #0f2847 70%, #0a1628 100%);
+            background: linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -46,8 +46,8 @@
             background-size: 80px 80px;
         }
         .orb { position: absolute; border-radius: 50%; filter: blur(90px); }
-        .orb-1 { width: 500px; height: 500px; top: -180px; right: -100px; background: radial-gradient(circle, rgba(59,130,246,0.22) 0%, transparent 70%); animation: orbFloat1 9s ease-in-out infinite; }
-        .orb-2 { width: 450px; height: 450px; bottom: -200px; left: 15%; background: radial-gradient(circle, rgba(99,102,241,0.16) 0%, transparent 70%); animation: orbFloat2 11s ease-in-out infinite; }
+        .orb-1 { width: 500px; height: 500px; top: -180px; right: -100px; background: radial-gradient(circle, rgba(255,183,3,0.22) 0%, transparent 70%); animation: orbFloat1 9s ease-in-out infinite; }
+        .orb-2 { width: 450px; height: 450px; bottom: -200px; left: 15%; background: radial-gradient(circle, rgba(255,183,3,0.16) 0%, transparent 70%); animation: orbFloat2 11s ease-in-out infinite; }
         @keyframes orbFloat1 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-30px,25px) scale(1.05); } }
         @keyframes orbFloat2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(25px,-25px) scale(1.08); } }
 
@@ -56,7 +56,7 @@
         .admin-sidebar {
             position: fixed; top: 0; left: 0; bottom: 0; width: 260px;
             padding: 28px 20px;
-            background: rgba(2,6,23,0.95);
+            background: rgba(7,20,38,0.95);
             border-right: 1px solid rgba(255,255,255,0.08);
             backdrop-filter: blur(20px);
             display: flex; flex-direction: column; z-index: 100;
@@ -78,8 +78,8 @@
         .sidebar-nav a i { width: 18px; text-align: center; font-size: 14px; }
         .sidebar-nav a:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
         .sidebar-nav a.active {
-            background: linear-gradient(90deg, rgba(59,130,246,0.14), rgba(59,130,246,0.04));
-            color: white; border: 1px solid rgba(59,130,246,0.12);
+            background: linear-gradient(90deg, rgba(255,183,3,0.14), rgba(255,183,3,0.04));
+            color: white; border: 1px solid rgba(255,183,3,0.12);
         }
         .sidebar-nav a.active i { color: var(--blue-light); }
 
@@ -91,7 +91,7 @@
         }
         .sidebar-user-avatar {
             width: 34px; height: 34px; border-radius: 10px;
-            background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center;
+            background: rgba(255,183,3,0.15); display: flex; align-items: center; justify-content: center;
             font-size: 13px; color: var(--blue-light); font-weight: 800;
         }
         .sidebar-user-info { flex: 1; min-width: 0; }
@@ -117,7 +117,7 @@
         .admin-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
         .admin-card {
-            background: linear-gradient(145deg, rgba(15,40,71,0.7), rgba(5,18,36,0.8));
+            background: linear-gradient(145deg, rgba(18,44,77,0.7), rgba(7,20,38,0.8));
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 18px; padding: 28px; margin-bottom: 24px;
             backdrop-filter: blur(10px);
@@ -136,15 +136,17 @@
             padding: 14px 16px; font-size: 13px; color: rgba(255,255,255,0.75);
             border-bottom: 1px solid rgba(255,255,255,0.04);
         }
-        .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .admin-table tr { cursor: pointer; transition: background 0.15s ease; }
+        .admin-table tr:hover td { background: rgba(255,255,255,0.03); }
 
         .admin-badge {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
         }
         .badge-pending { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
-        .badge-in_progress { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+        .badge-in_progress { background: rgba(255,183,3,0.12); color: #ffc72c; border: 1px solid rgba(255,183,3,0.2); }
         .badge-completed { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+        .badge-submitted { background: rgba(168,85,247,0.12); color: #a855f7; border: 1px solid rgba(168,85,247,0.2); }
         .badge-cancelled { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
         .badge-active { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
         .badge-inactive { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
@@ -152,9 +154,10 @@
         .badge-user { background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.1); }
 
         .stat-card {
-            background: linear-gradient(145deg, rgba(15,40,71,0.7), rgba(5,18,36,0.8));
+            background: linear-gradient(145deg, rgba(18,44,77,0.7), rgba(7,20,38,0.8));
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 18px; padding: 24px; text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .stat-icon { width: 48px; height: 48px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 14px; }
         .stat-value { font-size: 32px; font-weight: 800; color: white; line-height: 1; }
@@ -166,7 +169,7 @@
             text-decoration: none; border: none; cursor: pointer; transition: all 0.2s ease;
         }
         .btn-primary { background: var(--blue); color: white; }
-        .btn-primary:hover { background: var(--blue-light); transform: translateY(-1px); box-shadow: 0 8px 25px rgba(59,130,246,0.25); }
+        .btn-primary:hover { background: var(--blue-light); transform: translateY(-1px); box-shadow: 0 8px 25px rgba(255,183,3,0.25); }
         .btn-secondary { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.1); }
         .btn-secondary:hover { background: rgba(255,255,255,0.1); color: white; }
         .btn-danger { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.15); }
@@ -179,7 +182,7 @@
             border-radius: 10px; color: white; font-size: 13px;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .admin-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+        .admin-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(255,183,3,0.12); }
         .admin-input::placeholder { color: var(--text-muted); }
         select.admin-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.48)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
         select.admin-input option { background: #0f172a; color: white; }
@@ -190,6 +193,11 @@
         .admin-alert {
             padding: 14px 18px; border-radius: 12px; margin-bottom: 24px;
             display: flex; align-items: center; gap: 10px; font-size: 13px;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #34d399; }
         .alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #f87171; }
@@ -202,7 +210,7 @@
             transition: all 0.2s ease;
         }
         .pagination a { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.08); }
-        .pagination a:hover { background: rgba(59,130,246,0.1); color: var(--blue-light); border-color: rgba(59,130,246,0.2); }
+        .pagination a:hover { background: rgba(255,183,3,0.1); color: var(--blue-light); border-color: rgba(255,183,3,0.2); }
         .pagination .active { background: var(--blue); color: white; border: 1px solid var(--blue); }
         .pagination .disabled { opacity: 0.3; pointer-events: none; }
 
@@ -223,8 +231,8 @@
     <div class="admin-layout">
         <aside class="admin-sidebar">
             <div class="sidebar-brand">
-                <img src="{{ asset('IMAGES/Logo dominium.png') }}" alt="DOMINIUM">
-                <span>DOMINIUM</span>
+                <img src="{{ asset(config('admin_brand.logo')) }}" alt="{{ config('admin_brand.brand_name') }}">
+                <span>{{ config('admin_brand.brand_name') }}</span>
             </div>
 
             <div class="sidebar-section">
@@ -232,21 +240,11 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <i class="fa-solid fa-chart-line"></i> Dashboard
-                </a>
-                <a href="{{ route('admin.projects.index') }}" class="{{ request()->routeIs('admin.projects.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-folder-open"></i> Projets
-                </a>
-                <a href="{{ route('admin.clients.index') }}" class="{{ request()->routeIs('admin.clients.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-users"></i> Clients
-                </a>
-                <a href="{{ route('admin.questions.index') }}" class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-circle-question"></i> Questions
-                </a>
-                <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-user-shield"></i> Utilisateurs
-                </a>
+                @foreach(config('admin_brand.nav_items') as $item)
+                    <a href="{{ route($item['route']) }}" class="{{ request()->routeIs($item['route_pattern']) ? 'active' : '' }}">
+                        <i class="{{ $item['icon'] }}"></i> {{ $item['label'] }}
+                    </a>
+                @endforeach
             </nav>
 
             <div class="sidebar-footer">
@@ -254,7 +252,7 @@
                     <div class="sidebar-user-avatar">{{ substr(auth()->user()->name, 0, 1) }}</div>
                     <div class="sidebar-user-info">
                         <div class="sidebar-user-name">{{ auth()->user()->name }}</div>
-                        <div class="sidebar-user-role">Administrateur</div>
+                        <div class="sidebar-user-role">{{ config('user_roles.roles.' . auth()->user()->role . '.label', ucfirst(auth()->user()->role)) }}</div>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

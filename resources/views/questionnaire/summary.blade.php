@@ -61,7 +61,7 @@
             @if(!empty($summary['project']))
                 <div style="padding:24px;border-radius:var(--radius);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);margin-top:12px;" class="anim-up d3">
                     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(59,130,246,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;color:#3b82f6;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,183,3,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;color:#ffb703;">
                             <i class="fa-solid fa-building"></i>
                         </div>
                         <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">Type de projet</span>
@@ -135,7 +135,7 @@
             @if(!empty($files) && count($files) > 0)
                 <div style="padding:24px;border-radius:var(--radius);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);margin-top:12px;" class="anim-up">
                     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(59,130,246,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;color:#3b82f6;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,183,3,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;color:#ffb703;">
                             <i class="fa-solid fa-paperclip"></i>
                         </div>
                         <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">Fichiers joints</span>
@@ -153,12 +153,12 @@
             @endif
 
             <div style="display:flex;align-items:center;gap:14px;padding:18px;border-radius:var(--radius);margin-top:24px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12);" class="anim-up">
-                <i class="fa-solid fa-shield-halved" style="color:#3b82f6;font-size:18px;"></i>
+                <i class="fa-solid fa-shield-halved" style="color:#ffb703;font-size:18px;"></i>
                 <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Vos données sont transmises de manière sécurisée et ne sont jamais partagées avec des tiers.</div>
             </div>
 
             <div class="card-bottom anim-up d5">
-                <a href="{{ route('questionnaire.step', 1) }}" class="btn-back" style="text-decoration:none;">
+                <a href="{{ route('questionnaire.step', 1) }}?edit=1" class="btn-back" style="text-decoration:none;">
                     <i class="fa-solid fa-arrow-left"></i> Modifier
                 </a>
                 <form action="{{ route('questionnaire.submit') }}" method="POST" style="display:inline;">

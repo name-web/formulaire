@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StartQuestionnaireRequest;
 use App\Http\Requests\SubmitAnswerRequest;
 use App\Models\Answer;
+use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\Question;
 use App\Services\Questionnaire\AnswerService;
@@ -53,18 +54,7 @@ class QuestionnaireController extends Controller
             $project->update(['description' => $validated['other_description']]);
         }
 
-        $qType = Question::where('title', 'Quelle solution souhaitez-vous créer ?')->first();
-        if ($qType && ! empty($projectTypes)) {
-            $optionIds = $qType->options()
-                ->whereIn('value', $projectTypes)
-                ->pluck('id')
-                ->toArray();
-            if (! empty($optionIds)) {
-                $this->answerService->save($project->id, $qType->id, [
-                    'option_ids' => $optionIds,
-                ]);
-            }
-        }
+        // Q7 is answered in the wizard, not pre-saved here
 
         session([
             'client_id' => $project->client_id,
@@ -102,11 +92,7 @@ class QuestionnaireController extends Controller
     private function buildSteps(Collection $questions, string|array $projectType): Collection
     {
         // Each question becomes its own wizard step (one question per page)
-        // Skip Q7 "Quelle solution" — already answered by the start form
-        $qType = Question::where('title', 'Quelle solution souhaitez-vous créer ?')->first();
-
         return $questions
-            ->filter(fn (Question $q) => $qType && $q->id !== $qType->id)
             ->sortBy('sort_order')
             ->values()
             ->map(fn (Question $q) => [
@@ -156,6 +142,7 @@ class QuestionnaireController extends Controller
 
                 if ($hasContent) {
                     $this->answerService->save($projectId, $questionId, $questionData);
+                    $this->syncProjectTypeFromAnswer($projectId, $question);
                 }
             }
         });
@@ -263,6 +250,8 @@ class QuestionnaireController extends Controller
 
         $this->answerService->save($projectId, $currentQuestion->id, $data);
 
+        $this->syncProjectTypeFromAnswer($projectId, $currentQuestion);
+
         if ($isEditing) {
             return redirect()->route('questionnaire.summary');
         }
@@ -362,5 +351,36 @@ class QuestionnaireController extends Controller
         $this->fileService->delete($fileId);
 
         return redirect()->route('questionnaire.summary');
+    }
+
+    private function syncProjectTypeFromAnswer(int $projectId, Question $question): void
+    {
+        $projectTypeKeys = array_keys(config('project_types.types'));
+
+        $optionValues = $question->options()->pluck('value')->toArray();
+
+        if (empty(array_intersect($optionValues, $projectTypeKeys))) {
+            return;
+        }
+
+        $answer = Answer::where('project_id', $projectId)
+            ->where('question_id', $question->id)
+            ->first();
+
+        if (! $answer) {
+            return;
+        }
+
+        $selectedValues = $answer->answerOptions
+            ->map(fn ($ao) => $ao->questionOption?->value)
+            ->filter()
+            ->toArray();
+
+        $projectTypes = array_values(array_intersect($selectedValues, $projectTypeKeys));
+
+        if (! empty($projectTypes)) {
+            Project::where('id', $projectId)->update(['project_type' => $projectTypes]);
+            session(['project_type' => $projectTypes]);
+        }
     }
 }

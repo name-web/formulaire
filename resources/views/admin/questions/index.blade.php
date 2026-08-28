@@ -15,14 +15,9 @@
             <div style="min-width:150px;">
                 <select name="type" class="admin-input">
                     <option value="">Tous les types</option>
-                    <option value="text" {{ request('type') === 'text' ? 'selected' : '' }}>Texte</option>
-                    <option value="textarea" {{ request('type') === 'textarea' ? 'selected' : '' }}>Texte long</option>
-                    <option value="number" {{ request('type') === 'number' ? 'selected' : '' }}>Nombre</option>
-                    <option value="date" {{ request('type') === 'date' ? 'selected' : '' }}>Date</option>
-                    <option value="yes_no" {{ request('type') === 'yes_no' ? 'selected' : '' }}>Oui/Non</option>
-                    <option value="select" {{ request('type') === 'select' ? 'selected' : '' }}>Sélection</option>
-                    <option value="multiselect" {{ request('type') === 'multiselect' ? 'selected' : '' }}>Multi-sélection</option>
-                    <option value="file" {{ request('type') === 'file' ? 'selected' : '' }}>Fichier</option>
+                    @foreach(config('question_types.types') as $key => $type)
+                        <option value="{{ $key }}" {{ request('type') === $key ? 'selected' : '' }}>{{ $type['label'] }}</option>
+                    @endforeach
                 </select>
             </div>
             <div style="min-width:130px;">
@@ -64,17 +59,7 @@
                             </td>
                             <td>
                                 @php
-                                    $typeLabel = match($question->type) {
-                                        'text' => 'Texte',
-                                        'textarea' => 'Texte long',
-                                        'number' => 'Nombre',
-                                        'date' => 'Date',
-                                        'yes_no' => 'Oui/Non',
-                                        'select' => 'Sélection',
-                                        'multiselect' => 'Multi-sélection',
-                                        'file' => 'Fichier',
-                                        default => $question->type,
-                                    };
+                                    $typeLabel = config("question_types.types.{$question->type}.label", $question->type);
                                 @endphp
                                 <span class="admin-badge badge-in_progress">{{ $typeLabel }}</span>
                             </td>

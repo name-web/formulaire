@@ -14,16 +14,16 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (! auth()->user()->isAdmin()) {
-            abort(403, 'Accès non autorisé.');
-        }
-
         if (! auth()->user()->isActive()) {
             auth()->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             return redirect()->route('login')->with('error', 'Votre compte a été désactivé.');
+        }
+
+        if (! auth()->user()->isAdmin()) {
+            abort(403, 'Accès non autorisé.');
         }
 
         return $next($request);

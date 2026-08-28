@@ -23,6 +23,9 @@ class StartQuestionnaireRequest extends FormRequest
             $decoded = json_decode($projectTypes, true);
             if (is_array($decoded)) {
                 $this->merge(['project_types' => $decoded]);
+            } else {
+                // Plain string like 'ecommerce' — wrap in array
+                $this->merge(['project_types' => [$projectTypes]]);
             }
         }
     }

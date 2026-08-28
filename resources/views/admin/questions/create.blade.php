@@ -21,14 +21,9 @@
                     <label class="admin-label">Type *</label>
                     <select name="type" class="admin-input" required>
                         <option value="">— Sélectionner —</option>
-                        <option value="text" {{ old('type') === 'text' ? 'selected' : '' }}>Texte court</option>
-                        <option value="textarea" {{ old('type') === 'textarea' ? 'selected' : '' }}>Texte long</option>
-                        <option value="number" {{ old('type') === 'number' ? 'selected' : '' }}>Nombre</option>
-                        <option value="date" {{ old('type') === 'date' ? 'selected' : '' }}>Date</option>
-                        <option value="yes_no" {{ old('type') === 'yes_no' ? 'selected' : '' }}>Oui / Non</option>
-                        <option value="select" {{ old('type') === 'select' ? 'selected' : '' }}>Sélection unique</option>
-                        <option value="multiselect" {{ old('type') === 'multiselect' ? 'selected' : '' }}>Multi-sélection</option>
-                        <option value="file" {{ old('type') === 'file' ? 'selected' : '' }}>Fichier</option>
+                        @foreach(config('question_types.types') as $key => $type)
+                            <option value="{{ $key }}" {{ old('type') === $key ? 'selected' : '' }}>{{ $type['label'] }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -62,7 +57,7 @@
                     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
                         @foreach($projectTypes as $key => $type)
                             <label style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);cursor:pointer;font-size:12px;color:rgba(255,255,255,0.7);">
-                                <input type="checkbox" name="project_types[]" value="{{ $key }}" {{ in_array($key, old('project_types', [])) ? 'checked' : '' }} style="accent-color:#3b82f6;">
+                                <input type="checkbox" name="project_types[]" value="{{ $key }}" {{ in_array($key, old('project_types', [])) ? 'checked' : '' }} style="accent-color:#ffb703;">
                                 {{ $type['label'] }}
                             </label>
                         @endforeach
@@ -71,11 +66,11 @@
 
                 <div style="display:flex;gap:20px;grid-column:1/-1;">
                     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.7);">
-                        <input type="checkbox" name="is_required" value="1" {{ old('is_required') ? 'checked' : '' }} style="accent-color:#3b82f6;">
+                        <input type="checkbox" name="is_required" value="1" {{ old('is_required') ? 'checked' : '' }} style="accent-color:#ffb703;">
                         Question obligatoire
                     </label>
                     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.7);">
-                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', '1') ? 'checked' : '' }} style="accent-color:#3b82f6;">
+                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', '1') ? 'checked' : '' }} style="accent-color:#ffb703;">
                         Active
                     </label>
                 </div>

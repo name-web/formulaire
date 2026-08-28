@@ -38,7 +38,8 @@
                             <td style="font-weight:600;color:rgba(255,255,255,0.85);">{{ $user->name }}</td>
                             <td style="color:var(--text-secondary);">{{ $user->email }}</td>
                             <td>
-                                <span class="admin-badge {{ $user->isAdmin() ? 'badge-admin' : 'badge-user' }}">{{ ucfirst($user->role) }}</span>
+                                @php $roleConfig = config('user_roles.roles.' . $user->role, ['label' => ucfirst($user->role), 'class' => 'badge-user']); @endphp
+                                <span class="admin-badge {{ $roleConfig['class'] }}">{{ $roleConfig['label'] }}</span>
                             </td>
                             <td>
                                 <span class="admin-badge {{ $user->is_active ? 'badge-active' : 'badge-inactive' }}">{{ $user->is_active ? 'Actif' : 'Inactif' }}</span>
@@ -68,7 +69,7 @@
 
     {{-- Create User Modal --}}
     <div id="createUserModal" style="display:none;position:fixed;inset:0;z-index:999;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" onclick="if(event.target===this)this.style.display='none'">
-        <div style="width:100%;max-width:460px;background:linear-gradient(145deg,rgba(15,40,71,0.95),rgba(5,18,36,0.98));border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:36px;">
+        <div style="width:100%;max-width:460px;background:linear-gradient(145deg,rgba(18,44,77,0.95),rgba(7,20,38,0.98));border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:36px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
                 <h3 style="font-size:18px;font-weight:800;color:white;">Nouvel utilisateur</h3>
                 <button onclick="document.getElementById('createUserModal').style.display='none'" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;"><i class="fa-solid fa-xmark"></i></button>
@@ -95,8 +96,9 @@
                 <div class="form-group">
                     <label class="admin-label">Rôle</label>
                     <select name="role" class="admin-input">
-                        <option value="user">Utilisateur</option>
-                        <option value="admin">Administrateur</option>
+                        @foreach(config('user_roles.roles') as $key => $role)
+                            <option value="{{ $key }}">{{ $role['label'] }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div style="display:flex;gap:10px;margin-top:24px;">

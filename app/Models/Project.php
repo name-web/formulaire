@@ -22,6 +22,21 @@ class Project extends Model
         'submitted_at' => 'datetime',
     ];
 
+    public static function getStatusConfig(string $status): array
+    {
+        return config("project_status.statuses.{$status}") ?? ['label' => ucfirst($status), 'class' => 'badge-user', 'icon' => 'fa-circle'];
+    }
+
+    public static function getSectionIcon(string $label): string
+    {
+        return config("section_icons.icons.{$label}") ?? config('section_icons.default_icon', 'fa-clipboard-list');
+    }
+
+    public static function getStatuses(): array
+    {
+        return config('project_status.statuses', []);
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
@@ -40,5 +55,29 @@ class Project extends Model
     public function notes(): HasMany
     {
         return $this->hasMany(ProjectNote::class);
+    }
+
+    public function getTypeLabelsAttribute(): string
+    {
+        $types = is_array($this->project_type) ? $this->project_type : [$this->project_type];
+
+        return collect($types)
+            ->map(fn ($t) => config("project_types.types.{$t}.label", $t))
+            ->implode(', ');
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::getStatusConfig($this->status)['label'];
+    }
+
+    public function getStatusClassAttribute(): string
+    {
+        return self::getStatusConfig($this->status)['class'];
+    }
+
+    public function getAnswersCountAttribute(): int
+    {
+        return $this->answers->count();
     }
 }

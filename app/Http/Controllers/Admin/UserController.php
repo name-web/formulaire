@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\View;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
@@ -33,7 +33,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => ['required', 'in:admin,user'],
+            'role' => ['required', 'in:'.implode(',', array_keys(config('user_roles.roles')))],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -49,7 +49,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
-            'role' => ['sometimes', 'in:admin,user'],
+            'role' => ['sometimes', 'in:'.implode(',', array_keys(config('user_roles.roles')))],
         ]);
 
         $user->update($validated);

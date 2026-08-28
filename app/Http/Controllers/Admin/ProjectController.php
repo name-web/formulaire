@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\View;
+use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
@@ -19,7 +19,6 @@ class ProjectController extends Controller
         }
 
         if ($request->filled('type')) {
-            $query->whereRaw("json_type(project_type, '$[*]') IS NOT NULL");
             $query->whereRaw('project_type LIKE ?', ['%"'.$request->type.'"%']);
         }
 
@@ -29,12 +28,23 @@ class ProjectController extends Controller
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('company_name', 'like', "%{$search}%");
-            })->orWhere('title', 'like', "%{$search}%");
+            })->orWhere('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
         }
 
         $projects = $query->latest()->paginate(15)->withQueryString();
 
-        return view('admin.projects.index', compact('projects'));
+        $totalResults = $query->count();
+
+        return view('admin.projects.index', compact('projects', 'totalResults'));
     }
 
     public function show(Project $project): View
@@ -44,17 +54,20 @@ class ProjectController extends Controller
         $answers = $project->answers->map(function ($answer) {
             $question = $answer->question;
             $displayValue = $answer->getDisplayValue();
+            $selectValues = $answer->getSelectValues();
 
-            return compact('answer', 'question', 'displayValue');
+            return compact('answer', 'question', 'displayValue', 'selectValues');
         });
 
-        return view('admin.projects.show', compact('project', 'answers'));
+        $groupedAnswers = $answers->groupBy(fn ($item) => $item['question']->group_label ?? 'Informations');
+
+        return view('admin.projects.show', compact('project', 'answers', 'groupedAnswers'));
     }
 
     public function updateStatus(Request $request, Project $project): RedirectResponse
     {
         $request->validate([
-            'status' => ['required', 'in:pending,in_progress,completed,cancelled'],
+            'status' => ['required', 'in:'.implode(',', array_keys(config('project_status.statuses')))],
         ]);
 
         $project->update(['status' => $request->status]);

@@ -89,7 +89,7 @@
                         <div class="counter">{{ str_pad($globalIdx, 2, '0', STR_PAD_LEFT) }} / {{ str_pad(count($steps), 2, '0', STR_PAD_LEFT) }}</div>
                     </div>
 
-                    <h1 class="question-title anim-slide-in">{{ $question->title }}</h1>
+                    <h1 class="question-title anim-slide-in">{{ $question->title }}@if($question->is_required)<span class="req">*</span>@endif</h1>
                     @if(!empty($question->description))
                         <p class="question-desc anim-up d1">{{ $question->description }}</p>
                     @endif
@@ -163,7 +163,7 @@
                             <label class="opt-card yesno-card {{ $currentVal === 'yes' ? 'selected' : '' }}"
                                    data-group="yesno-{{ $question->id }}" data-value="yes" data-question="{{ $question->id }}">
                                 <div class="opt-check"><i class="fa-solid fa-check" style="font-size:10px;"></i></div>
-                                <div class="yesno-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;">
+                                <div class="yesno-icon" style="background:rgba(255,183,3,0.12);color:#ffb703;">
                                     <i class="fa-solid fa-check"></i>
                                 </div>
                                 <div class="opt-label">Oui</div>
@@ -171,7 +171,7 @@
                             <label class="opt-card yesno-card {{ $currentVal === 'no' ? 'selected' : '' }}"
                                    data-group="yesno-{{ $question->id }}" data-value="no" data-question="{{ $question->id }}">
                                 <div class="opt-check" style="background:#f87171;"><i class="fa-solid fa-xmark" style="font-size:10px;"></i></div>
-                                <div class="yesno-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;">
+                                <div class="yesno-icon" style="background:rgba(255,183,3,0.12);color:#ffb703;">
                                     <i class="fa-solid fa-xmark"></i>
                                 </div>
                                 <div class="opt-label">Non</div>
@@ -224,7 +224,7 @@
                             $showOther = $otherOption && in_array($otherOption->id, $selectedValues);
                         @endphp
                         <div class="anim-up d2" style="display:flex;flex-direction:column;gap:12px;">
-                            <div class="option-grid">
+                            <div class="option-grid" data-other-option="{{ $otherOption?->id }}">
                                 @foreach($options as $option)
                                     @php $sel = in_array($option->id, $selectedValues); @endphp
                                     <label class="opt-card {{ $sel ? 'selected' : '' }}"
@@ -270,7 +270,7 @@
                             <div data-file-list="{{ $question->id }}" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
                             @if($existingAnswer && !empty($existingAnswer->file_path))
                                 <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;margin-top:8px;border-radius:var(--radius-xs);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);">
-                                    <i class="fa-solid fa-file-check" style="color:#3b82f6;"></i>
+                                    <i class="fa-solid fa-file-check" style="color:#ffb703;"></i>
                                     <span style="color:var(--text-secondary);">Fichier déjà envoyé</span>
                                 </div>
                             @endif
@@ -396,14 +396,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeFill) activeFill.style.width = pct + '%';
     }
 
+    function restartAnimations(container) {
+        container.querySelectorAll('.anim-up, .anim-slide-in, .anim-scale').forEach(el => {
+            el.style.animation = 'none';
+            el.offsetHeight;
+            el.style.animation = '';
+        });
+    }
+
     function showStep(step) {
         document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
         const target = document.getElementById('step-' + step);
-        if (target) target.classList.add('active');
+        if (target) {
+            target.classList.add('active');
+            restartAnimations(target);
+        }
         currentStep = step;
         updateSidebar();
         updateProgress();
-        document.querySelector('.main-content').scrollTo(0, 0);
+        window.scrollTo(0, 0);
     }
 
     window.goToStep = function(step, depth) {
@@ -535,18 +546,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const optId = parseInt(card.dataset.value);
             const otherField = document.querySelector(`[data-other-for="${qid}"]`);
             if (otherField) {
-                const selectEl = document.querySelector(`select[data-qid="${qid}"]`);
-                if (selectEl) {
-                    const otherOptionId = selectEl.dataset.otherOption;
-                    otherField.style.display = selectEl.value == otherOptionId ? 'block' : 'none';
-                } else {
-                    const otherInput = otherField.querySelector('input[type="text"]');
-                    if (otherInput) {
-                        const parentSelect = document.querySelector(`select[data-qid="${qid}"]`);
-                        if (parentSelect && parseInt(parentSelect.dataset.otherOption) === optId) {
-                            otherField.style.display = card.classList.contains('selected') ? 'block' : 'none';
-                        }
-                    }
+                const grid = card.closest('.option-grid');
+                const otherOptionId = grid ? parseInt(grid.dataset.otherOption) : 0;
+                if (otherOptionId && optId === otherOptionId) {
+                    otherField.style.display = card.classList.contains('selected') ? 'block' : 'none';
                 }
             }
         });
@@ -594,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Array.from(files).forEach(f => {
             const div = document.createElement('div');
             div.style.cssText = 'padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);';
-            div.innerHTML = '<i class="fa-solid fa-file" style="color:#60a5fa;"></i><span style="color:white;">' + f.name + '</span><span style="margin-left:auto;color:var(--text-muted);font-size:11px;">' + (f.size/1024).toFixed(0) + ' KB</span>';
+            div.innerHTML = '<i class="fa-solid fa-file" style="color:#ffc72c;"></i><span style="color:white;">' + f.name + '</span><span style="margin-left:auto;color:var(--text-muted);font-size:11px;">' + (f.size/1024).toFixed(0) + ' KB</span>';
             container.appendChild(div);
         });
     }

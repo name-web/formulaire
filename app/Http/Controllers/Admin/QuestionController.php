@@ -7,7 +7,7 @@ use App\Models\Question;
 use App\Models\QuestionOption;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\View;
+use Illuminate\View\View;
 
 class QuestionController extends Controller
 {
@@ -35,9 +35,10 @@ class QuestionController extends Controller
     public function create(): View
     {
         $projectTypes = config('project_types.types');
+        $questionTypes = config('question_types.types');
         $questions_max_order = (Question::max('sort_order') ?? 0) + 1;
 
-        return view('admin.questions.create', compact('projectTypes', 'questions_max_order'));
+        return view('admin.questions.create', compact('projectTypes', 'questionTypes', 'questions_max_order'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -45,7 +46,7 @@ class QuestionController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'in:text,textarea,number,date,yes_no,select,multiselect,file'],
+            'type' => ['required', 'in:'.implode(',', array_keys(config('question_types.types')))],
             'project_types' => ['nullable', 'array'],
             'project_types.*' => ['string'],
             'is_required' => ['boolean'],
@@ -87,8 +88,9 @@ class QuestionController extends Controller
     {
         $question->load('options', 'conditions');
         $projectTypes = config('project_types.types');
+        $questionTypes = config('question_types.types');
 
-        return view('admin.questions.edit', compact('question', 'projectTypes'));
+        return view('admin.questions.edit', compact('question', 'projectTypes', 'questionTypes'));
     }
 
     public function update(Request $request, Question $question): RedirectResponse
@@ -96,7 +98,7 @@ class QuestionController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'in:text,textarea,number,date,yes_no,select,multiselect,file'],
+            'type' => ['required', 'in:'.implode(',', array_keys(config('question_types.types')))],
             'project_types' => ['nullable', 'array'],
             'project_types.*' => ['string'],
             'is_required' => ['boolean'],
