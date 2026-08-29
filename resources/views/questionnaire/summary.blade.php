@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         </div>
 
-        <div class="sidebar-label">VOTRE PROGRESSION</div>
+        <div class="sidebar-label">{{ __('VOTRE PROGRESSION') }}</div>
 
         <nav class="step-list">
             {{-- Questions du questionnaire --}}
@@ -87,20 +87,20 @@ document.addEventListener('DOMContentLoaded', () => {
             @endif
             <div class="step-item active">
                 <div class="step-dot active"><i class="fa-solid fa-clipboard-check" style="font-size:10px;"></i></div>
-                <span class="step-label">Récapitulatif</span>
+                <span class="step-label">{{ __('Récapitulatif') }}</span>
                 <i class="fa-solid fa-chevron-right step-arrow"></i>
             </div>
         </nav>
 
         <div class="progress-section">
             <div class="progress-header">
-                <span class="progress-label">Progression</span>
+                <span class="progress-label">{{ __('Progression') }}</span>
                 <span class="progress-value">{{ $progress['percentage'] }}%</span>
             </div>
             <div class="progress-bar-track">
                 <div class="progress-bar-fill" style="width: {{ $progress['percentage'] }}%"></div>
             </div>
-            <div class="progress-step-text">Récapitulatif</div>
+            <div class="progress-step-text">{{ __('Récapitulatif') }}</div>
         </div>
     </aside>
 
@@ -121,14 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="top">
-                <div class="eyebrow">PARLONS DE VOTRE PROJET</div>
+                <div class="eyebrow">{{ __('PARLONS DE VOTRE PROJET') }}</div>
                 <div class="counter">{{ str_pad(count($summary['questions']), 2, '0', STR_PAD_LEFT) }} / {{ str_pad(count($summary['questions']), 2, '0', STR_PAD_LEFT) }}</div>
             </div>
 
             <h1 class="question-title anim-up d1">
-                Récapitulatif
+                {{ __('Récapitulatif') }}
             </h1>
-            <p class="question-desc anim-up d2">Vérifiez vos réponses avant de soumettre votre demande.</p>
+            <p class="question-desc anim-up d2">{{ __('Vérifiez vos réponses avant de soumettre votre demande.') }}</p>
 
             @if(!empty($summary['project']))
                 <div style="padding:24px;border-radius:var(--radius);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);margin-top:12px;" class="anim-up d3">
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,183,3,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;color:#ffb703;">
                             <i class="fa-solid fa-building"></i>
                         </div>
-                        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">Type de projet</span>
+                        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">{{ __('Type de projet') }}</span>
                     </div>
                     @php
                         $projType = $summary['project']->project_type ?? null;
@@ -153,25 +153,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style="width:36px;height:36px;border-radius:10px;background:var(--accent-surface);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--accent-light);">
                             <i class="fa-solid fa-user"></i>
                         </div>
-                        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">Vos informations</span>
+                        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">{{ __('Vos informations') }}</span>
                     </div>
                     <div style="font-size:14px;color:var(--text-secondary);line-height:1.9;">
-                        <p><strong style="color:rgba(255,255,255,0.85);">Nom :</strong> {{ $summary['client']->name ?? '—' }}</p>
-                        <p><strong style="color:rgba(255,255,255,0.85);">Email :</strong> {{ $summary['client']->email ?? '—' }}</p>
+                        <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Nom :') }}</strong> {{ $summary['client']->name ?? '—' }}</p>
+                        <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Email :') }}</strong> {{ $summary['client']->email ?? '—' }}</p>
                         @if(!empty($summary['client']->phone))
-                            <p><strong style="color:rgba(255,255,255,0.85);">Téléphone :</strong> {{ $summary['client']->phone }}</p>
+                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Téléphone :') }}</strong> {{ $summary['client']->phone }}</p>
                         @endif
                         @if(!empty($summary['client']->company_name))
-                            <p><strong style="color:rgba(255,255,255,0.85);">Société :</strong> {{ $summary['client']->company_name }}</p>
+                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Société :') }}</strong> {{ $summary['client']->company_name }}</p>
                         @endif
                         @if(!empty($summary['client']->whatsapp))
-                            <p><strong style="color:rgba(255,255,255,0.85);">WhatsApp :</strong> {{ $summary['client']->whatsapp }}</p>
+                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('WhatsApp :') }}</strong> {{ $summary['client']->whatsapp }}</p>
                         @endif
                         @if(!empty($summary['client']->city))
-                            <p><strong style="color:rgba(255,255,255,0.85);">Ville :</strong> {{ $summary['client']->city }}</p>
+                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Ville :') }}</strong> {{ $summary['client']->city }}</p>
                         @endif
                         @if(!empty($summary['client']->country))
-                            <p><strong style="color:rgba(255,255,255,0.85);">Pays :</strong> {{ $summary['client']->country }}</p>
+                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Pays :') }}</strong> {{ $summary['client']->country }}</p>
                         @endif
                     </div>
                 </div>
@@ -185,19 +185,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         $display = $item['display_value'];
                     @endphp
                     <div style="padding:18px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);margin-top:12px;{{ $loop->iteration <= 5 ? 'animation-delay:' . min($loop->iteration * 60, 300) . 'ms;opacity:0;animation-fill-mode:forwards;' : '' }}" class="anim-up">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">{{ $question->title }}</div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;min-width:0;">
+                            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $question->title }}</div>
                             <a href="{{ route('questionnaire.step', $question->sort_order) }}?edit=1" style="font-size:11px;color:var(--accent-light);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
-                                <i class="fa-solid fa-pen" style="font-size:9px;"></i> Modifier
+                                 <i class="fa-solid fa-pen" style="font-size:9px;"></i> {{ __('Modifier') }}
                             </a>
                         </div>
-                        <div style="font-size:15px;color:rgba(255,255,255,0.85);font-weight:500;line-height:1.6;">
+                        <div style="font-size:15px;color:rgba(255,255,255,0.85);font-weight:500;line-height:1.6;word-break:break-word;">
                             @if(!empty($display))
                                 {{ $display }}
                             @elseif(!empty($answer) && $question->type === 'file' && !empty($answer->file_path))
-                                <span style="display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-paperclip" style="color:var(--accent-light);"></i> Fichier joint</span>
+                                <span style="display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-paperclip" style="color:var(--accent-light);"></i> {{ __('Fichier joint') }}</span>
                             @else
-                                <span style="color:var(--text-muted);font-style:italic;">Non répondu</span>
+                                <span style="color:var(--text-muted);font-style:italic;">{{ __('Non répondu') }}</span>
                             @endif
                         </div>
                     </div>
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,183,3,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;color:#ffb703;">
                             <i class="fa-solid fa-paperclip"></i>
                         </div>
-                        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">Fichiers joints</span>
+                        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">{{ __('Fichiers joints') }}</span>
                     </div>
                     <div style="display:flex;flex-direction:column;gap:8px;">
                         @foreach($files as $file)
@@ -226,18 +226,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <div style="display:flex;align-items:center;gap:14px;padding:18px;border-radius:var(--radius);margin-top:24px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12);" class="anim-up">
                 <i class="fa-solid fa-shield-halved" style="color:#ffb703;font-size:18px;"></i>
-                <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Vos données sont transmises de manière sécurisée et ne sont jamais partagées avec des tiers.</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">{{ __('Vos données sont transmises de manière sécurisée et ne sont jamais partagées avec des tiers.') }}</div>
             </div>
 
             <div class="card-bottom anim-up d5">
                 <a href="{{ route('questionnaire.step', 1) }}?edit=1" class="btn-back" style="text-decoration:none;">
-                    <i class="fa-solid fa-arrow-left"></i> Modifier
+                    <i class="fa-solid fa-arrow-left"></i> {{ __('Modifier') }}
                 </a>
                 <div style="display:inline-flex;">
                     <form action="{{ route('questionnaire.submit') }}" method="POST">
                         @csrf
                         <button type="submit" class="btn-continue">
-                            Envoyer ma demande <i class="fa-solid fa-paper-plane"></i>
+                            {{ __('Envoyer ma demande') }} <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </form>
                 </div>

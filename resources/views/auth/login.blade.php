@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Connexion — DOMINIUM TECH</title>
+    <title>{{ __('Connexion — DOMINIUM TECH') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
@@ -89,7 +89,7 @@
             <div class="login-brand">
                 <img src="{{ asset('IMAGES/Logo dominium.png') }}" alt="DOMINIUM">
                 <h1>DOMINIUM TECH</h1>
-                <p>Espace administrateur</p>
+                <p>{{ __('Espace administrateur') }}</p>
             </div>
 
             @if(session('error'))
@@ -109,7 +109,7 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
                 <div class="form-group">
-                    <label class="form-label">Email</label>
+                    <label class="form-label">{{ __('Email') }}</label>
                     <div class="input-wrap">
                         <i class="fa-solid fa-envelope"></i>
                         <input type="email" name="email" class="form-input" placeholder="admin@dominium.tech" value="{{ old('email') }}" required autofocus autocomplete="username">
@@ -117,7 +117,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Mot de passe</label>
+                    <label class="form-label">{{ __('Mot de passe') }}</label>
                     <div class="input-wrap">
                         <i class="fa-solid fa-lock"></i>
                         <input type="password" name="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
@@ -126,16 +126,16 @@
 
                 <div class="remember-row">
                     <input type="checkbox" id="remember" name="remember" value="1" checked>
-                    <label for="remember">Rester connecté</label>
+                    <label for="remember">{{ __('Rester connecté') }}</label>
                 </div>
 
                 <button type="submit" class="btn-login">
-                    Se connecter <i class="fa-solid fa-arrow-right" style="margin-left:6px;"></i>
+                    {{ __('Se connecter') }} <i class="fa-solid fa-arrow-right" style="margin-left:6px;"></i>
                 </button>
             </form>
 
             <div class="forgot-link">
-                <a href="{{ route('password.request') }}">Mot de passe oublié ?</a>
+                <a href="{{ route('password.request') }}">{{ __('Mot de passe oublié ?') }}</a>
             </div>
         </div>
     </div>

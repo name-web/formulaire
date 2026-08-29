@@ -130,25 +130,25 @@
         </div>
     </div>
 
-    <div class="sidebar-label">VOTRE PROGRESSION</div>
+    <div class="sidebar-label">{{ __('VOTRE PROGRESSION') }}</div>
 
     <nav class="step-list">
         <div class="step-item active" data-step="1">
             <div class="step-dot active">01</div>
-            <span class="step-label">Vos informations</span>
+            <span class="step-label">{{ __('Vos informations') }}</span>
             <i class="fa-solid fa-chevron-right step-arrow"></i>
         </div>
     </nav>
 
     <div class="progress-section">
         <div class="progress-header">
-            <span class="progress-label">Progression</span>
+            <span class="progress-label">{{ __('Progression') }}</span>
             <span class="progress-value">0%</span>
         </div>
         <div class="progress-bar-track">
             <div class="progress-bar-fill" style="width:0%"></div>
         </div>
-        <div class="progress-step-text">Étape <strong>1</strong></div>
+        <div class="progress-step-text">{{ __('Étape') }} <strong>1</strong></div>
     </div>
 </aside>
 
@@ -165,7 +165,7 @@
 
         @if($errors->any())
             <div class="error-box anim-up d1">
-                <div class="error-header"><i class="fa-solid fa-circle-exclamation"></i><span>Erreur</span></div>
+                <div class="error-header"><i class="fa-solid fa-circle-exclamation"></i><span>{{ __('Erreur') }}</span></div>
                 @foreach($errors->all() as $error)
                     <div class="error-msg">{{ $error }}</div>
                 @endforeach
@@ -177,21 +177,21 @@
             @csrf
 
             <div class="top">
-                <div class="eyebrow">PARLONS DE VOTRE PROJET</div>
+                <div class="eyebrow">{{ __('PARLONS DE VOTRE PROJET') }}</div>
             </div>
-            <h1 class="question-title anim-slide-in">Vos informations</h1>
-            <p class="question-desc anim-up d1">Commençons par vos coordonnées.</p>
+            <h1 class="question-title anim-slide-in">{{ __('Vos informations') }}</h1>
+            <p class="question-desc anim-up d1">{{ __('Commençons par vos coordonnées.') }}</p>
 
             <div style="display:flex;flex-direction:column;gap:20px;">
                 <div>
-                    <label class="form-label">Nom complet <span style="color:#f87171;">*</span></label>
+                    <label class="form-label">{{ __('Nom complet') }} <span style="color:#f87171;">*</span></label>
                     <div class="input-icon-wrap">
                         <i class="fa-solid fa-user input-icon"></i>
                         <input type="text" name="name" value="{{ old('name') }}" class="glass-input" placeholder="Jean Dupont" required>
                     </div>
                 </div>
                 <div>
-                    <label class="form-label">Email <span style="color:#f87171;">*</span></label>
+                    <label class="form-label">{{ __('Email') }} <span style="color:#f87171;">*</span></label>
                     <div class="input-icon-wrap">
                         <i class="fa-solid fa-envelope input-icon"></i>
                         <input type="email" name="email" value="{{ old('email') }}" class="glass-input" placeholder="jean@entreprise.com" required>
@@ -199,14 +199,14 @@
                 </div>
                 <div class="option-grid" style="grid-template-columns:1fr 1fr;">
                     <div>
-                        <label class="form-label">Téléphone <span style="color:#f87171;">*</span></label>
+                        <label class="form-label">{{ __('Téléphone') }} <span style="color:#f87171;">*</span></label>
                         <div class="input-icon-wrap">
                             <i class="fa-solid fa-phone input-icon"></i>
                             <input type="tel" name="phone" value="{{ old('phone') }}" class="glass-input" placeholder="+212 6..." required>
                         </div>
                     </div>
                     <div>
-                        <label class="form-label">WhatsApp</label>
+                        <label class="form-label">{{ __('WhatsApp') }}</label>
                         <div class="input-icon-wrap">
                             <i class="fa-brands fa-whatsapp input-icon"></i>
                             <input type="tel" name="whatsapp" value="{{ old('whatsapp') }}" class="glass-input" placeholder="+212 6...">
@@ -214,7 +214,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="form-label">Société</label>
+                    <label class="form-label">{{ __('Société') }}</label>
                     <div class="input-icon-wrap">
                         <i class="fa-solid fa-building input-icon"></i>
                         <input type="text" name="company_name" value="{{ old('company_name') }}" class="glass-input" placeholder="Nom de votre société">
@@ -222,7 +222,7 @@
                 </div>
                 <div class="option-grid" style="grid-template-columns:1fr 1fr;">
                     <div>
-                        <label class="form-label">Pays <span style="color:#f87171;">*</span></label>
+                        <label class="form-label">{{ __('Pays') }} <span style="color:#f87171;">*</span></label>
                         <div class="searchable-dropdown" id="countryDropdown">
                             <div class="input-icon-wrap">
                                 <i class="fa-solid fa-earth-africa input-icon"></i>
@@ -233,7 +233,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="form-label">Ville <span style="color:#f87171;">*</span></label>
+                        <label class="form-label">{{ __('Ville') }} <span style="color:#f87171;">*</span></label>
                         <div class="searchable-dropdown" id="cityDropdown">
                             <div class="input-icon-wrap">
                                 <i class="fa-solid fa-location-dot input-icon"></i>
@@ -250,7 +250,7 @@
 
             <div class="card-bottom anim-up d3">
                 <div></div>
-                <button type="submit" class="btn-continue">Commencer le questionnaire <i class="fa-solid fa-arrow-right"></i></button>
+                <button type="submit" class="btn-continue">{{ __('Commencer le questionnaire') }} <i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </form>
     </div>
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q);
             });
             list.innerHTML = '';
-            if(filtered.length === 0) { const div = document.createElement('div'); div.className = 'dropdown-item no-results'; div.textContent = 'Aucun résultat'; list.appendChild(div); return; }
+            if(filtered.length === 0) { const div = document.createElement('div'); div.className = 'dropdown-item no-results'; div.textContent = '{{ __("Aucun résultat") }}'; list.appendChild(div); return; }
             filtered.forEach(item => {
                 const label = String(getLabel(item));
                 const div = document.createElement('div');
@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cityNameInput = document.getElementById('cityNameInput');
         const cityList = document.getElementById('cityDropdownList');
         if(!citySearch) return;
-        citySearch.value = ''; citySearch.disabled = true; citySearch.placeholder = "Sélectionnez d'abord un pays…";
+        citySearch.value = ''; citySearch.disabled = true; citySearch.placeholder = "{{ __("Sélectionnez d'abord un pays…") }}";
         if(cityNameInput) cityNameInput.value = '';
         if(cityList) { cityList.innerHTML = ''; cityList.style.display = 'none'; }
         const cd = document.getElementById('cityDropdown');
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cityNameInput = document.getElementById('cityNameInput');
         const cityDropdown = document.getElementById('cityDropdown');
         if(!citySearch || !cityList || !cityNameInput) return;
-        citySearch.disabled = true; citySearch.placeholder = 'Chargement…';
+        citySearch.disabled = true; citySearch.placeholder = '{{ __("Chargement…") }}';
         cityNameInput.value = ''; citySearch.value = ''; cityList.innerHTML = ''; cityList.style.display = 'none';
         if(cityDropdown) cityDropdown.classList.remove('dropdown-open');
         fetch('/api/countries/' + encodeURIComponent(country.code) + '/cities')
@@ -370,16 +370,16 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 const cities = Array.isArray(data.cities) ? data.cities : [];
                 citySearch.disabled = false;
-                citySearch.placeholder = cities.length ? 'Rechercher une ville…' : 'Aucune ville disponible';
+                citySearch.placeholder = cities.length ? '{{ __("Rechercher une ville…") }}' : '{{ __("Aucune ville disponible") }}';
                 if(cityDropdown && cityDropdown._updateItems) cityDropdown._updateItems(cities, item => item);
             })
-            .catch(() => { citySearch.disabled = false; citySearch.placeholder = 'Erreur de chargement — réessayez'; });
+            .catch(() => { citySearch.disabled = false; citySearch.placeholder = '{{ __("Erreur de chargement — réessayez") }}'; });
     }
 
     fetch('/api/countries').then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(data => {
         countriesData = Array.isArray(data) ? data : [];
         const cs = document.querySelector('#countryDropdown .dropdown-search');
-        if(cs) { cs.disabled = false; cs.placeholder = 'Rechercher un pays…'; }
+        if(cs) { cs.disabled = false; cs.placeholder = '{{ __("Rechercher un pays…") }}'; }
         initSearchableDropdown('countryDropdown', countriesData, country => {
             document.getElementById('countryNameInput').value = country.name;
             const cd = document.getElementById('countryDropdown'); const cl = document.getElementById('countryDropdownList');
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(oldCountry) { const c = countriesData.find(c => c.name === oldCountry); if(c) loadCitiesForCountry(c); }
     }).catch(() => {
         const cs = document.querySelector('#countryDropdown .dropdown-search');
-        if(cs) { cs.disabled = false; cs.placeholder = 'Erreur de chargement — réessayez'; }
+        if(cs) { cs.disabled = false; cs.placeholder = '{{ __("Erreur de chargement — réessayez") }}'; }
     });
 });
 </script>

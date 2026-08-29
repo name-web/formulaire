@@ -9,7 +9,7 @@
 
     </div>
 
-    <div class="sidebar-label">VOTRE PROGRESSION</div>
+    <div class="sidebar-label">{{ __('VOTRE PROGRESSION') }}</div>
 
     <nav class="step-list" id="stepList">
         @php $globalIdx = 0; @endphp
@@ -37,13 +37,13 @@
 
     <div class="progress-section">
         <div class="progress-header">
-            <span class="progress-label">Progression</span>
+            <span class="progress-label">{{ __('Progression') }}</span>
             <span class="progress-value" id="progressPercent">0%</span>
         </div>
         <div class="progress-bar-track">
             <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
         </div>
-        <div class="progress-step-text">Question <strong id="progressCurrent">1</strong> sur <strong id="progressTotal">{{ count($steps) }}</strong></div>
+        <div class="progress-step-text">{{ __('Question') }} <strong id="progressCurrent">1</strong> {{ __('sur') }} <strong id="progressTotal">{{ count($steps) }}</strong></div>
     </div>
 </aside>
 
@@ -52,7 +52,7 @@
 
         @if($errors->any())
             <div class="error-box anim-up d1">
-                <div class="error-header"><i class="fa-solid fa-circle-exclamation"></i><span>Erreur</span></div>
+                <div class="error-header"><i class="fa-solid fa-circle-exclamation"></i><span>{{ __('Erreur') }}</span></div>
                 @foreach($errors->all() as $error)
                     <div class="error-msg">{{ $error }}</div>
                 @endforeach
@@ -95,7 +95,7 @@
                             <div class="input-icon-wrap">
                                 <i class="fa-solid fa-pen input-icon"></i>
                                 <input type="text" name="answers[{{ $question->id }}][value]" class="glass-input"
-                                       placeholder="{{ $question->placeholder ?? 'Votre réponse…' }}"
+                                       placeholder="{{ $question->placeholder ?? __('Votre réponse…') }}"
                                        value="{{ old("answers.{$question->id}.value", $existingAnswer?->text_value ?? '') }}"
                                        {{ $question->is_required ? 'required' : '' }}>
                             </div>
@@ -111,7 +111,7 @@
                         <div class="anim-up d2">
                             <div class="textarea-wrap">
                                 <textarea name="answers[{{ $question->id }}][value]" class="glass-input" rows="4"
-                                          placeholder="{{ $question->placeholder ?? 'Décrivez en détail…' }}"
+                                          placeholder="{{ $question->placeholder ?? __('Décrivez en détail…') }}"
                                           {{ $question->is_required ? 'required' : '' }}>{{ old("answers.{$question->id}.value", $existingAnswer?->text_value ?? '') }}</textarea>
                                 <span class="char-counter"><span class="current">0</span>/500</span>
                             </div>
@@ -156,7 +156,7 @@
                                 <div class="yesno-icon" style="background:rgba(255,183,3,0.12);color:#ffb703;">
                                     <i class="fa-solid fa-check"></i>
                                 </div>
-                                <div class="opt-label">Oui</div>
+                                <div class="opt-label">{{ __('Oui') }}</div>
                             </label>
                             <label class="opt-card yesno-card {{ $currentVal === 'no' ? 'selected' : '' }}"
                                    data-group="yesno-{{ $question->id }}" data-value="no" data-question="{{ $question->id }}">
@@ -164,7 +164,7 @@
                                 <div class="yesno-icon" style="background:rgba(255,183,3,0.12);color:#ffb703;">
                                     <i class="fa-solid fa-xmark"></i>
                                 </div>
-                                <div class="opt-label">Non</div>
+                                <div class="opt-label">{{ __('Non') }}</div>
                             </label>
                         </div>
 
@@ -184,7 +184,7 @@
                                 <select name="answers[{{ $question->id }}][option_ids][]" class="glass-input"
                                         {{ $question->is_required ? 'required' : '' }}
                                         data-qid="{{ $question->id }}" data-other-option="{{ $otherOption?->id ?? '' }}">
-                                    <option value="">— Sélectionnez —</option>
+                                    <option value="">{{ __('— Sélectionnez —') }}</option>
                                     @foreach($options as $option)
                                         <option value="{{ $option->id }}" {{ $selectedId == $option->id ? 'selected' : '' }}>{{ $option->label }}</option>
                                     @endforeach
@@ -194,7 +194,7 @@
                                 <div class="other-field" style="display:{{ $showOther ? 'block' : 'none' }};" data-other-for="{{ $question->id }}">
                                     <div class="textarea-wrap">
                                         <textarea name="answers[{{ $question->id }}][other_value]" class="glass-input" rows="3"
-                                                  placeholder="Précisez votre réponse…">{{ old("answers.{$question->id}.other_value", $existingAnswer?->other_value ?? '') }}</textarea>
+                                                  placeholder="{{ __('Précisez votre réponse…') }}">{{ old("answers.{$question->id}.other_value", $existingAnswer?->other_value ?? '') }}</textarea>
                                         <span class="char-counter"><span class="current">0</span>/500</span>
                                     </div>
                                 </div>
@@ -230,7 +230,7 @@
                                 <div class="other-field" style="display:{{ $showOther ? 'block' : 'none' }};" data-other-for="{{ $question->id }}">
                                     <div class="textarea-wrap">
                                         <textarea name="answers[{{ $question->id }}][other_value]" class="glass-input" rows="3"
-                                                  placeholder="Précisez votre réponse…">{{ old("answers.{$question->id}.other_value", $existingAnswer?->other_value ?? '') }}</textarea>
+                                                  placeholder="{{ __('Précisez votre réponse…') }}">{{ old("answers.{$question->id}.other_value", $existingAnswer?->other_value ?? '') }}</textarea>
                                         <span class="char-counter"><span class="current">0</span>/500</span>
                                     </div>
                                 </div>
@@ -245,8 +245,8 @@
                                        data-file-input="{{ $question->id }}" class="hidden"
                                        accept=".png,.jpg,.jpeg,.gif,.pdf,.svg,.doc,.docx,.zip">
                                 <div class="dropzone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                                <div class="dropzone-title">Glissez-déposez votre fichier ici</div>
-                                <div class="dropzone-sub">ou cliquez pour parcourir</div>
+                                <div class="dropzone-title">{{ __('Glissez-déposez votre fichier ici') }}</div>
+                                <div class="dropzone-sub">{{ __('ou cliquez pour parcourir') }}</div>
                                 <div class="dropzone-formats">
                                     <span class="format-tag">PNG</span>
                                     <span class="format-tag">JPG</span>
@@ -259,7 +259,7 @@
                             @if($existingAnswer && !empty($existingAnswer->file_path))
                                 <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;margin-top:8px;border-radius:var(--radius-xs);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);">
                                     <i class="fa-solid fa-file-check" style="color:#ffb703;"></i>
-                                    <span style="color:var(--text-secondary);">Fichier déjà envoyé</span>
+                                    <span style="color:var(--text-secondary);">{{ __('Fichier déjà envoyé') }}</span>
                                 </div>
                             @endif
                         </div>
@@ -270,7 +270,7 @@
                         <div class="anim-up d3" style="margin-top:16px;">
                             <a href="#" class="skip-link" data-qid="{{ $question->id }}"
                                style="font-size:13px;color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .2s;">
-                                <i class="fa-solid fa-circle-question" style="font-size:11px;"></i> Je ne sais pas encore
+                                <i class="fa-solid fa-circle-question" style="font-size:11px;"></i> {{ __('Je ne sais pas encore') }}
                             </a>
                         </div>
                     @endif
@@ -278,20 +278,20 @@
                     <div class="card-bottom anim-up d5">
                         @if($globalIdx > 1)
                             <button type="button" class="btn-back" onclick="goToStep({{ $globalIdx - 1 }})">
-                                <i class="fa-solid fa-arrow-left"></i> Retour
+                                <i class="fa-solid fa-arrow-left"></i> {{ __('Retour') }}
                             </button>
                         @else
                             <a href="{{ route('questionnaire.index') }}" class="btn-back" style="text-decoration:none;">
-                                <i class="fa-solid fa-arrow-left"></i> Retour
+                                <i class="fa-solid fa-arrow-left"></i> {{ __('Retour') }}
                             </a>
                         @endif
                         @if($globalIdx < count($steps))
                             <button type="button" class="btn-continue" onclick="goToStep({{ $globalIdx + 1 }})">
-                                Continuer <i class="fa-solid fa-arrow-right"></i>
+                                {{ __('Continuer') }} <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         @else
                             <button type="submit" class="btn-continue">
-                                Envoyer ma demande <i class="fa-solid fa-paper-plane"></i>
+                                {{ __('Envoyer ma demande') }} <i class="fa-solid fa-paper-plane"></i>
                             </button>
                         @endif
                     </div>
@@ -366,13 +366,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const checkboxes = container.querySelectorAll(`input[name="answers[${qid}][option_ids][]"]`);
             const fileEl = container.querySelector(`input[type="file"][name="answers[${qid}][file]"]`);
             if (textEl) {
-                if (!textEl.value.trim()) { showError('Veuillez répondre à cette question.'); return false; }
+                if (!textEl.value.trim()) { showError('{{ __("Veuillez répondre à cette question.") }}'); return false; }
             } else if (areaEl) {
-                if (!areaEl.value.trim()) { showError('Veuillez répondre à cette question.'); return false; }
+                if (!areaEl.value.trim()) { showError('{{ __("Veuillez répondre à cette question.") }}'); return false; }
             } else if (selectEl) {
                 const nsaOpt = Array.from(selectEl.options).find(o => o.text.includes('Je ne sais pas encore'));
                 if (nsaOpt && selectEl.value === nsaOpt.value) { continue; }
-                if (!selectEl.value) { showError('Veuillez sélectionner une réponse.'); return false; }
+                if (!selectEl.value) { showError('{{ __("Veuillez sélectionner une réponse.") }}'); return false; }
             } else if (checkboxes.length > 0) {
                 const nsaChecked = Array.from(checkboxes).some(cb => {
                     const card = cb.closest('.opt-card');
@@ -380,11 +380,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (nsaChecked) { continue; }
                 const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-                if (!anyChecked) { showError('Veuillez sélectionner au moins une réponse.'); return false; }
+                if (!anyChecked) { showError('{{ __("Veuillez sélectionner au moins une réponse.") }}'); return false; }
             } else if (fileEl) {
                 if (!fileEl.files || !fileEl.files.length) {
                     const existingFile = container.querySelector('[data-file-list] .fa-file-check');
-                    if (!existingFile) { showError('Veuillez joindre un fichier.'); return false; }
+                    if (!existingFile) { showError('{{ __("Veuillez joindre un fichier.") }}'); return false; }
                 }
             }
         }
@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Visual feedback
             link.classList.add('skipped');
-            link.innerHTML = '<i class="fa-solid fa-check" style="font-size:11px;"></i> Passé';
+            link.innerHTML = '<i class="fa-solid fa-check" style="font-size:11px;"></i> {{ __("Passé") }}';
 
             // Auto-advance after short delay
             setTimeout(() => {
@@ -654,8 +654,8 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = '';
         Array.from(files).forEach(f => {
             const div = document.createElement('div');
-            div.style.cssText = 'padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);';
-            div.innerHTML = '<i class="fa-solid fa-file" style="color:#ffc72c;"></i><span style="color:white;">' + f.name + '</span><span style="margin-left:auto;color:var(--text-muted);font-size:11px;">' + (f.size/1024).toFixed(0) + ' KB</span>';
+            div.style.cssText = 'padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);min-width:0;';
+            div.innerHTML = '<i class="fa-solid fa-file" style="color:#ffc72c;flex-shrink:0;"></i><span style="color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">' + f.name + '</span><span style="margin-left:auto;color:var(--text-muted);font-size:11px;flex-shrink:0;">' + (f.size/1024).toFixed(0) + ' KB</span>';
             container.appendChild(div);
         });
     }

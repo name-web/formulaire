@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Questionnaire' }} — DOMINIUM TECH</title>
+    <title>{{ $title ?? __('Questionnaire') }} — DOMINIUM TECH</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
@@ -781,7 +781,7 @@
         .error-box {
             padding: 14px 16px; border-radius: 13px;
             background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.15);
-            margin-bottom: 24px;
+            margin-bottom: 24px; word-break: break-word;
         }
         .error-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
         .error-header i { color: #f87171; font-size: 14px; }

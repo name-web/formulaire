@@ -703,7 +703,7 @@
                     class="inline-flex items-center gap-2.5 px-6 py-3 rounded-lg text-sm font-bold transition-all duration-300"
                     id="nav-cta"
                 >
-                    Démarrer un projet
+                    {{ __('Démarrer un projet') }}
                     <i class="fa-solid fa-arrow-right w-4 h-4"></i>
                 </a>
             </div>
@@ -740,27 +740,27 @@
             </div>
 
             <h1 class="hero-title">
-                Votre idée
+                {{ __('Votre idée') }}
                 <br>
-                <span class="yellow">mérite</span>
+                <span class="yellow">{{ __('mérite') }}</span>
                 <br>
-                une vraie
-                <span class="outline">structure.</span>
+                {{ __('une vraie') }}
+                <span class="outline">{{ __('structure.') }}</span>
             </h1>
 
             <p class="hero-description">
-                Décrivez votre projet, vos besoins et votre vision.
-                Nous transformons vos idées en spécifications claires
-                pour donner à votre équipe une direction précise.
+                {{ __('Décrivez votre projet, vos besoins et votre vision.') }}
+                {{ __('Nous transformons vos idées en spécifications claires') }}
+                {{ __('pour donner à votre équipe une direction précise.') }}
             </p>
 
             <div class="btn-group">
                 <a href="{{ route('questionnaire.index') }}" class="btn-hero btn-primary">
-                    Créer mon cahier des charges
+                    {{ __('Créer mon cahier des charges') }}
                     <span>&rarr;</span>
                 </a>
                 <a href="#services" class="btn-hero btn-secondary">
-                    Voir un modèle
+                    {{ __('Voir un modèle') }}
                 </a>
             </div>
 
@@ -768,15 +768,15 @@
             <div class="hero-info">
                 <div class="info-item">
                     <div class="info-number">01</div>
-                    <div class="info-label">Décrivez votre idée</div>
+                    <div class="info-label">{{ __('Décrivez votre idée') }}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-number">02</div>
-                    <div class="info-label">Structurez votre besoin</div>
+                    <div class="info-label">{{ __('Structurez votre besoin') }}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-number">03</div>
-                    <div class="info-label">Préparez votre solution</div>
+                    <div class="info-label">{{ __('Préparez votre solution') }}</div>
                 </div>
             </div>
 
@@ -838,13 +838,13 @@
 
             <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-14 reveal-up">
                 <div>
-                    <span class="text-xs font-semibold text-yellow-400 uppercase tracking-widest mb-3 block">Nos services</span>
+                    <span class="text-xs font-semibold text-yellow-400 uppercase tracking-widest mb-3 block">{{ __('Nos services') }}</span>
                     <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                        Un projet en tête ?
+                        {{ __('Un projet en tête ?') }}
                     </h2>
                 </div>
                 <a href="{{ route('questionnaire.index') }}" class="mt-4 sm:mt-0 text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors inline-flex items-center gap-1.5">
-                    Voir tous les services
+                    {{ __('Voir tous les services') }}
                     <i class="fa-solid fa-arrow-right w-4 h-4"></i>
                 </a>
             </div>
@@ -858,13 +858,13 @@
                         <div class="w-9 h-9 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
                             <i class="fa-solid fa-globe text-yellow-400 text-base"></i>
                         </div>
-                        <h3 class="text-sm font-bold text-white">Site vitrine</h3>
+                        <h3 class="text-sm font-bold text-white">{{ __('Site vitrine') }}</h3>
                     </div>
                     <p class="text-xs text-white/50 leading-relaxed mb-2.5">
-                        Présentez votre activité et vos services avec un site professionnel.
+                        {{ __('Présentez votre activité et vos services avec un site professionnel.') }}
                     </p>
                     <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-yellow-400">
-                        Démarrer
+                        {{ __('Démarrer') }}
                         <i class="fa-solid fa-arrow-right w-3 h-3 transition-transform group-hover:translate-x-1"></i>
                     </span>
                 </a>
@@ -876,13 +876,13 @@
                         <div class="w-9 h-9 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
                             <i class="fa-solid fa-bag-shopping text-yellow-400 text-base"></i>
                         </div>
-                        <h3 class="text-sm font-bold text-white">Boutique en ligne</h3>
+                        <h3 class="text-sm font-bold text-white">{{ __('Boutique en ligne') }}</h3>
                     </div>
                     <p class="text-xs text-white/50 leading-relaxed mb-2.5">
-                        Vendez vos produits en ligne avec une boutique rapide et sécurisée.
+                        {{ __('Vendez vos produits en ligne avec une boutique rapide et sécurisée.') }}
                     </p>
                     <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-yellow-400">
-                        Démarrer
+                        {{ __('Démarrer') }}
                         <i class="fa-solid fa-arrow-right w-3 h-3 transition-transform group-hover:translate-x-1"></i>
                     </span>
                 </a>
@@ -894,13 +894,13 @@
                         <div class="w-9 h-9 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
                             <i class="fa-solid fa-mobile-screen text-yellow-400 text-base"></i>
                         </div>
-                        <h3 class="text-sm font-bold text-white">Application mobile</h3>
+                        <h3 class="text-sm font-bold text-white">{{ __('Application mobile') }}</h3>
                     </div>
                     <p class="text-xs text-white/50 leading-relaxed mb-2.5">
-                        Créez une application mobile native pour iOS et Android.
+                        {{ __('Créez une application mobile native pour iOS et Android.') }}
                     </p>
                     <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-yellow-400">
-                        Démarrer
+                        {{ __('Démarrer') }}
                         <i class="fa-solid fa-arrow-right w-3 h-3 transition-transform group-hover:translate-x-1"></i>
                     </span>
                 </a>
@@ -912,13 +912,13 @@
                         <div class="w-9 h-9 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
                             <i class="fa-solid fa-gear text-yellow-400 text-base"></i>
                         </div>
-                        <h3 class="text-sm font-bold text-white">Logiciel / ERP / CRM</h3>
+                        <h3 class="text-sm font-bold text-white">{{ __('Logiciel / ERP / CRM') }}</h3>
                     </div>
                     <p class="text-xs text-white/50 leading-relaxed mb-2.5">
-                        Développez un logiciel sur mesure pour vos processus métier.
+                        {{ __('Développez un logiciel sur mesure pour vos processus métier.') }}
                     </p>
                     <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-yellow-400">
-                        Démarrer
+                        {{ __('Démarrer') }}
                         <i class="fa-solid fa-arrow-right w-3 h-3 transition-transform group-hover:translate-x-1"></i>
                     </span>
                 </a>
@@ -930,13 +930,13 @@
                         <div class="w-9 h-9 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
                             <i class="fa-solid fa-wand-magic-sparkles text-yellow-400 text-base"></i>
                         </div>
-                        <h3 class="text-sm font-bold text-white">Autre projet</h3>
+                        <h3 class="text-sm font-bold text-white">{{ __('Autre projet') }}</h3>
                     </div>
                     <p class="text-xs text-white/50 leading-relaxed mb-2.5">
-                        Un projet unique ? Décrivez votre vision, nous trouverons la solution technique adaptée.
+                        {{ __('Un projet unique ? Décrivez votre vision, nous trouverons la solution technique adaptée.') }}
                     </p>
                     <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-yellow-400">
-                        Démarrer
+                        {{ __('Démarrer') }}
                         <i class="fa-solid fa-arrow-right w-3 h-3 transition-transform group-hover:translate-x-1"></i>
                     </span>
                 </a>
@@ -954,9 +954,9 @@
         <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-10">
 
             <div class="text-center mb-16 reveal-scale">
-                <span class="text-xs font-semibold text-yellow-400 uppercase tracking-widest mb-3 block">Processus</span>
+                <span class="text-xs font-semibold text-yellow-400 uppercase tracking-widest mb-3 block">{{ __('Processus') }}</span>
                 <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                    Comment ça fonctionne ?
+                    {{ __('Comment ça fonctionne ?') }}
                 </h2>
             </div>
 
@@ -966,9 +966,9 @@
                     <div class="step-number w-12 h-12 rounded-xl bg-yellow-500/10 text-yellow-400 font-bold text-lg flex items-center justify-center mb-6 border border-blue-500/20">
                         01
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-3">Vous nous présentez votre idée</h3>
+                    <h3 class="text-lg font-bold text-white mb-3">{{ __('Vous nous présentez votre idée') }}</h3>
                     <p class="text-sm text-white/50 leading-relaxed">
-                        Décrivez votre projet en quelques clics. Notre questionnaire interactif recueille toutes les informations essentielles.
+                        {{ __('Décrivez votre projet en quelques clics. Notre questionnaire interactif recueille toutes les informations essentielles.') }}
                     </p>
                 </div>
 
@@ -976,9 +976,9 @@
                     <div class="step-number w-12 h-12 rounded-xl bg-yellow-500/10 text-yellow-400 font-bold text-lg flex items-center justify-center mb-6 border border-blue-500/20">
                         02
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-3">Nous comprenons votre besoin</h3>
+                    <h3 class="text-lg font-bold text-white mb-3">{{ __('Nous comprenons votre besoin') }}</h3>
                     <p class="text-sm text-white/50 leading-relaxed">
-                        Notre équipe analyse votre demande et identifie les meilleures solutions techniques pour atteindre vos objectifs.
+                        {{ __('Notre équipe analyse votre demande et identifie les meilleures solutions techniques pour atteindre vos objectifs.') }}
                     </p>
                 </div>
 
@@ -986,9 +986,9 @@
                     <div class="step-number w-12 h-12 rounded-xl bg-yellow-500/10 text-yellow-400 font-bold text-lg flex items-center justify-center mb-6 border border-blue-500/20">
                         03
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-3">Nous étudions votre projet</h3>
+                    <h3 class="text-lg font-bold text-white mb-3">{{ __('Nous étudions votre projet') }}</h3>
                     <p class="text-sm text-white/50 leading-relaxed">
-                        Vous recevez une proposition détaillée sous 24 à 48 heures. Délai et budget sont transparents.
+                        {{ __('Vous recevez une proposition détaillée sous 24 à 48 heures. Délai et budget sont transparents.') }}
                     </p>
                 </div>
 
@@ -1004,14 +1004,14 @@
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50 Q25 30 50 50 T100 50' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 70 Q25 50 50 70 T100 70' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 30 Q25 10 50 30 T100 30' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E&quot;); background-size: 200px 100px;"></div>
         <div class="relative z-10 max-w-3xl mx-auto px-6 lg:px-10 text-center reveal-scale glow-on-scroll">
             <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
-                Prêt à donner vie à votre projet ?
+                {{ __('Prêt à donner vie à votre projet ?') }}
             </h2>
             <p class="text-lg text-white/50 mb-8 max-w-lg mx-auto">
-                Décrivez votre projet en quelques minutes. C'est gratuit, rapide et sans engagement.
+                {{ __('Décrivez votre projet en quelques minutes. C\'est gratuit, rapide et sans engagement.') }}
             </p>
             <a href="{{ route('questionnaire.index') }}"
                class="group inline-flex items-center gap-3 px-8 py-4 bg-yellow-500 text-white font-bold rounded-2xl hover:bg-yellow-400 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/30 hover:-translate-y-0.5 text-base">
-                Commencer maintenant
+                {{ __('Commencer maintenant') }}
                 <i class="fa-solid fa-arrow-right w-5 h-5 transition-transform group-hover:translate-x-1"></i>
             </a>
         </div>
@@ -1049,7 +1049,7 @@
         </div>
 
         <p class="text-xs text-white/30">
-            &copy; {{ date('Y') }} DOMINIUM TECH. Tous droits réservés.
+            &copy; {{ date('Y') }} DOMINIUM TECH. {{ __('Tous droits réservés.') }}
         </p>
 
     </div>

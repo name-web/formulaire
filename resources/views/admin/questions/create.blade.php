@@ -28,7 +28,7 @@
                 <form method="POST" action="{{ route('admin.questions.store') }}">
                     @csrf
 
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+                    <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
                         <div style="grid-column:1/-1;">
                             <label class="admin-label">Titre de la question *</label>
                             <input type="text" name="title" class="admin-input" value="{{ old('title') }}" required placeholder="Ex: Quel est votre budget ?">
@@ -121,11 +121,11 @@
     function addOption() {
         const container = document.getElementById('optionsContainer');
         const div = document.createElement('div');
-        div.style.cssText = 'display:flex;gap:10px;align-items:center;';
+        div.style.cssText = 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;';
         div.innerHTML = `
-            <input type="text" name="options[${optionIndex}][label]" class="admin-input" placeholder="Label" required style="flex:2;">
-            <input type="text" name="options[${optionIndex}][value]" class="admin-input" placeholder="Valeur" required style="flex:2;">
-            <input type="number" name="options[${optionIndex}][sort_order]" class="admin-input" placeholder="Ordre" style="flex:0.5;">
+            <input type="text" name="options[${optionIndex}][label]" class="admin-input" placeholder="Label" required style="flex:2;min-width:120px;">
+            <input type="text" name="options[${optionIndex}][value]" class="admin-input" placeholder="Valeur" required style="flex:2;min-width:120px;">
+            <input type="number" name="options[${optionIndex}][sort_order]" class="admin-input" placeholder="Ordre" style="flex:0.5;min-width:80px;">
             <button type="button" onclick="this.parentElement.remove()" class="admin-btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
         `;
         container.appendChild(div);

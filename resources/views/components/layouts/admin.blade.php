@@ -311,8 +311,8 @@
         .activity:last-child { margin-bottom: 0; }
         .activity:hover { background: #fafaf8; }
         .activity-dot { width: 7px; height: 7px; flex-shrink: 0; margin-top: 4px; border-radius: 50%; background: var(--yellow); }
-        .activity-title { font-size: 13px; line-height: 1.5; font-weight: 700; }
-        .activity-time { margin-top: 3px; color: #aaa; font-size: 12px; }
+        .activity-title { font-size: 13px; line-height: 1.5; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+        .activity-time { margin-top: 3px; color: #aaa; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 
         .quick-action {
             display: block; padding: 14px;
@@ -507,6 +507,7 @@
             .content-reverse { grid-template-columns: 1fr; }
             .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
             .table-head, .table-row { min-width: 600px; }
+            .form-grid { grid-template-columns: 1fr !important; }
             .sidebar-overlay {
                 position: fixed; inset: 0; background: rgba(0,0,0,.45);
                 z-index: 99; pointer-events: none; opacity: 0;
@@ -518,6 +519,13 @@
             .intro h1 { font-size: 28px; }
             .admin-header { flex-direction: column; align-items: flex-start; gap: 12px; }
             .admin-title { font-size: 28px; }
+            .pagination { flex-wrap: wrap; gap: 4px; }
+            .search-form { flex-direction: column; }
+            .search-form > div { min-width: 0 !important; width: 100%; }
+            .search-form > div:last-child { flex-direction: row; }
+            .modal-content { margin: 16px; max-height: calc(100vh - 32px); overflow-y: auto; }
+            .client-name, .client-email, .project-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+            .error-box { word-break: break-word; }
         }
         @media (max-width: 550px) {
             .stats { grid-template-columns: 1fr; }
@@ -536,13 +544,14 @@
             .side-section { padding: 16px; }
             .stat-card { padding: 16px; }
             .stat-value { font-size: 28px; }
+            .pagination { justify-content: center; }
         }
 
         /* ── Hamburger animated icon ── */
         .hamburger {
             display: none;
             align-items: center; justify-content: center;
-            width: 40px; height: 40px; border: none; background: none;
+            width: 44px; height: 44px; border: none; background: none;
             color: var(--text); cursor: pointer;
             border-radius: 6px; transition: background .2s;
             position: relative; z-index: 110;
@@ -572,7 +581,8 @@
         @media (pointer: coarse) {
             .nav-item { min-height: 48px; }
             .admin-btn { min-height: 44px; }
-            .top-btn { min-height: 40px; }
+            .top-btn { min-height: 44px; }
+            .hamburger { min-width: 44px; min-height: 44px; }
             .open { min-width: 44px; min-height: 44px; }
             .pagination a, .pagination span { min-width: 44px; min-height: 44px; }
         }

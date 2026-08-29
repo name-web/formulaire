@@ -20,7 +20,7 @@
     {{-- Filtres --}}
     <section class="stats" style="grid-template-columns:1fr;min-height:auto;">
         <div class="stat" style="border-right:0;min-height:auto;">
-            <form method="GET" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <form method="GET" class="search-form" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
                 <div style="flex:1;min-width:200px;">
                     <label class="admin-label">Recherche</label>
                     <input type="text" name="search" class="admin-input" placeholder="Client, email, projet..." value="{{ request('search') }}">

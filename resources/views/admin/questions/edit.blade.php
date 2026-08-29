@@ -29,7 +29,7 @@
                 </div>
 
                 <div style="padding:22px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+                    <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
                         <div style="grid-column:1/-1;">
                             <label class="admin-label">Titre *</label>
                             <input type="text" name="title" class="admin-input" value="{{ old('title', $question->title) }}" required>
@@ -117,7 +117,7 @@
 
             {{-- Add Option Form --}}
             <div id="addOptionForm" style="display:none;padding:22px;border-bottom:1px solid var(--line);">
-                <form method="POST" action="{{ route('admin.questions.options.store', $question) }}" style="display:flex;gap:12px;align-items:flex-end;">
+                <form method="POST" action="{{ route('admin.questions.options.store', $question) }}" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
                     @csrf
                     <div style="flex:2;">
                         <label class="admin-label">Label</label>
@@ -139,7 +139,7 @@
             @else
                 <div style="padding:14px 22px;display:flex;flex-direction:column;gap:10px;">
                     @foreach($question->options->sortBy('sort_order') as $option)
-                        <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);">
+                        <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);flex-wrap:wrap;">
                             <span style="font-size:13px;color:var(--muted);min-width:28px;font-weight:700;">{{ $option->sort_order }}</span>
                             <div style="flex:1;">
                                 <div style="font-size:15px;font-weight:700;color:var(--black);">{{ $option->label }}</div>
@@ -173,7 +173,7 @@
             </div>
 
             <div id="addConditionForm" style="display:none;padding:22px;border-bottom:1px solid var(--line);">
-                <form method="POST" action="{{ route('admin.questions.conditions.store', $question) }}" style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;align-items:flex-end;">
+                <form method="POST" action="{{ route('admin.questions.conditions.store', $question) }}" style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;align-items:flex-end;" class="form-grid">
                     @csrf
                     <div>
                         <label class="admin-label">Dépend de la question</label>
@@ -211,7 +211,7 @@
             @else
                 <div style="padding:14px 22px;display:flex;flex-direction:column;gap:10px;">
                     @foreach($question->conditions as $condition)
-                        <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);">
+                        <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);flex-wrap:wrap;">
                             <i class="fa-solid fa-code-branch" style="color:var(--yellow);font-size:14px;"></i>
                             <div style="flex:1;font-size:14px;color:var(--text-muted);">
                                 Si <strong style="color:var(--black);">« {{ $condition->dependsOnQuestion->title ?? '???' }} »</strong>

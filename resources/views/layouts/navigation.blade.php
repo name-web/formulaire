@@ -23,7 +23,7 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border rounded-md text-sm leading-4 font-medium transition ease-in-out duration-150"
-                                style="border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.05);">
+                                style="border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.05);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                             <div>{{ Auth::user()->name }}</div>
 
                             <div class="ms-1">
