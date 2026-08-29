@@ -9,10 +9,6 @@
         </p>
     </header>
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
-
     <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
         @csrf
         @method('patch')
@@ -32,10 +28,6 @@
                 <div>
                     <p class="text-sm mt-2" style="color: rgba(255,255,255,0.7);">
                         {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification" class="underline text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" style="color: rgba(255,255,255,0.5);">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')

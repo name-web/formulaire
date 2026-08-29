@@ -16,7 +16,8 @@ class QuestionController extends Controller
         $query = Question::withCount('options');
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', "%{$request->search}%");
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
+            $query->whereRaw('title LIKE ? ESCAPE ?', ["%{$search}%", '\\']);
         }
 
         if ($request->filled('type')) {
@@ -89,8 +90,9 @@ class QuestionController extends Controller
         $question->load('options', 'conditions');
         $projectTypes = config('project_types.types');
         $questionTypes = config('question_types.types');
+        $otherQuestions = Question::where('id', '!=', $question->id)->orderBy('sort_order')->get();
 
-        return view('admin.questions.edit', compact('question', 'projectTypes', 'questionTypes'));
+        return view('admin.questions.edit', compact('question', 'projectTypes', 'questionTypes', 'otherQuestions'));
     }
 
     public function update(Request $request, Question $question): RedirectResponse
@@ -132,7 +134,7 @@ class QuestionController extends Controller
             foreach ($options as $index => $option) {
                 if (isset($option['_destroy']) && $option['_destroy']) {
                     if (isset($option['id'])) {
-                        QuestionOption::destroy($option['id']);
+                        $question->options()->where('id', $option['id'])->delete();
                     }
 
                     continue;

@@ -20,7 +20,6 @@ class DashboardController extends Controller
             'pending_projects' => Project::where('status', 'pending')->count(),
             'in_progress_projects' => Project::where('status', 'in_progress')->count(),
             'completed_projects' => Project::where('status', 'completed')->count(),
-            'cancelled_projects' => Project::where('status', 'cancelled')->count(),
             'total_clients' => Client::count(),
             'total_users' => User::count(),
         ];

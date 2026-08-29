@@ -59,8 +59,10 @@
             </div>
         @endif
 
-        <form action="{{ route('questionnaire.wizard.submit') }}" method="POST" enctype="multipart/form-data" id="wizardForm">
+        <form action="{{ route('questionnaire.wizard.submit') }}" method="POST" enctype="multipart/form-data" id="wizardForm" novalidate>
             @csrf
+
+            <div class="step-error" id="stepError" style="display:none;"></div>
 
             @php $globalIdx = 0; @endphp
             @foreach($steps as $i => $stepDef)
@@ -264,7 +266,7 @@
                     @endif
 
                     {{-- "Je ne sais pas encore" link --}}
-                    @if(!$question->is_required && $question->type !== 'file')
+                    @if($question->options->contains('value', 'nsa') && $question->type !== 'file')
                         <div class="anim-up d3" style="margin-top:16px;">
                             <a href="#" class="skip-link" data-qid="{{ $question->id }}"
                                style="font-size:13px;color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .2s;">
@@ -312,6 +314,18 @@
 .step-group .step-item { padding-left: 12px; }
 .skip-link:hover { color: var(--blue-light) !important; }
 .skip-link.skipped { color: var(--blue-light); }
+.step-error {
+    padding: 10px 16px;
+    border-radius: var(--radius-xs);
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.25);
+    color: #fca5a5;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 </style>
 
 <script>
@@ -321,6 +335,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const projectTypes = @json(is_array($project->project_type) ? $project->project_type : [$project->project_type]);
     const stepTypes = @json($steps->pluck('types')->toArray());
+
+    const answeredQuestions = new Set();
+    const errorEl = document.getElementById('stepError');
+
+    function clearError() {
+        if (errorEl) { errorEl.style.display = 'none'; errorEl.textContent = ''; }
+    }
+
+    function showError(msg) {
+        if (!errorEl) return;
+        errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + msg;
+        errorEl.style.display = 'flex';
+        errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function validateStep(step) {
+        const container = document.getElementById('step-' + step);
+        if (!container) return true;
+        const qids = new Set();
+        container.querySelectorAll('input[name^="answers["], textarea[name^="answers["], select[name^="answers["]').forEach(el => {
+            const m = el.name.match(/answers\[(\d+)\]/);
+            if (m) qids.add(m[1]);
+        });
+        for (const qid of qids) {
+            if (answeredQuestions.has(qid)) continue;
+            const textEl = container.querySelector(`input[name="answers[${qid}][value]"]`);
+            const areaEl = container.querySelector(`textarea[name="answers[${qid}][value]"]`);
+            const selectEl = container.querySelector(`select[data-qid="${qid}"]`);
+            const checkboxes = container.querySelectorAll(`input[name="answers[${qid}][option_ids][]"]`);
+            const fileEl = container.querySelector(`input[type="file"][name="answers[${qid}][file]"]`);
+            if (textEl) {
+                if (!textEl.value.trim()) { showError('Veuillez répondre à cette question.'); return false; }
+            } else if (areaEl) {
+                if (!areaEl.value.trim()) { showError('Veuillez répondre à cette question.'); return false; }
+            } else if (selectEl) {
+                const nsaOpt = Array.from(selectEl.options).find(o => o.text.includes('Je ne sais pas encore'));
+                if (nsaOpt && selectEl.value === nsaOpt.value) { continue; }
+                if (!selectEl.value) { showError('Veuillez sélectionner une réponse.'); return false; }
+            } else if (checkboxes.length > 0) {
+                const nsaChecked = Array.from(checkboxes).some(cb => {
+                    const card = cb.closest('.opt-card');
+                    return cb.checked && card && card.querySelector('.opt-label')?.textContent.includes('Je ne sais pas encore');
+                });
+                if (nsaChecked) { continue; }
+                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+                if (!anyChecked) { showError('Veuillez sélectionner au moins une réponse.'); return false; }
+            } else if (fileEl) {
+                if (!fileEl.files || !fileEl.files.length) {
+                    const existingFile = container.querySelector('[data-file-list] .fa-file-check');
+                    if (!existingFile) { showError('Veuillez joindre un fichier.'); return false; }
+                }
+            }
+        }
+        clearError();
+        return true;
+    }
 
     function updateSidebar() {
         document.querySelectorAll('.step-item').forEach(item => {
@@ -412,6 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         if (step < 1 || step > totalSteps) return;
+        if (step > currentStep && !validateStep(currentStep)) return;
         const targetStepDef = stepTypes[step - 1];
         if (targetStepDef && !targetStepDef.includes('all')) {
             const matches = targetStepDef.some(t => projectTypes.includes(t));
@@ -444,6 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const qid = link.dataset.qid;
+            answeredQuestions.add(qid);
 
             // For yes_no: set value to 'no'
             const yesnoInput = document.querySelector(`input[data-yesno="${qid}"]`);
@@ -589,6 +661,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     showStep(1);
+
+    // Clear validation error on any user interaction
+    document.getElementById('wizardForm').addEventListener('input', clearError);
+    document.getElementById('wizardForm').addEventListener('change', clearError);
 });
 </script>
 </x-layouts.app>

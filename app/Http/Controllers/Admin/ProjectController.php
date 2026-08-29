@@ -25,14 +25,14 @@ class ProjectController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
             $query->where(function ($q) use ($search) {
                 $q->whereHas('client', function ($client) use ($search) {
-                    $client->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('company_name', 'like', "%{$search}%");
-                })->orWhere('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                    $client->whereRaw('name LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
+                        ->orWhereRaw('email LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
+                        ->orWhereRaw('company_name LIKE ? ESCAPE ?', ["%{$search}%", '\\']);
+                })->orWhereRaw('title LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
+                    ->orWhereRaw('description LIKE ? ESCAPE ?', ["%{$search}%", '\\']);
             });
         }
 

@@ -42,6 +42,8 @@ class QuestionConditionController extends Controller
 
     public function destroy(Question $question, QuestionCondition $condition): RedirectResponse
     {
+        abort_unless($condition->question_id === $question->id, 404);
+
         $condition->delete();
 
         return redirect()->route('admin.questions.edit', $question)->with('success', 'Condition supprimée.');

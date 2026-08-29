@@ -29,6 +29,14 @@ class Question extends Model
         'is_active' => 'boolean',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Question $question): void {
+            $question->options()->delete();
+            $question->conditions()->delete();
+        });
+    }
+
     public function options(): HasMany
     {
         return $this->hasMany(QuestionOption::class);
@@ -46,56 +54,21 @@ class Question extends Model
 
     /**
      * Known wizard-to-label mappings for values that don't exist in DB options.
-     * These cover the wizard's inline options (steps 3-12).
+     * These cover legacy or fallback values stored in answers.
      */
     private static array $wizardLabels = [
-        // Step 8: Features (wizard adaptive values)
-        'compte' => 'Créer un compte / Se connecter',
-        'catalogue' => 'Consulter le catalogue de produits',
-        'panier' => 'Ajouter au panier et commander',
-        'paiement_en_ligne' => 'Payer en ligne',
-        'suivi_cmd' => 'Suivre mes commandes',
-        'avis' => 'Laisser des avis',
-        'recherche' => 'Rechercher un produit',
-        'promos' => 'Appliquer des codes promo',
-        'compte_client' => 'Gérer mon espace client',
-        'inscription' => "S'inscrire / Se connecter",
-        'notifications' => 'Recevoir des notifications',
-        'profil' => 'Gérer mon profil',
-        'reservation' => 'Réserver / Commander',
-        'paiement' => "Payer depuis l'application",
-        'localisation' => 'Utiliser la géolocalisation',
-        'chat' => 'Envoyer / Recevoir des messages',
-        'partage' => "Partager avec d'autres utilisateurs",
-        'dashboard' => 'Voir un tableau de bord',
-        'clients_gestion' => 'Gérer mes clients',
-        'ventes_gestion' => 'Gérer mes ventes',
-        'facturation' => 'Créer et envoyer des factures',
-        'stocks' => 'Gérer les stocks',
-        'rapports' => 'Générer des rapports',
-        'multi_user' => 'Plusieurs utilisateurs avec des droits différents',
-        'import_export' => 'Importer / Exporter des données',
-        'presentation' => 'Présenter mes services / activité',
-        'contact_form' => 'Formulaire de contact',
-        'rdv' => 'Prise de rendez-vous en ligne',
-        'blog' => 'Publier des articles / actualités',
-        'galerie' => 'Galerie photos / réalisations',
-        'temoignages' => 'Afficher des témoignages',
-        'faq' => 'FAQ (questions fréquentes)',
-        'devis' => 'Demander un devis en ligne',
-        // Step 3: Pourquoi
-        'developper' => 'Développer mon activité',
+        // Legacy step labels (backward compatibility with existing answers)
+        'nouvelle_idee' => "J'ai une idée et je veux la concrétiser",
+        'ameliorer' => "J'ai un projet existant à améliorer",
+        'remplacer' => 'Je veux remplacer un processus actuel',
+        'maquette' => "J'ai déjà une maquette ou un prototype",
+        'nouveau' => "Je pars de zéro, c'est une nouvelle activité",
         'clients' => 'Trouver davantage de clients',
         'vendre' => 'Vendre davantage',
-        'temps' => 'Gagner du temps',
-        'automatiser' => 'Automatiser certaines tâches',
         'organiser' => 'Mieux organiser mon activité',
-        'ameliorer' => 'Améliorer mon service',
         'nouveau_service' => 'Créer un nouveau service',
-        'remplacer' => 'Remplacer une méthode actuelle',
         'ameliorer_existant' => 'Améliorer une solution existante',
-        'nouvelle_idee' => 'Réaliser une nouvelle idée',
-        // Step 4: Problème
+        // Legacy problem labels
         'ec_manuelle' => 'Les commandes sont gérées manuellement',
         'ec_suivi' => 'Il est difficile de suivre les commandes',
         'ec_vente_en_ligne' => "L'entreprise veut vendre sur Internet",
@@ -116,70 +89,39 @@ class Question extends Model
         'am_notifications' => 'Je veux envoyer des notifications à mes clients',
         'am_pas_sur_mobile' => "Mon service n'est pas encore sur mobile",
         'am_interactions' => 'Les interactions avec mes clients sont limitées',
-        'lg_processus_manuels' => 'Mes processus sont trop manuels',
         'lg_outils_dispersion' => "J'ai trop d'outils dispersés",
         'lg_pas_de_suivi' => "Je n'ai pas de suivi de mon activité",
         'lg_temps_perdu' => 'Mes employés perdent du temps',
-        'lg_automatiser' => 'Je veux automatiser certaines tâches',
         'lg_desorganisation' => 'La gestion des informations est désorganisée',
-        // Step 5: Actuel
-        'whatsapp' => 'WhatsApp',
-        'appels' => 'Appels téléphoniques',
-        'reseaux' => 'Réseaux sociaux',
-        'cahier' => 'Cahier / Papier',
+        // Legacy current tools labels
         'excel' => 'Excel ou tableur',
         'site_exist' => 'Site internet existant',
         'app_exist' => 'Application existante',
         'plusieurs_outils' => 'Plusieurs outils différents',
         'rien' => 'Rien pour le moment',
-        // Step 6: Résultat
+        // Legacy result labels
         'plus_clients' => 'Obtenir plus de clients',
-        'ventes' => 'Augmenter les ventes',
         'reduire_manuel' => 'Réduire les tâches manuelles',
         'experience_client' => "Améliorer l'expérience client",
         'centraliser' => 'Centraliser les informations',
         'faciliter_employes' => 'Faciliter le travail des employés',
-        'visibilite' => 'Avoir une meilleure visibilité',
-        // Step 7: Utilisateurs
-        'employes' => 'Mes employés',
+        // Legacy user labels
         'admin' => 'Administrateur(s)',
-        'partenaires' => 'Partenaires',
-        'fournisseurs' => 'Fournisseurs',
-        'grand_public' => 'Grand public',
         'interne' => 'Usage interne uniquement',
-        // Step 9: Workflow
+        // Legacy workflow labels
         'navigation' => 'Il navigue / recherche',
         'action' => 'Il effectue une action (commande, réservation, etc.)',
         'confirmation' => 'Il reçoit une confirmation',
         'suivi' => "Il suit l'avancement (commande, livraison, etc.)",
         'notification' => 'Il reçoit des notifications',
         'support' => 'Il peut contacter le support',
-        // Step 10: Style
-        'moderne' => 'Moderne et épuré',
+        // Legacy style labels
         'luxe' => 'Luxe et élégant',
         'coloré' => 'Coloré et dynamique',
-        'sobre' => 'Sobre et professionnel',
-        'jeune' => 'Jeune et tendance',
         'nature' => 'Naturel et organique',
         'tech' => 'Technique et futuriste',
-        // Step 11: Budget
-        'moins_500k' => 'Moins de 500 000 FCFA',
-        '500k_1m' => '500 000 à 1 000 000 FCFA',
-        '1m_3m' => '1 000 000 à 3 000 000 FCFA',
-        'plus_3m' => 'Plus de 3 000 000 FCFA',
+        // Legacy budget labels
         'discuter' => 'Je préfère en discuter',
-        // Step 11.1: Delay
-        'moins_1_mois' => "Moins d'1 mois",
-        '1_3_mois' => '1 à 3 mois',
-        '3_6_mois' => '3 à 6 mois',
-        'plus_6_mois' => 'Plus de 6 mois',
-        'aucun' => 'Aucune date précise',
-        // Step 9: Fonctionnalités (DB Q9)
-        'relation_client' => 'Améliorer la relation client',
-        'gestion' => 'Gérer mieux mon entreprise',
-        // Step 13: Problème universal
-        'autre' => 'Autre',
-        'nsa' => 'Je ne sais pas encore',
     ];
 
     /**

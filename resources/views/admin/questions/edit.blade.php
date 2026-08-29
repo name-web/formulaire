@@ -179,7 +179,7 @@
                         <label class="admin-label">Dépend de la question</label>
                         <select name="depends_on_question_id" class="admin-input" required>
                             <option value="">— Sélectionner —</option>
-                            @foreach(\App\Models\Question::where('id', '!=', $question->id)->orderBy('sort_order')->get() as $q)
+                            @foreach($otherQuestions as $q)
                                 <option value="{{ $q->id }}">{{ $q->title }}</option>
                             @endforeach
                         </select>

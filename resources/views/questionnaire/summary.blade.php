@@ -115,7 +115,7 @@
                     <div style="padding:18px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);margin-top:12px;{{ $loop->iteration <= 5 ? 'animation-delay:' . min($loop->iteration * 60, 300) . 'ms;opacity:0;animation-fill-mode:forwards;' : '' }}" class="anim-up">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                             <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">{{ $question->title }}</div>
-                            <a href="{{ route('questionnaire.step', $loop->iteration) }}?edit=1" style="font-size:11px;color:var(--accent-light);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                            <a href="{{ route('questionnaire.step', $question->sort_order) }}?edit=1" style="font-size:11px;color:var(--accent-light);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
                                 <i class="fa-solid fa-pen" style="font-size:9px;"></i> Modifier
                             </a>
                         </div>

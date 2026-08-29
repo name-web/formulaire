@@ -101,11 +101,15 @@
                             </div>
                         </div>
                         <div>
-                            @php $typeLabels = $project->type_labels; @endphp
+                            @php $typeLabels = $project->type_labels ?? ''; @endphp
                             <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                                @foreach(explode(', ', $typeLabels) as $label)
-                                    <span class="admin-badge badge-in_progress">{{ $label }}</span>
-                                @endforeach
+                                @if($typeLabels)
+                                    @foreach(explode(', ', $typeLabels) as $label)
+                                        @if($label)
+                                            <span class="admin-badge badge-in_progress">{{ $label }}</span>
+                                        @endif
+                                    @endforeach
+                                @endif
                             </div>
                         </div>
                         <div class="project">{{ $project->answers_count }} réponse{{ $project->answers_count > 1 ? 's' : '' }}</div>

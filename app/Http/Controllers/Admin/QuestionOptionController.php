@@ -44,6 +44,8 @@ class QuestionOptionController extends Controller
 
     public function destroy(Question $question, QuestionOption $option): RedirectResponse
     {
+        abort_unless($option->question_id === $question->id, 404);
+
         $option->delete();
 
         return redirect()->route('admin.questions.edit', $question)->with('success', 'Option supprimée.');

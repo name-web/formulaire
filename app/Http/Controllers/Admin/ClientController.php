@@ -15,11 +15,11 @@ class ClientController extends Controller
             ->whereHas('projects', fn ($q) => $q->where('status', 'submitted'));
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('company_name', 'like', "%{$search}%");
+                $q->whereRaw('name LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
+                    ->orWhereRaw('email LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
+                    ->orWhereRaw('company_name LIKE ? ESCAPE ?', ["%{$search}%", '\\']);
             });
         }
 

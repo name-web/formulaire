@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\QuestionOptionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionnaireController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,12 +44,17 @@ Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');
 })->middleware(['auth', 'admin'])->name('dashboard');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::resource('projects', ProjectController::class)->only(['index', 'show']);
+    Route::resource('projects', ProjectController::class)->only(['index', 'show', 'destroy']);
     Route::patch('projects/{project}/status', [ProjectController::class, 'updateStatus'])->name('projects.update-status');
-    Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
     Route::resource('clients', ClientController::class)->only(['index', 'show']);
 

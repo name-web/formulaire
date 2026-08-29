@@ -31,9 +31,29 @@ class QuestionnaireController extends Controller
 
     public function index(): View
     {
+        $types = config('project_types.types');
+
         return view('questionnaire.index', [
-            'projectTypes' => config('project_types.types'),
+            'projectTypes' => $types,
+            'selectedProjectTypes' => $this->resolveSelectedProjectTypes(old('project_types')),
         ]);
+    }
+
+    private function resolveSelectedProjectTypes(mixed $old): array
+    {
+        if (is_string($old)) {
+            $decoded = json_decode($old, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        if (is_array($old)) {
+            return $old;
+        }
+
+        // Le home ne collecte que les coordonnées du client : on présélectionne
+        // tous les types réels, mais jamais « autre » (aucun champ de précision ici).
+        return array_values(array_diff(array_keys(config('project_types.types')), ['autre']));
     }
 
     public function start(StartQuestionnaireRequest $request): RedirectResponse
@@ -80,7 +100,7 @@ class QuestionnaireController extends Controller
             ->get()
             ->keyBy('question_id');
 
-        $steps = $this->buildSteps($visibleQuestions, $projectType);
+        $steps = $this->buildSteps($visibleQuestions);
 
         return view('questionnaire.wizard', [
             'project' => $project,
@@ -89,7 +109,7 @@ class QuestionnaireController extends Controller
         ]);
     }
 
-    private function buildSteps(Collection $questions, string|array $projectType): Collection
+    private function buildSteps(Collection $questions): Collection
     {
         // Each question becomes its own wizard step (one question per page)
         return $questions
@@ -194,34 +214,13 @@ class QuestionnaireController extends Controller
         $project = $this->projectService->find($projectId);
         abort_unless($project, 404);
 
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $project->project_type ?? $projectType);
-        $answeredIds = $this->answerService->getAnsweredQuestionIds($projectId);
-        $isEditing = request()->query('edit') === '1';
+        $result = $this->resolveCurrentQuestion($projectId, $project, $step);
 
-        if ($isEditing) {
-            // Edit mode: show the question at this exact position (no skip)
-            $currentIndex = $step - 1;
-            $currentQuestion = $visibleQuestions->get($currentIndex);
-            abort_unless($currentQuestion, 404);
-        } else {
-            // Normal flow: skip answered questions
-            $unansweredIndex = $step - 1;
-            while ($unansweredIndex < $visibleQuestions->count()) {
-                $candidate = $visibleQuestions->get($unansweredIndex);
-                if ($candidate && ! in_array($candidate->id, $answeredIds)) {
-                    break;
-                }
-                $unansweredIndex++;
-            }
-
-            if ($unansweredIndex >= $visibleQuestions->count()) {
-                return redirect()->route('questionnaire.summary');
-            }
-
-            $currentQuestion = $visibleQuestions->get($unansweredIndex);
-            abort_unless($currentQuestion, 404);
-            $step = $unansweredIndex + 1;
+        if ($result instanceof RedirectResponse) {
+            return $result;
         }
+
+        ['question' => $currentQuestion, 'step' => $resolvedStep, 'isEditing' => $isEditing] = $result;
 
         $existingAnswer = $this->answerService->getForQuestion($projectId, $currentQuestion->id);
         $progress = $this->questionnaireService->getProgress($projectId, $project->project_type ?? $projectType);
@@ -230,12 +229,12 @@ class QuestionnaireController extends Controller
             'question' => $currentQuestion,
             'options' => $this->questionService->getOptions($currentQuestion->id),
             'answer' => $existingAnswer,
-            'step' => $step,
+            'step' => $resolvedStep,
             'totalSteps' => $progress['total'],
             'progress' => $progress,
             'project' => $project,
-            'visibleQuestions' => $visibleQuestions,
-            'answeredIds' => $answeredIds,
+            'visibleQuestions' => $this->questionnaireService->getVisibleQuestions($projectId, $project->project_type ?? $projectType),
+            'answeredIds' => $this->answerService->getAnsweredQuestionIds($projectId),
             'isEditing' => $isEditing,
         ]);
     }
@@ -250,32 +249,13 @@ class QuestionnaireController extends Controller
         $project = $this->projectService->find($projectId);
         $effectiveType = $project->project_type ?? $projectType;
 
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $effectiveType);
-        $answeredIds = $this->answerService->getAnsweredQuestionIds($projectId);
-        $isEditing = request()->query('edit') === '1';
+        $result = $this->resolveCurrentQuestion($projectId, $project, $step);
 
-        if ($isEditing) {
-            $currentIndex = $step - 1;
-            $currentQuestion = $visibleQuestions->get($currentIndex);
-            abort_unless($currentQuestion, 404);
-        } else {
-            $unansweredIndex = $step - 1;
-            while ($unansweredIndex < $visibleQuestions->count()) {
-                $candidate = $visibleQuestions->get($unansweredIndex);
-                if ($candidate && ! in_array($candidate->id, $answeredIds)) {
-                    break;
-                }
-                $unansweredIndex++;
-            }
-
-            if ($unansweredIndex >= $visibleQuestions->count()) {
-                return redirect()->route('questionnaire.summary');
-            }
-
-            $currentQuestion = $visibleQuestions->get($unansweredIndex);
-            abort_unless($currentQuestion, 404);
-            $step = $unansweredIndex + 1;
+        if ($result instanceof RedirectResponse) {
+            return $result;
         }
+
+        ['question' => $currentQuestion, 'step' => $resolvedStep, 'isEditing' => $isEditing] = $result;
 
         $data = $request->validated();
 
@@ -293,13 +273,48 @@ class QuestionnaireController extends Controller
             return redirect()->route('questionnaire.summary');
         }
 
-        $nextStep = $step + 1;
+        $nextStep = $resolvedStep + 1;
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $effectiveType);
 
         if ($nextStep > $visibleQuestions->count()) {
             return redirect()->route('questionnaire.summary');
         }
 
         return redirect()->route('questionnaire.step', $nextStep);
+    }
+
+    private function resolveCurrentQuestion(int $projectId, Project $project, int $step): array|RedirectResponse
+    {
+        $effectiveType = $project->project_type ?? session('project_type');
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $effectiveType);
+        $answeredIds = $this->answerService->getAnsweredQuestionIds($projectId);
+        $isEditing = request()->query('edit') === '1';
+
+        if ($isEditing) {
+            $currentIndex = $step - 1;
+            $currentQuestion = $visibleQuestions->get($currentIndex);
+            abort_unless($currentQuestion, 404);
+
+            return ['question' => $currentQuestion, 'step' => $step, 'isEditing' => true];
+        }
+
+        $unansweredIndex = $step - 1;
+        while ($unansweredIndex < $visibleQuestions->count()) {
+            $candidate = $visibleQuestions->get($unansweredIndex);
+            if ($candidate && ! in_array($candidate->id, $answeredIds)) {
+                break;
+            }
+            $unansweredIndex++;
+        }
+
+        if ($unansweredIndex >= $visibleQuestions->count()) {
+            return redirect()->route('questionnaire.summary');
+        }
+
+        $currentQuestion = $visibleQuestions->get($unansweredIndex);
+        abort_unless($currentQuestion, 404);
+
+        return ['question' => $currentQuestion, 'step' => $unansweredIndex + 1, 'isEditing' => false];
     }
 
     public function previous(): RedirectResponse

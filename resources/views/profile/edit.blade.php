@@ -1,29 +1,30 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight" style="color: white;">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+<x-layouts.app :title="'Profil'">
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 shadow sm:rounded-lg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
+    <main class="main-content">
+        <div class="content-card anim-scale">
+
+            <div class="top">
+                <div class="eyebrow">VOTRE PROFIL</div>
             </div>
 
-            <div class="p-4 sm:p-8 shadow sm:rounded-lg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
+            <h1 class="question-title anim-up d1">
+                Profil
+            </h1>
+            <p class="question-desc anim-up d2">Gérez vos informations personnelles.</p>
+
+            <div class="anim-up d3" style="padding:24px;border-radius:var(--radius);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);margin-top:12px;">
+                @include('profile.partials.update-profile-information-form')
             </div>
 
-            <div class="p-4 sm:p-8 shadow sm:rounded-lg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
+            <div class="anim-up d4" style="padding:24px;border-radius:var(--radius);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);margin-top:12px;">
+                @include('profile.partials.update-password-form')
             </div>
+
+            <div class="anim-up d5" style="padding:24px;border-radius:var(--radius);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);margin-top:12px;">
+                @include('profile.partials.delete-user-form')
+            </div>
+
         </div>
-    </div>
-</x-app-layout>
+    </main>
+
+</x-layouts.app>

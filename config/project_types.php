@@ -25,28 +25,28 @@ return [
         'ecommerce' => [
             'label' => 'Boutique en ligne',
             'icon' => 'fa-solid fa-bag-shopping',
-            'color' => '#3b82f6',
+            'color' => '#10b981',
             'description' => 'Vendez vos produits en ligne avec une boutique rapide et sécurisée.',
         ],
 
         'application_mobile' => [
             'label' => 'Application mobile',
             'icon' => 'fa-solid fa-mobile-screen',
-            'color' => '#3b82f6',
+            'color' => '#8b5cf6',
             'description' => 'iOS et Android',
         ],
 
         'logiciel' => [
             'label' => 'Logiciel / ERP / CRM',
             'icon' => 'fa-solid fa-gears',
-            'color' => '#3b82f6',
+            'color' => '#f59e0b',
             'description' => 'Solution sur mesure',
         ],
 
         'autre' => [
             'label' => 'Autre',
             'icon' => 'fa-solid fa-wand-magic-sparkles',
-            'color' => '#3b82f6',
+            'color' => '#ec4899',
             'description' => 'Décrivez votre vision',
         ],
 

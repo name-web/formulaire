@@ -6,6 +6,7 @@ use App\Models\Question;
 use App\Models\QuestionCondition;
 use App\Models\QuestionOption;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class QuestionSeeder extends Seeder
 {
@@ -18,31 +19,17 @@ class QuestionSeeder extends Seeder
         $typesVitrineOnly = array_values(array_intersect($allTypes, ['site_vitrine']));
         $typesNoLogicielNoAutre = array_values(array_diff($allTypes, ['logiciel', 'autre']));
 
+        // Wipe all questions to make the seeder idempotent.
+        // forceDelete on Query Builder skips model events, so delete children explicitly.
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        QuestionCondition::query()->delete();
+        QuestionOption::query()->delete();
+        Question::withTrashed()->forceDelete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
         // ============================================================
         // ÉTAPE 03 — VOTRE PROJET (questions discovery/motivation)
         // ============================================================
-
-        // --- Pourquoi ---
-        $qWhy = Question::create([
-            'title' => 'Pourquoi souhaitez-vous créer cette solution ?',
-            'description' => 'Sélectionnez la ou les raisons principales.',
-            'type' => 'multiselect',
-            'project_types' => $allTypes,
-            'is_required' => false,
-            'sort_order' => 5,
-            'group_label' => 'Votre projet',
-            'placeholder' => null,
-            'help_text' => 'Vous pouvez sélectionner plusieurs réponses.',
-            'is_active' => true,
-        ]);
-
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Développer mon activité', 'value' => 'developper', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Trouver davantage de clients', 'value' => 'clients', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Gagner du temps', 'value' => 'temps', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Automatiser certaines tâches', 'value' => 'automatiser', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Améliorer mon service', 'value' => 'ameliorer', 'sort_order' => 5, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 6, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qWhy->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 7, 'is_active' => true]);
 
         // --- Quel problème (adaptatif par type de projet) ---
         // Options universelles + options par type de projet
@@ -89,13 +76,12 @@ class QuestionSeeder extends Seeder
         // ============================================================
         // QUESTION 1 : Solutions souhaitez-vous créer (SÉLECTION MULTIPLE)
         // ============================================================
-        $allTypeKeys = array_keys(config('project_types.types'));
 
         $qType = Question::create([
             'title' => 'Quelle solution souhaitez-vous créer ?',
             'description' => 'Sélectionnez le type de projet qui correspond le mieux à votre besoin.',
             'type' => 'multiselect',
-            'project_types' => $allTypeKeys,
+            'project_types' => $allTypes,
             'is_required' => true,
             'sort_order' => 1,
             'group_label' => 'Votre projet',
@@ -116,36 +102,24 @@ class QuestionSeeder extends Seeder
             ]);
         }
 
-        $optVitrine = $typeOptions['site_vitrine'];
-        $optEcommerce = $typeOptions['ecommerce'];
-        $optMobile = $typeOptions['application_mobile'];
-        $optLogiciel = $typeOptions['logiciel'];
-
         // ============================================================
         // QUESTION 2 : Description du besoin
         // ============================================================
         $qDescProjet = Question::create([
             'title' => 'Décrivez votre projet en quelques mots',
             'description' => 'Quelle est la situation actuelle de votre projet ?',
-            'type' => 'multiselect',
+            'type' => 'textarea',
             'project_types' => $allTypes,
             'is_required' => false,
             'sort_order' => 2,
             'group_label' => 'Votre projet',
-            'placeholder' => null,
-            'help_text' => 'Vous pouvez sélectionner plusieurs réponses.',
+            'placeholder' => 'Décrivez brièvement votre projet, vos attentes, ou toute information utile...',
+            'help_text' => null,
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qDescProjet->id, 'label' => "J'ai une idée et je veux la concrétiser", 'value' => 'nouvelle_idee', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDescProjet->id, 'label' => "J'ai un projet existant à améliorer", 'value' => 'ameliorer', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDescProjet->id, 'label' => 'Je veux remplacer un processus actuel', 'value' => 'remplacer', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDescProjet->id, 'label' => 'J\'ai déjà une maquette ou un prototype', 'value' => 'maquette', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDescProjet->id, 'label' => "Je pars de zéro, c'est une nouvelle activité", 'value' => 'nouveau', 'sort_order' => 5, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDescProjet->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 6, 'is_active' => true]);
-
         // ============================================================
-        // QUESTION 3 : Objectifs
+        // QUESTION 3 : Objectifs (fusionné avec l'ancienne Q5 "Pourquoi")
         // ============================================================
         $qObjectifs = Question::create([
             'title' => 'Quels sont vos objectifs principaux ?',
@@ -216,15 +190,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qPages->id, 'label' => 'FAQ', 'value' => 'faq', 'sort_order' => 8, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qPages->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 9, 'is_active' => true]);
 
-        QuestionCondition::create([
-            'question_id' => $qPages->id,
-            'depends_on_question_id' => $qType->id,
-            'operator' => 'equals',
-            'option_value_id' => $optVitrine->id,
-            'text_value' => null,
-            'sort_order' => 1,
-        ]);
-
         // ============================================================
         // E-COMMERCE
         // ============================================================
@@ -247,8 +212,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => 'Plus de 1000 produits', 'value' => 'plus_1000', 'sort_order' => 4, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 5, 'is_active' => true]);
 
-        QuestionCondition::create(['question_id' => $qNbProduits->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optEcommerce->id, 'text_value' => null, 'sort_order' => 1]);
-
         $qTypeProduits = Question::create([
             'title' => 'Quel type de produits vendez-vous ?',
             'description' => 'Cela nous aide à comprendre vos besoins spécifiques.',
@@ -266,8 +229,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qTypeProduits->id, 'label' => 'Produits numériques (e-books, formations...)', 'value' => 'numeriques', 'sort_order' => 2, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qTypeProduits->id, 'label' => 'Services (consulting, abonnements...)', 'value' => 'services', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qTypeProduits->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
-
-        QuestionCondition::create(['question_id' => $qTypeProduits->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optEcommerce->id, 'text_value' => null, 'sort_order' => 2]);
 
         $qFonctionnalitesEcommerce = Question::create([
             'title' => 'Quelles fonctionnalités souhaitez-vous pour votre boutique ?',
@@ -292,8 +253,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qFonctionnalitesEcommerce->id, 'label' => 'Wishlist (liste de souhaits)', 'value' => 'wishlist', 'sort_order' => 8, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qFonctionnalitesEcommerce->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 9, 'is_active' => true]);
 
-        QuestionCondition::create(['question_id' => $qFonctionnalitesEcommerce->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optEcommerce->id, 'text_value' => null, 'sort_order' => 3]);
-
         $qLivraison = Question::create([
             'title' => 'Comment souhaitez-vous gérer la livraison ?',
             'description' => null,
@@ -312,8 +271,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qLivraison->id, 'label' => 'Les deux', 'value' => 'les_deux', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qLivraison->id, 'label' => 'Livraison numérique (pas de livraison physique)', 'value' => 'numerique', 'sort_order' => 4, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qLivraison->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 5, 'is_active' => true]);
-
-        QuestionCondition::create(['question_id' => $qLivraison->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optEcommerce->id, 'text_value' => null, 'sort_order' => 4]);
 
         // ============================================================
         // APPLICATION MOBILE
@@ -335,8 +292,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qPlateforme->id, 'label' => 'Android', 'value' => 'android', 'sort_order' => 2, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qPlateforme->id, 'label' => 'Les deux', 'value' => 'les_deux', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qPlateforme->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
-
-        QuestionCondition::create(['question_id' => $qPlateforme->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optMobile->id, 'text_value' => null, 'sort_order' => 1]);
 
         $qFonctionnalitesMobile = Question::create([
             'title' => 'Quelles fonctionnalités souhaitez-vous dans votre application ?',
@@ -360,8 +315,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qFonctionnalitesMobile->id, 'label' => 'Scan de QR code', 'value' => 'qr', 'sort_order' => 7, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qFonctionnalitesMobile->id, 'label' => 'Mode hors ligne', 'value' => 'offline', 'sort_order' => 8, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qFonctionnalitesMobile->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 9, 'is_active' => true]);
-
-        QuestionCondition::create(['question_id' => $qFonctionnalitesMobile->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optMobile->id, 'text_value' => null, 'sort_order' => 1]);
 
         // ============================================================
         // LOGICIEL / ERP / CRM
@@ -387,8 +340,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qProcessus->id, 'label' => 'Comptabilité', 'value' => 'comptabilite', 'sort_order' => 6, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qProcessus->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 7, 'is_active' => true]);
 
-        QuestionCondition::create(['question_id' => $qProcessus->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optLogiciel->id, 'text_value' => null, 'sort_order' => 1]);
-
         $qUtilisateursLogiciel = Question::create([
             'title' => 'Combien d\'utilisateurs auront accès au logiciel ?',
             'description' => null,
@@ -407,8 +358,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qUtilisateursLogiciel->id, 'label' => '21 à 50 utilisateurs', 'value' => '21_50', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qUtilisateursLogiciel->id, 'label' => 'Plus de 50 utilisateurs', 'value' => 'plus_50', 'sort_order' => 4, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qUtilisateursLogiciel->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 5, 'is_active' => true]);
-
-        QuestionCondition::create(['question_id' => $qUtilisateursLogiciel->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optLogiciel->id, 'text_value' => null, 'sort_order' => 2]);
 
         $qFonctionnalitesLogiciel = Question::create([
             'title' => 'Quelles fonctionnalités sont essentielles pour votre logiciel ?',
@@ -431,8 +380,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qFonctionnalitesLogiciel->id, 'label' => 'Gestion des utilisateurs et droits d\'accès', 'value' => 'utilisateurs', 'sort_order' => 6, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qFonctionnalitesLogiciel->id, 'label' => 'Intégration avec d\'autres outils', 'value' => 'integrations', 'sort_order' => 7, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qFonctionnalitesLogiciel->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 8, 'is_active' => true]);
-
-        QuestionCondition::create(['question_id' => $qFonctionnalitesLogiciel->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optLogiciel->id, 'text_value' => null, 'sort_order' => 3]);
 
         // ============================================================
         // IDENTITÉ VISUELLE
@@ -599,8 +546,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qPaiements->id, 'label' => 'Virement bancaire', 'value' => 'virement', 'sort_order' => 5, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qPaiements->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 6, 'is_active' => true]);
 
-        QuestionCondition::create(['question_id' => $qPaiements->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optEcommerce->id, 'text_value' => null, 'sort_order' => 1]);
-
         // ============================================================
         // PAIEMENTS — APPLICATION MOBILE
         // ============================================================
@@ -622,8 +567,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qPaiementsMobile->id, 'label' => 'Apple Pay / Google Pay', 'value' => 'apple_google', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qPaiementsMobile->id, 'label' => 'PayPal', 'value' => 'paypal', 'sort_order' => 4, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qPaiementsMobile->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 5, 'is_active' => true]);
-
-        QuestionCondition::create(['question_id' => $qPaiementsMobile->id, 'depends_on_question_id' => $qType->id, 'operator' => 'equals', 'option_value_id' => $optMobile->id, 'text_value' => null, 'sort_order' => 1]);
 
         // ============================================================
         // LANGUES
@@ -682,7 +625,6 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qHebergementDetails->id, 'label' => 'Google Domains', 'value' => 'google', 'sort_order' => 4, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qHebergementDetails->id, 'label' => 'Cloudflare', 'value' => 'cloudflare', 'sort_order' => 5, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qHebergementDetails->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 6, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qHebergementDetails->id, 'label' => "Je n'en ai pas", 'value' => 'aucun', 'sort_order' => 7, 'is_active' => true]);
 
         QuestionCondition::create(['question_id' => $qHebergementDetails->id, 'depends_on_question_id' => $qHebergement->id, 'operator' => 'equals', 'option_value_id' => null, 'text_value' => 'yes', 'sort_order' => 1]);
 
