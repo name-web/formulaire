@@ -37,6 +37,12 @@
         .login-brand img { height: 60px; width: auto; filter: drop-shadow(0 0 12px rgba(255,183,3,0.25)); }
         .login-brand h1 { font-size: 16px; font-weight: 800; color: rgba(255,255,255,0.7); letter-spacing: 1px; margin-top: 10px; text-transform: uppercase; }
         .login-brand p { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .login-brand img { max-width: 100%; height: auto; }
+
+        @media (max-width: 420px) {
+            .login-card { padding: 32px 20px; }
+            .login-brand img { height: 48px; }
+        }
 
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.06em; }

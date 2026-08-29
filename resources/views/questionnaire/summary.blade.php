@@ -1,6 +1,70 @@
 <x-layouts.app :title="'Récapitulatif'">
 
-    <aside class="sidebar">
+<style>
+@media (max-width:750px) {
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:270px; transform:translateX(-100%); transition:transform .35s cubic-bezier(.4,0,.2,1); z-index:200; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-label { display:none; }
+    .step-list { flex-direction:column; gap:4px; }
+    .step-item { padding:6px 8px; min-height:40px; }
+    .step-dot { width:28px; height:28px; }
+    .progress-section { margin-top:12px; }
+    .main-content { margin-left:0; min-height:auto; padding:16px; align-items:flex-start; }
+    .content-card { min-height:auto; padding:24px 18px; border-radius:20px; }
+    .question-title { margin:24px 0 12px; font-size:28px; letter-spacing:-1px; line-height:1.1; }
+    .card-bottom { flex-direction:column; align-items:stretch; gap:10px; }
+    .btn-continue { width:100%; justify-content:center; min-height:48px; }
+    .qm-hamburger { display:flex; }
+    .qm-overlay { display:block; }
+}
+.qm-hamburger {
+    display:none; align-items:center; justify-content:center;
+    width:44px; height:44px; border:none; background:rgba(255,255,255,.06);
+    color:white; font-size:18px; cursor:pointer; border-radius:12px;
+    transition:background .2s; position:relative; z-index:210;
+}
+.qm-hamburger:hover { background:rgba(255,255,255,.12); }
+.qm-hamburger .bars {
+    width:20px; height:14px; display:flex; flex-direction:column;
+    justify-content:space-between; position:relative;
+}
+.qm-hamburger .bars span {
+    display:block; width:100%; height:2px; background:white; border-radius:2px;
+    transition:all .3s cubic-bezier(.4,0,.2,1); transform-origin:center;
+}
+.qm-hamburger.active .bars span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
+.qm-hamburger.active .bars span:nth-child(2) { opacity:0; transform:scaleX(0); }
+.qm-hamburger.active .bars span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); }
+.qm-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
+    z-index:199; opacity:0; transition:opacity .3s ease; pointer-events:none;
+}
+.qm-overlay.visible { opacity:1; pointer-events:auto; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const qmToggle = document.getElementById('qmToggle');
+    const qmSidebar = document.getElementById('qmSidebar');
+    const qmOverlay = document.getElementById('qmOverlay');
+    if (qmToggle && qmSidebar) {
+        qmToggle.addEventListener('click', () => {
+            qmSidebar.classList.toggle('open');
+            qmToggle.classList.toggle('active');
+            qmOverlay.classList.toggle('visible');
+        });
+    }
+    if (qmOverlay && qmSidebar) {
+        qmOverlay.addEventListener('click', () => {
+            qmSidebar.classList.remove('open');
+            qmToggle.classList.remove('active');
+            qmOverlay.classList.remove('visible');
+        });
+    }
+});
+</script>
+
+    <aside class="sidebar" id="qmSidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <img src="{{ asset('IMAGES/Logo dominium.png') }}" alt="DOMINIUM">
@@ -41,8 +105,16 @@
     </aside>
 
 
+    <div class="qm-overlay" id="qmOverlay"></div>
+
     <main class="main-content">
         <div class="content-card anim-scale">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <button class="qm-hamburger" id="qmToggle" aria-label="Menu">
+                    <div class="bars"><span></span><span></span><span></span></div>
+                </button>
+                <span style="font-size:12px;font-weight:700;color:var(--yellow);letter-spacing:1.5px;">DOMINIUM TECH</span>
+            </div>
 
             <div class="card-progress-top">
                 <div class="card-progress-top-fill" style="width: {{ $progress['percentage'] }}%"></div>
@@ -142,10 +214,10 @@
                     </div>
                     <div style="display:flex;flex-direction:column;gap:8px;">
                         @foreach($files as $file)
-                            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.05);font-size:13px;">
-                                <i class="fa-solid fa-file" style="color:var(--accent-light);"></i>
-                                <span style="color:white;">{{ $file->original_name }}</span>
-                                <span style="margin-left:auto;color:var(--text-muted);font-size:11px;">{{ round($file->size / 1024) }} KB</span>
+                            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.05);font-size:13px;min-width:0;">
+                                <i class="fa-solid fa-file" style="color:var(--accent-light);flex-shrink:0;"></i>
+                                <span style="color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">{{ $file->original_name }}</span>
+                                <span style="margin-left:auto;color:var(--text-muted);font-size:11px;flex-shrink:0;">{{ round($file->size / 1024) }} KB</span>
                             </div>
                         @endforeach
                     </div>
@@ -161,12 +233,14 @@
                 <a href="{{ route('questionnaire.step', 1) }}?edit=1" class="btn-back" style="text-decoration:none;">
                     <i class="fa-solid fa-arrow-left"></i> Modifier
                 </a>
-                <form action="{{ route('questionnaire.submit') }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn-continue">
-                        Envoyer ma demande <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                </form>
+                <div style="display:inline-flex;">
+                    <form action="{{ route('questionnaire.submit') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn-continue">
+                            Envoyer ma demande <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </main>

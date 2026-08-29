@@ -209,6 +209,9 @@
         .step-label {
             font-size: 13px;
             font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .step-item:not(:last-child)::after {
@@ -834,20 +837,32 @@
         /* ============================================
            MOBILE
         ============================================ */
+        @media (max-width: 1024px) {
+            .sidebar { width: 240px; padding: 24px 20px; }
+            .sidebar-logo img { height: 60px; }
+            .step-item { min-height: 44px; padding: 7px 8px; }
+            .step-dot { width: 30px; height: 30px; font-size: 9px; }
+            .step-label { font-size: 12px; }
+            .main-content { margin-left: 240px; padding: 30px 35px; }
+            .content-card { padding: 40px 45px; }
+            .question-title { font-size: clamp(32px, 4.5vw, 52px); }
+        }
         @media (max-width: 750px) {
             .sidebar {
                 position: relative;
                 width: 100%;
                 height: auto;
-                padding: 20px;
+                padding: 16px;
                 border-right: none;
                 border-bottom: 1px solid rgba(255,255,255,0.08);
             }
-            .sidebar-header { margin-bottom: 20px; }
+            .sidebar-header { margin-bottom: 12px; }
             .sidebar-label { display: none; }
             .step-list {
                 flex-direction: row;
-                justify-content: space-between;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 4px;
             }
             .step-item {
                 padding: 0;
@@ -857,8 +872,8 @@
             }
             .step-item:not(:last-child)::after { display: none; }
             .step-label { display: none; }
-            .step-dot { width: 35px; height: 35px; }
-            .progress-section { margin-top: 20px; }
+            .step-dot { width: 32px; height: 32px; font-size: 10px; }
+            .progress-section { margin-top: 16px; }
             .step-arrow { display: none; }
             .project-badge { margin-top: 12px; padding: 10px 12px; }
             .project-badge-icon { width: 30px; height: 30px; font-size: 12px; }
@@ -866,29 +881,43 @@
             .main-content {
                 margin-left: 0;
                 min-height: auto;
-                padding: 20px;
+                padding: 16px;
+                align-items: flex-start;
             }
             .content-card {
                 min-height: auto;
-                padding: 30px 22px;
-                border-radius: 24px;
+                padding: 24px 18px;
+                border-radius: 20px;
                 max-width: 100%;
+                animation: none;
             }
             .btn-continue, .btn-back { border-radius: 5px; }
             .top, .card-top { flex-wrap: wrap; gap: 10px; }
             .question-title {
-                margin: 35px 0;
-                font-size: 40px;
-                letter-spacing: -1.5px;
+                margin: 24px 0 12px;
+                font-size: 28px;
+                letter-spacing: -1px;
+                line-height: 1.1;
             }
-            .question-desc { margin: -20px 0 30px; }
-            .option-grid { grid-template-columns: 1fr; }
+            .question-desc { margin: 0 0 20px; font-size: 14px; }
+            .option-grid { grid-template-columns: 1fr !important; gap: 10px; }
+            .opt-card { padding: 18px; font-size: 15px; }
             .card-bottom {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 10px;
             }
-            .btn-continue, .btn-back { width: 100%; justify-content: center; }
-            .counter, .counter-circle { min-width: 46px; height: 46px; font-size: 11px; padding: 0 8px; border-radius: 23px; background: rgba(255,183,3,0.1); border-color: rgba(255,183,3,0.18); color: var(--yellow); }
+            .btn-continue, .btn-back { width: 100%; justify-content: center; min-height: 48px; }
+            .counter, .counter-circle { min-width: 42px; height: 42px; font-size: 11px; padding: 0 8px; border-radius: 21px; background: rgba(255,183,3,0.1); border-color: rgba(255,183,3,0.18); color: var(--yellow); }
+            .dropzone { padding: 24px 16px; }
+            .glass-input { height: 46px; font-size: 14px; }
+            .textarea-wrap textarea { min-height: 100px; }
+        }
+        @media (pointer: coarse) {
+            .opt-card { min-height: 48px; }
+            .btn-continue, .btn-back { min-height: 48px; }
+            .glass-input { height: 48px; }
+            .skip-link { min-height: 44px; display: inline-flex; align-items: center; }
         }
     </style>
 </head>

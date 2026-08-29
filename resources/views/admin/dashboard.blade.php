@@ -61,20 +61,20 @@
                 <a href="{{ route('admin.projects.index') }}" class="view-all">Voir tout →</a>
             </div>
 
-            <div class="table-head">
-                <div>Client</div>
-                <div>Projet</div>
-                <div>Date</div>
-                <div>Statut</div>
-                <div></div>
-            </div>
-
             @if($recentProjects->isEmpty())
                 <div class="empty-state">
                     <i class="fa-regular fa-folder-open"></i>
                     <p>Aucune demande pour le moment.</p>
                 </div>
             @else
+                <div class="table-wrap">
+                <div class="table-head">
+                    <div>Client</div>
+                    <div>Projet</div>
+                    <div>Date</div>
+                    <div>Statut</div>
+                    <div></div>
+                </div>
                 @foreach($recentProjects as $project)
                     <div class="table-row" style="cursor:pointer;" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
                         <div class="client">
@@ -93,6 +93,7 @@
                         <a href="{{ route('admin.projects.show', $project) }}" class="open">↗</a>
                     </div>
                 @endforeach
+                </div>
             @endif
         </div>
 

@@ -80,6 +80,7 @@
                     <p>Aucun projet trouvé.</p>
                 </div>
             @else
+                <div class="table-wrap">
                 <div class="table-head" style="grid-template-columns:.5fr 1.4fr 1.2fr .6fr .7fr .8fr 52px;">
                     <div>N°</div>
                     <div>Client</div>
@@ -121,6 +122,7 @@
                         <a href="{{ route('admin.projects.show', $project) }}" class="open" onclick="event.stopPropagation();">↗</a>
                     </div>
                 @endforeach
+                </div>
 
                 <div style="padding:16px 19px;">
                     {{ $projects->links() }}

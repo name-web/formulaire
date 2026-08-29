@@ -14,7 +14,7 @@
     </section>
 
     {{-- Content grid --}}
-    <section class="content" style="grid-template-columns:minmax(0,1fr) 300px;align-items:start;">
+    <section class="content" style="align-items:start;">
 
         {{-- Left: answers + files --}}
         <div style="display:flex;flex-direction:column;gap:18px;">
@@ -59,7 +59,7 @@
                                     </div>
                                     <span class="admin-badge badge-user">{{ $question->type }}</span>
                                 </div>
-                                <div style="font-size:14px;color:var(--text-muted);line-height:1.6;">
+                                <div style="font-size:14px;color:var(--text-muted);line-height:1.6;word-break:break-word;">
                                     @if(!empty($displayValue))
                                         @if($question->type === 'multiselect' && count($selectValues) > 1)
                                             <div style="display:flex;flex-wrap:wrap;gap:6px;">
@@ -144,10 +144,10 @@
                     </div>
                     <div style="padding:14px 22px;display:flex;flex-direction:column;gap:10px;">
                         @foreach($project->files as $file)
-                            <a href="{{ asset('storage/' . $file->stored_path) }}" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:5px;border:1px solid var(--line);text-decoration:none;transition:all .2s;">
-                                <i class="fa-solid fa-file" style="color:var(--yellow);font-size:16px;"></i>
-                                <div style="flex:1;">
-                                    <div style="font-size:14px;color:var(--black);font-weight:700;">{{ $file->original_name }}</div>
+                            <a href="{{ asset('storage/' . $file->stored_path) }}" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:5px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
+                                <i class="fa-solid fa-file" style="color:var(--yellow);font-size:16px;flex-shrink:0;"></i>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-size:14px;color:var(--black);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $file->original_name }}</div>
                                     <div style="font-size:12px;color:var(--muted);">{{ $file->mime_type }} — {{ round($file->size / 1024) }} KB</div>
                                 </div>
                                 <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--muted);font-size:13px;"></i>

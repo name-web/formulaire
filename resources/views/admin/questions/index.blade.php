@@ -63,6 +63,7 @@
                     <p>Aucune question trouvée.</p>
                 </div>
             @else
+                <div class="table-wrap">
                 <div class="table-head" style="grid-template-columns:.5fr 2fr .8fr .6fr .7fr 100px;">
                     <div>N°</div>
                     <div>Titre</div>
@@ -108,6 +109,7 @@
                         </div>
                     </div>
                 @endforeach
+                </div>
 
                 <div style="padding:18px 22px;">
                     {{ $questions->links() }}

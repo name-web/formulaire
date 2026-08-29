@@ -465,7 +465,7 @@
                 padding-right: 6%;
             }
             .hero-content {
-                width: 54%;
+                width: 50%;
             }
             .hero-visual {
                 width: 42%;
@@ -562,6 +562,33 @@
                 right: 18px;
                 bottom: 18px;
             }
+            .footer-logo { height: 80px !important; }
+            .footer-brand { margin-left: -20px !important; }
+        }
+        .welcome-hamburger {
+            display: none;
+            align-items: center; justify-content: center;
+            width: 44px; height: 44px; border: none; background: none;
+            color: white; cursor: pointer;
+            border-radius: 8px; transition: background .2s;
+        }
+        .welcome-hamburger:hover { background: rgba(255,255,255,.1); }
+        .welcome-hamburger .w-bars {
+            width: 20px; height: 14px; display: flex; flex-direction: column;
+            justify-content: space-between; position: relative;
+        }
+        .welcome-hamburger .w-bars span {
+            display: block; width: 100%; height: 2px; background: white; border-radius: 2px;
+            transition: all .3s cubic-bezier(.4,0,.2,1); transform-origin: center;
+        }
+        .welcome-hamburger.active .w-bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .welcome-hamburger.active .w-bars span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .welcome-hamburger.active .w-bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+        @media (max-width: 500px) {
+            .welcome-hamburger { display: flex; }
+            .nav-links { display: none; }
+            .nav-links.open { display: flex; position: absolute; top: 110px; left: 0; right: 0; flex-direction: column; background: rgba(7,20,38,.97); backdrop-filter: blur(20px); padding: 16px 24px; gap: 8px; border-bottom: 1px solid var(--line); animation: fadeIn .3s ease; }
+            .nav-links.open a { padding: 12px 0; width: 100%; }
         }
 
         /* =====================================================
@@ -670,14 +697,20 @@
 
         <div class="flex items-center gap-4">
 
-            <a
-                href="{{ route('questionnaire.index') }}"
-                class="inline-flex items-center gap-2.5 px-6 py-3 rounded-lg text-sm font-bold transition-all duration-300"
-                id="nav-cta"
-            >
-                Démarrer un projet
-                <i class="fa-solid fa-arrow-right w-4 h-4"></i>
-            </a>
+            <div class="nav-links" id="navLinks">
+                <a
+                    href="{{ route('questionnaire.index') }}"
+                    class="inline-flex items-center gap-2.5 px-6 py-3 rounded-lg text-sm font-bold transition-all duration-300"
+                    id="nav-cta"
+                >
+                    Démarrer un projet
+                    <i class="fa-solid fa-arrow-right w-4 h-4"></i>
+                </a>
+            </div>
+
+            <button class="welcome-hamburger" id="welcomeHamburger" aria-label="Menu">
+                <div class="w-bars"><span></span><span></span><span></span></div>
+            </button>
 
         </div>
 
@@ -996,11 +1029,11 @@
             <img
                 src="{{ asset('IMAGES/Logo dominium.png') }}"
                 alt="DOMINIUM TECH"
-                class="h-40 w-auto opacity-100"
+                class="h-40 w-auto opacity-100 footer-logo"
                 style="filter: brightness(0) saturate(100%) invert(67%) sepia(96%) saturate(1200%) hue-rotate(2deg) brightness(94%) contrast(93%);"
             >
 
-            <div class="flex flex-col justify-center -ml-10 mt-2">
+            <div class="flex flex-col justify-center -ml-10 mt-2 footer-brand">
                 <span class="text-sm font-bold text-white/60 tracking-tight leading-none">
                     DOMINIUM
                 </span>
@@ -1028,6 +1061,16 @@
     ============================================ --}}
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+
+        // --- Welcome hamburger toggle ---
+        const welcomeHamburger = document.getElementById('welcomeHamburger');
+        const navLinks = document.getElementById('navLinks');
+        if (welcomeHamburger && navLinks) {
+            welcomeHamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('open');
+                welcomeHamburger.classList.toggle('active');
+            });
+        }
 
         const nav = document.getElementById('main-nav');
         const navCta = document.getElementById('nav-cta');

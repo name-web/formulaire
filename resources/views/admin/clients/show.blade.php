@@ -12,7 +12,7 @@
         <a href="{{ route('admin.clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
     </section>
 
-    <section class="content" style="grid-template-columns:300px minmax(0,1fr);align-items:start;">
+    <section class="content content-reverse" style="align-items:start;">
 
         {{-- Left: Client info --}}
         <div style="display:flex;flex-direction:column;gap:18px;">
@@ -87,13 +87,13 @@
                                 $typeLabels = $project->type_labels;
                                 $sc = \App\Models\Project::getStatusConfig($project->status);
                             @endphp
-                            <a href="{{ route('admin.projects.show', $project) }}" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);text-decoration:none;transition:all .2s;">
+                            <a href="{{ route('admin.projects.show', $project) }}" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
                                 <div style="width:40px;height:40px;border-radius:6px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <i class="fa-solid fa-folder" style="color:var(--black);font-size:14px;"></i>
                                 </div>
-                                <div style="flex:1;">
+                                <div style="flex:1;min-width:0;overflow:hidden;">
                                     <div style="font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;">Projet {{ $project->id }}</div>
-                                    <div style="font-size:13px;color:var(--text-secondary);">{{ $typeLabels }}</div>
+                                    <div style="font-size:13px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $typeLabels }}</div>
                                 </div>
                                 <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>
                                 <span class="date">{{ $project->created_at->format('d/m/Y') }}</span>

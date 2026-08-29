@@ -45,6 +45,7 @@
                     <p>Aucun client trouvé.</p>
                 </div>
             @else
+                <div class="table-wrap">
                 <div class="table-head" style="grid-template-columns:1.3fr 1.3fr 1fr 1fr .6fr .8fr 52px;">
                     <div>Nom</div>
                     <div>Email</div>
@@ -71,6 +72,7 @@
                         <a href="{{ route('admin.clients.show', $client) }}" class="open" onclick="event.stopPropagation();">↗</a>
                     </div>
                 @endforeach
+                </div>
 
                 <div style="padding:18px 22px;">
                     {{ $clients->links() }}

@@ -62,25 +62,67 @@
 .error-box { margin-bottom:20px; padding:15px; border-radius:12px; background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.15); }
 .error-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; color:#f87171; font-size:13px; font-weight:700; }
 .error-msg { color:rgba(255,255,255,.65); font-size:12px; margin-top:4px; }
-@media (max-width:750px) {
-    .sidebar { position:relative; width:100%; height:auto; padding:16px; border-right:none; border-bottom:1px solid rgba(255,255,255,.08); }
-    .sidebar-header { margin-bottom:12px; }
-    .sidebar-label { display:none; }
-    .step-list { flex-direction:row; flex-wrap:wrap; gap:4px; }
-    .step-item { padding:4px 6px; min-height:auto; background:transparent !important; border:none !important; }
-    .step-label { display:none; }
-    .step-dot { width:30px; height:30px; }
-    .progress-section { margin-top:12px; }
-    .main-content { margin-left:0; min-height:auto; padding:20px; }
-    .content-card { min-height:600px; padding:30px 22px; border-radius:24px; }
-    .question-title { margin:35px 0 15px; font-size:40px; letter-spacing:-1.5px; }
-    .option-grid { grid-template-columns:1fr; }
-    .card-bottom { flex-direction:column; align-items:stretch; }
-    .btn-continue { width:100%; justify-content:center; }
+@media (max-width:1024px) {
+    .sidebar { width:240px; padding:24px 20px; }
+    .sidebar-logo img { height:36px; }
+    .step-item { min-height:36px; padding:5px 6px; }
+    .step-dot { width:24px; height:24px; font-size:8px; }
+    .step-label { font-size:11px; }
+    .main-content { margin-left:240px; padding:30px 35px; }
+    .content-card { padding:40px 45px; }
+    .question-title { font-size:clamp(32px,4.5vw,52px); }
 }
+@media (max-width:750px) {
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:270px; transform:translateX(-100%); transition:transform .35s cubic-bezier(.4,0,.2,1); z-index:200; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-label { display:none; }
+    .step-list { flex-direction:column; gap:4px; }
+    .step-item { padding:6px 8px; min-height:40px; background:transparent !important; border:none !important; }
+    .step-dot { width:28px; height:28px; }
+    .progress-section { margin-top:12px; }
+    .main-content { margin-left:0; min-height:auto; padding:16px; align-items:flex-start; }
+    .content-card { min-height:auto; padding:24px 18px; border-radius:20px; }
+    .question-title { margin:24px 0 12px; font-size:28px; letter-spacing:-1px; line-height:1.1; }
+    .option-grid { grid-template-columns:1fr !important; gap:10px; }
+    .opt-card { padding:18px; }
+    .card-bottom { flex-direction:column; align-items:stretch; gap:10px; }
+    .btn-continue { width:100%; justify-content:center; min-height:48px; }
+    .qm-hamburger { display:flex; }
+    .qm-overlay { display:block; }
+}
+@media (pointer: coarse) {
+    .opt-card { min-height:48px; }
+    .btn-continue { min-height:48px; }
+    .glass-input { height:48px; }
+}
+
+/* ── Hamburger for questionnaire sidebar ── */
+.qm-hamburger {
+    display:none; align-items:center; justify-content:center;
+    width:44px; height:44px; border:none; background:rgba(255,255,255,.06);
+    color:white; font-size:18px; cursor:pointer; border-radius:12px;
+    transition:background .2s; position:relative; z-index:210;
+}
+.qm-hamburger:hover { background:rgba(255,255,255,.12); }
+.qm-hamburger .bars {
+    width:20px; height:14px; display:flex; flex-direction:column;
+    justify-content:space-between; position:relative;
+}
+.qm-hamburger .bars span {
+    display:block; width:100%; height:2px; background:white; border-radius:2px;
+    transition:all .3s cubic-bezier(.4,0,.2,1); transform-origin:center;
+}
+.qm-hamburger.active .bars span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
+.qm-hamburger.active .bars span:nth-child(2) { opacity:0; transform:scaleX(0); }
+.qm-hamburger.active .bars span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); }
+.qm-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
+    z-index:199; opacity:0; transition:opacity .3s ease; pointer-events:none;
+}
+.qm-overlay.visible { opacity:1; pointer-events:auto; }
 </style>
 
-<aside class="sidebar">
+<aside class="sidebar" id="qmSidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">
             <img src="{{ asset('IMAGES/Logo dominium.png') }}" alt="DOMINIUM">
@@ -110,8 +152,16 @@
     </div>
 </aside>
 
+<div class="qm-overlay" id="qmOverlay"></div>
+
 <main class="main-content">
     <div class="content-card anim-scale">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <button class="qm-hamburger" id="qmToggle" aria-label="Menu">
+                <div class="bars"><span></span><span></span><span></span></div>
+            </button>
+            <span style="font-size:12px;font-weight:700;color:var(--blue-light);letter-spacing:1.5px;">DOMINIUM TECH</span>
+        </div>
 
         @if($errors->any())
             <div class="error-box anim-up d1">
@@ -208,6 +258,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const qmToggle = document.getElementById('qmToggle');
+    const qmSidebar = document.getElementById('qmSidebar');
+    const qmOverlay = document.getElementById('qmOverlay');
+    if (qmToggle && qmSidebar) {
+        qmToggle.addEventListener('click', () => {
+            qmSidebar.classList.toggle('open');
+            qmToggle.classList.toggle('active');
+            qmOverlay.classList.toggle('visible');
+        });
+    }
+    if (qmOverlay && qmSidebar) {
+        qmOverlay.addEventListener('click', () => {
+            qmSidebar.classList.remove('open');
+            qmToggle.classList.remove('active');
+            qmOverlay.classList.remove('visible');
+        });
+    }
+
     const typesInput = document.getElementById('projectTypesInput');
     const otherField = document.getElementById('otherField');
 

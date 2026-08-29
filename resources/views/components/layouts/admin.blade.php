@@ -179,8 +179,9 @@
             width: 6px; height: 6px; border-radius: 50%; background: var(--yellow);
             animation: pulse 2s ease infinite;
         }
-        .intro h1 { font-size: 40px; line-height: 1; letter-spacing: -2px; font-weight: 800; }
-        .intro p { margin-top: 8px; color: var(--muted); font-size: 15px; }
+        .intro h1 { font-size: 40px; line-height: 1; letter-spacing: -2px; font-weight: 800; overflow-wrap: break-word; }
+        .intro p { margin-top: 8px; color: var(--muted); font-size: 15px; overflow-wrap: break-word; }
+        .intro > div:first-child { min-width: 0; }
 
         /* ── Cards ── */
         .card {
@@ -288,6 +289,7 @@
             gap: 18px; margin-top: 22px;
             animation: slideUp .5s ease .2s backwards;
         }
+        .content-reverse { grid-template-columns: 300px minmax(0, 1fr); }
 
         /* ── Right column ── */
         .side-section { padding: 22px; border-bottom: 1px solid var(--line); }
@@ -387,7 +389,7 @@
             padding: 10px 18px; border-radius: 5px; font-size: 14px; font-weight: 700;
             text-decoration: none; border: 1px solid var(--line); background: white;
             color: #666; cursor: pointer; transition: var(--transition);
-            position: relative; overflow: hidden;
+            position: relative;
         }
         .admin-btn i { font-size: 12px; transition: transform .2s ease; }
         .admin-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
@@ -478,25 +480,46 @@
         /* ── Responsive ── */
         @media (max-width: 1050px) {
             .main { padding-left: 25px; padding-right: 25px; }
+            .intro { flex-direction: column; align-items: flex-start; gap: 14px; }
         }
         @media (max-width: 800px) {
-            .sidebar { width: 65px; }
-            .brand { justify-content: center; padding: 0; }
-            .brand-logo { height: 34px; max-width: 50px; }
-            .brand-name, .nav-heading, .nav-item span, .user-info { display: none; }
-            .navigation { padding-left: 8px; padding-right: 8px; }
-            .nav-item { justify-content: center; padding: 0; }
-            .nav-item i { margin-right: 0; }
-            .main { margin-left: 65px; padding-left: 18px; padding-right: 18px; }
+            .sidebar {
+                transform: translateX(-100%);
+                width: 240px;
+                transition: transform .35s cubic-bezier(.4,0,.2,1);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main {
+                margin-left: 0 !important;
+                padding-left: 18px !important;
+                padding-right: 18px !important;
+            }
+            .hamburger { display: flex; }
             .stats { grid-template-columns: 1fr 1fr; }
             .stat { border-bottom: 1px solid var(--line); }
             .stat:nth-child(2) { border-right: 0; }
             .stat:last-child { border-bottom: 0; }
-            .top-right { display: none; }
+            .stat-number { font-size: 34px; }
+            .top-right .top-btn span { display: none; }
             .content { grid-template-columns: 1fr; }
+            .content-reverse { grid-template-columns: 1fr; }
+            .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .table-head, .table-row { min-width: 600px; }
+            .sidebar-overlay {
+                position: fixed; inset: 0; background: rgba(0,0,0,.45);
+                z-index: 99; pointer-events: none; opacity: 0;
+                transition: opacity .3s ease;
+            }
+            .sidebar.open ~ .sidebar-overlay {
+                pointer-events: auto; opacity: 1;
+            }
+            .intro h1 { font-size: 28px; }
+            .admin-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .admin-title { font-size: 28px; }
         }
         @media (max-width: 550px) {
-            .intro h1 { font-size: 28px; }
             .stats { grid-template-columns: 1fr; }
             .stat { border-right: 0; border-bottom: 1px solid var(--line); }
             .stat:last-child { border-bottom: 0; }
@@ -504,12 +527,60 @@
             .table-row { grid-template-columns: 1fr 40px; padding: 15px 17px; }
             .table-row > .project, .table-row > .date, .table-row > .status { display: none; }
             .open { grid-column: 2; grid-row: 1; }
+            .topbar { height: 56px; padding: 0 12px; }
+            .breadcrumb { font-size: 12px; }
+            .intro { padding: 20px 0 16px; }
+            .intro h1 { font-size: 24px; }
+            .card-header { height: auto; padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
+            .admin-btn { padding: 8px 12px; font-size: 13px; }
+            .side-section { padding: 16px; }
+            .stat-card { padding: 16px; }
+            .stat-value { font-size: 28px; }
+        }
+
+        /* ── Hamburger animated icon ── */
+        .hamburger {
+            display: none;
+            align-items: center; justify-content: center;
+            width: 40px; height: 40px; border: none; background: none;
+            color: var(--text); cursor: pointer;
+            border-radius: 6px; transition: background .2s;
+            position: relative; z-index: 110;
+        }
+        .hamburger:hover { background: var(--line); }
+        .hamburger-bars {
+            width: 20px; height: 14px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative;
+        }
+        .hamburger-bars span {
+            display: block; width: 100%; height: 2px;
+            background: var(--text); border-radius: 2px;
+            transition: all .3s cubic-bezier(.4,0,.2,1);
+            transform-origin: center;
+        }
+        .hamburger.active .hamburger-bars span:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+        .hamburger.active .hamburger-bars span:nth-child(2) {
+            opacity: 0; transform: scaleX(0);
+        }
+        .hamburger.active .hamburger-bars span:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        @media (pointer: coarse) {
+            .nav-item { min-height: 48px; }
+            .admin-btn { min-height: 44px; }
+            .top-btn { min-height: 40px; }
+            .open { min-width: 44px; min-height: 44px; }
+            .pagination a, .pagination span { min-width: 44px; min-height: 44px; }
         }
     </style>
 </head>
 <body>
 
-<aside class="sidebar">
+<aside class="sidebar" id="adminSidebar">
     <div class="brand">
         <img src="{{ asset(config('admin_brand.logo', 'IMAGES/Logo dominium.png')) }}"
              alt="{{ config('admin_brand.brand_name', 'DOMINIUM') }}" class="brand-logo">
@@ -537,15 +608,26 @@
     </div>
 </aside>
 
-<main class="main">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<main class="main" id="adminMain">
     <header class="topbar">
-        <div class="breadcrumb">
-            {{ config('admin_brand.brand_name', 'DOMINIUM') }} / <strong>{{ $title ?? 'Dashboard' }}</strong>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <button class="hamburger" id="sidebarToggle" aria-label="Menu">
+                <div class="hamburger-bars">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+            <div class="breadcrumb">
+                {{ config('admin_brand.brand_name', 'DOMINIUM') }} / <strong>{{ $title ?? 'Dashboard' }}</strong>
+            </div>
         </div>
         <div class="top-right">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="top-btn">Déconnexion</button>
+                <button type="submit" class="top-btn"><i class="fa-solid fa-right-from-bracket"></i> <span>Déconnexion</span></button>
             </form>
         </div>
     </header>
@@ -566,6 +648,33 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('adminSidebar');
+    var toggle = document.getElementById('sidebarToggle');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            toggle.classList.toggle('active');
+            overlay.classList.toggle('visible');
+        });
+    }
+    if (overlay && sidebar) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            toggle.classList.remove('active');
+            overlay.classList.remove('visible');
+        });
+    }
+    document.querySelectorAll('.nav-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            if (window.innerWidth <= 800) {
+                sidebar.classList.remove('open');
+                toggle.classList.remove('active');
+                overlay.classList.remove('visible');
+            }
+        });
+    });
+
     document.querySelectorAll('.admin-table tr[onclick], .table-row[onclick]').forEach(function(row) {
         row.style.cursor = 'pointer';
         row.addEventListener('mouseenter', function() {

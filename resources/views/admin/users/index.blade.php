@@ -46,6 +46,7 @@
                     <p>Aucun utilisateur trouvé.</p>
                 </div>
             @else
+                <div class="table-wrap">
                 <div class="table-head" style="grid-template-columns:1.2fr 1.4fr .8fr .8fr .8fr 80px;">
                     <div>Nom</div>
                     <div>Email</div>
@@ -83,6 +84,7 @@
                         </div>
                     </div>
                 @endforeach
+                </div>
 
                 <div style="padding:18px 22px;">
                     {{ $users->links() }}
