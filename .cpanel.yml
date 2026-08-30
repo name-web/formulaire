@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - cd /home/c2719683c/formulaire && composer install --no-dev --optimize-autoloader
+    - cd /home/c2719683c/formulaire && php artisan migrate --force
+    - cd /home/c2719683c/formulaire && php artisan optimize
