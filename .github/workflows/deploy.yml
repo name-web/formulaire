@@ -1,0 +1,26 @@
+```yaml
+name: Deploy Laravel to cPanel
+
+on:
+  push:
+    branches:
+      - kamal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via cPanel
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.CPANEL_SSH_KEY }}
+          script: |
+            cd /home/c2719683c/formulaire
+            git pull origin kamal
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan optimize
+```
