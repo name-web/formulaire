@@ -15,6 +15,7 @@ class QuestionSeeder extends Seeder
         $allTypes = array_values(array_keys(config('project_types.types')));
         $allTypesExceptVitrine = array_values(array_diff($allTypes, ['site_vitrine']));
         $allTypesExceptVitrineAndEcom = array_values(array_diff($allTypes, ['site_vitrine', 'ecommerce']));
+        $allTypesExceptVitrineEcomMobile = array_values(array_diff($allTypes, ['site_vitrine', 'ecommerce', 'application_mobile']));
         $typesVitrineOnly = ['site_vitrine'];
         $typesEcommerceOnly = ['ecommerce'];
         $typesMobileOnly = ['application_mobile'];
@@ -28,13 +29,13 @@ class QuestionSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         // ============================================================
-        // Q1 : Description du projet (tous les types sauf site vitrine et ecommerce)
+        // Q1 : Description du projet (tous les types sauf site vitrine, ecommerce et application mobile)
         // ============================================================
         Question::create([
             'title' => 'Décrivez votre projet en quelques mots',
             'description' => 'Expliquez simplement ce que vous voulez créer ou améliorer.',
             'type' => 'textarea',
-            'project_types' => $allTypesExceptVitrineAndEcom,
+            'project_types' => $allTypesExceptVitrineEcomMobile,
             'is_required' => true,
             'sort_order' => 1,
             'group_label' => 'Votre projet',
@@ -50,7 +51,7 @@ class QuestionSeeder extends Seeder
             'title' => 'Quel est votre objectif principal ?',
             'description' => null,
             'type' => 'select',
-            'project_types' => $allTypesExceptVitrineAndEcom,
+            'project_types' => $allTypesExceptVitrineEcomMobile,
             'is_required' => true,
             'sort_order' => 2,
             'group_label' => 'Votre projet',
@@ -73,7 +74,7 @@ class QuestionSeeder extends Seeder
             'title' => 'Quelles fonctionnalités sont essentielles ?',
             'description' => null,
             'type' => 'multiselect',
-            'project_types' => $allTypesExceptVitrineAndEcom,
+            'project_types' => $allTypesExceptVitrineEcomMobile,
             'is_required' => true,
             'sort_order' => 3,
             'group_label' => 'Votre projet',
@@ -367,12 +368,12 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qBudgetEcom->id, 'label' => 'Plus de 3 000 000 FCFA', 'value' => 'plus_3m', 'sort_order' => 4, 'is_active' => true]);
 
         // ============================================================
-        // APPLICATION MOBILE — Q4 à Q7
+        // APPLICATION MOBILE — Q4 à Q10
         // ============================================================
 
-        // Q4 : Plateformes
-        $qPlateforme = Question::create([
-            'title' => 'Sur quelles plateformes ?',
+        // Q4 : Type d'application
+        $qTypeApp = Question::create([
+            'title' => 'Quel type d\'application souhaitez-vous créer ?',
             'description' => null,
             'type' => 'select',
             'project_types' => $typesMobileOnly,
@@ -384,14 +385,14 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qPlateforme->id, 'label' => 'iPhone (iOS)', 'value' => 'ios', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qPlateforme->id, 'label' => 'Android', 'value' => 'android', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qPlateforme->id, 'label' => 'Les deux', 'value' => 'les_deux', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qPlateforme->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qTypeApp->id, 'label' => 'Application de services (réservation, livraison, rendez-vous...)', 'value' => 'services', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qTypeApp->id, 'label' => 'Application commerciale (vente, commandes, marketplace...)', 'value' => 'commerciale', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qTypeApp->id, 'label' => 'Application communautaire (réseau social, messagerie, communauté...)', 'value' => 'communautaire', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qTypeApp->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
 
-        // Q5 : Paiements
-        $qPaiementMobile = Question::create([
-            'title' => 'Quels moyens de paiement ?',
+        // Q5 : Public cible
+        $qPublic = Question::create([
+            'title' => 'À qui s\'adresse votre application ?',
             'description' => null,
             'type' => 'multiselect',
             'project_types' => $typesMobileOnly,
@@ -403,15 +404,14 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Carte bancaire', 'value' => 'cb', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Mobile Money', 'value' => 'mobile_money', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Apple Pay / Google Pay', 'value' => 'apple_google', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Pas de paiement dans l\'app', 'value' => 'aucun', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPublic->id, 'label' => 'Particuliers (clients, consommateurs...)', 'value' => 'particuliers', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPublic->id, 'label' => 'Entreprises (professionnels, sociétés...)', 'value' => 'entreprises', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPublic->id, 'label' => 'Membres d\'une communauté (élèves, adhérents, employés...)', 'value' => 'communaute', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPublic->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
 
-        // Q6 : Utilisateurs
-        $qUtilisateursMobile = Question::create([
-            'title' => 'Qui utilisera votre application ?',
+        // Q6 : Appareils
+        $qAppareils = Question::create([
+            'title' => 'Sur quels appareils souhaitez-vous utiliser votre application ?',
             'description' => null,
             'type' => 'multiselect',
             'project_types' => $typesMobileOnly,
@@ -423,14 +423,14 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qUtilisateursMobile->id, 'label' => 'Mes clients', 'value' => 'clients', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qUtilisateursMobile->id, 'label' => 'Mes employés', 'value' => 'employes', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qUtilisateursMobile->id, 'label' => 'Le grand public', 'value' => 'grand_public', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qUtilisateursMobile->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qAppareils->id, 'label' => 'Android (Samsung, Tecno, Xiaomi...)', 'value' => 'android', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qAppareils->id, 'label' => 'iPhone / iPad (Apple)', 'value' => 'ios', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qAppareils->id, 'label' => 'Android + iPhone', 'value' => 'les_deux', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qAppareils->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
 
-        // Q7 : Budget
-        $qBudgetMobile = Question::create([
-            'title' => 'Quel est votre budget ?',
+        // Q7 : Connexion Internet
+        $qInternet = Question::create([
+            'title' => 'L\'application doit-elle fonctionner avec Internet ?',
             'description' => null,
             'type' => 'select',
             'project_types' => $typesMobileOnly,
@@ -442,11 +442,67 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
+        QuestionOption::create(['question_id' => $qInternet->id, 'label' => 'Oui, uniquement en ligne', 'value' => 'en_ligne', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qInternet->id, 'label' => 'Oui, avec certaines fonctions hors ligne', 'value' => 'hors_ligne_partiel', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qInternet->id, 'label' => 'Non, principalement hors ligne', 'value' => 'hors_ligne', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qInternet->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q8 : Types d'utilisateurs
+        $qUtilisateurs = Question::create([
+            'title' => 'Quels types d\'utilisateurs devront utiliser l\'application ?',
+            'description' => null,
+            'type' => 'multiselect',
+            'project_types' => $typesMobileOnly,
+            'is_required' => true,
+            'sort_order' => 8,
+            'group_label' => 'Votre application mobile',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
+        QuestionOption::create(['question_id' => $qUtilisateurs->id, 'label' => 'Un seul type d\'utilisateur (ex. clients)', 'value' => 'un_seul', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qUtilisateurs->id, 'label' => 'Clients + administrateur (gestion de l\'application)', 'value' => 'client_admin', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qUtilisateurs->id, 'label' => 'Plusieurs types d\'utilisateurs (ex. client, vendeur, livreur...)', 'value' => 'plusieurs', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qUtilisateurs->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q9 : Paiements
+        $qPaiementMobile = Question::create([
+            'title' => 'Votre application devra-t-elle permettre des paiements ?',
+            'description' => null,
+            'type' => 'multiselect',
+            'project_types' => $typesMobileOnly,
+            'is_required' => true,
+            'sort_order' => 9,
+            'group_label' => 'Votre application mobile',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
+        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Mobile Money (Wave, Orange Money, MTN...)', 'value' => 'mobile_money', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Carte bancaire (Visa, Mastercard...)', 'value' => 'carte', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Paiement à la livraison (paiement à la réception)', 'value' => 'livraison', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPaiementMobile->id, 'label' => 'Aucun paiement', 'value' => 'aucun', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q10 : Budget (dernière question)
+        $qBudgetMobile = Question::create([
+            'title' => 'Quel budget avez-vous prévu pour ce projet ?',
+            'description' => null,
+            'type' => 'select',
+            'project_types' => $typesMobileOnly,
+            'is_required' => true,
+            'sort_order' => 10,
+            'group_label' => 'Votre application mobile',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
         QuestionOption::create(['question_id' => $qBudgetMobile->id, 'label' => 'Moins de 1 000 000 FCFA', 'value' => 'moins_1m', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetMobile->id, 'label' => '1 000 000 à 3 000 000 FCFA', 'value' => '1m_3m', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetMobile->id, 'label' => '3 000 000 à 5 000 000 FCFA', 'value' => '3m_5m', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qBudgetMobile->id, 'label' => '1 000 000 à 2 000 000 FCFA', 'value' => '1m_2m', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qBudgetMobile->id, 'label' => '2 000 000 à 5 000 000 FCFA', 'value' => '2m_5m', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qBudgetMobile->id, 'label' => 'Plus de 5 000 000 FCFA', 'value' => 'plus_5m', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetMobile->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
 
         // ============================================================
         // LOGICIEL / ERP / CRM — Q4 à Q7
