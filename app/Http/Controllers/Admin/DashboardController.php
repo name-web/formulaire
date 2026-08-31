@@ -15,7 +15,7 @@ class DashboardController extends Controller
     public function index(): View
     {
         $stats = [
-            'total_projects' => Project::count(),
+            'total_projects' => Project::where('status', '!=', 'draft')->count(),
             'submitted_projects' => Project::where('status', 'submitted')->count(),
             'pending_projects' => Project::where('status', 'pending')->count(),
             'in_progress_projects' => Project::where('status', 'in_progress')->count(),
@@ -25,6 +25,7 @@ class DashboardController extends Controller
         ];
 
         $recentProjects = Project::with('client')
+            ->where('status', '!=', 'draft')
             ->whereIn('status', array_keys(collect(config('project_status.statuses'))->filter()->toArray()))
             ->latest()
             ->take(config('dashboard.recent_projects_count', 8))
@@ -54,7 +55,8 @@ class DashboardController extends Controller
 
     private function getProjectsByType(): Collection
     {
-        return Project::get(['project_type'])
+        return Project::where('status', '!=', 'draft')
+            ->get(['project_type'])
             ->flatMap(fn (Project $project) => is_array($project->project_type) ? $project->project_type : [$project->project_type])
             ->countBy()
             ->map(fn (int $count, string $type) => [
@@ -70,11 +72,13 @@ class DashboardController extends Controller
 
     private function getProjectsByStatus()
     {
-        $results = Project::selectRaw('status, COUNT(*) as count')
+        $results = Project::where('status', '!=', 'draft')
+            ->selectRaw('status, COUNT(*) as count')
             ->groupBy('status')
             ->pluck('count', 'status');
 
         return collect(Project::getStatuses())
+            ->filter(fn ($config, $key) => $key !== 'draft')
             ->mapWithKeys(fn ($config, $key) => [
                 $key => [
                     'count' => $results->get($key, 0),
@@ -90,7 +94,8 @@ class DashboardController extends Controller
         $months = config('dashboard.months', []);
         $monthsBack = config('dashboard.months_back', 6);
 
-        return Project::where('created_at', '>=', Carbon::now()->subMonths($monthsBack)->startOfMonth())
+        return Project::where('status', '!=', 'draft')
+            ->where('created_at', '>=', Carbon::now()->subMonths($monthsBack)->startOfMonth())
             ->get(['created_at'])
             ->countBy(fn (Project $project) => $project->created_at->format('Y-m'))
             ->sortKeys()

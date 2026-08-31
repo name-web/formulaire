@@ -21,7 +21,6 @@ class QuestionSeeder extends Seeder
         $typesEcommerceOnly = ['ecommerce'];
         $typesMobileOnly = ['application_mobile'];
         $typesLogicielOnly = ['logiciel'];
-        $typesAutreOnly = ['autre'];
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         QuestionCondition::query()->delete();
@@ -641,83 +640,5 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => '1 000 000 à 2 000 000 FCFA', 'value' => '1m_2m', 'sort_order' => 2, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => '2 000 000 à 5 000 000 FCFA', 'value' => '2m_5m', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => 'Plus de 5 000 000 FCFA', 'value' => 'plus_5m', 'sort_order' => 4, 'is_active' => true]);
-
-        // ============================================================
-        // AUTRE — Q4 à Q7
-        // ============================================================
-
-        // Q4 : Description détaillée
-        Question::create([
-            'title' => 'Décrivez votre projet en détail',
-            'description' => 'Plus vous donnez de détails, mieux nous pourrons vous aider.',
-            'type' => 'textarea',
-            'project_types' => $typesAutreOnly,
-            'is_required' => false,
-            'sort_order' => 4,
-            'group_label' => 'Votre projet sur mesure',
-            'placeholder' => 'Décrivez votre idée, vos besoins, vos attentes…',
-            'help_text' => null,
-            'is_active' => true,
-        ]);
-
-        // Q5 : Type de solution
-        $qTypeSolution = Question::create([
-            'title' => 'Quel type de solution envisagez-vous ?',
-            'description' => null,
-            'type' => 'select',
-            'project_types' => $typesAutreOnly,
-            'is_required' => true,
-            'sort_order' => 5,
-            'group_label' => 'Votre projet sur mesure',
-            'placeholder' => null,
-            'help_text' => null,
-            'is_active' => true,
-        ]);
-
-        QuestionOption::create(['question_id' => $qTypeSolution->id, 'label' => 'Site web', 'value' => 'site', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qTypeSolution->id, 'label' => 'Application mobile', 'value' => 'app', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qTypeSolution->id, 'label' => 'Logiciel / Outil', 'value' => 'logiciel', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qTypeSolution->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qTypeSolution->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
-
-        // Q6 : Délai
-        $qDelaiAutre = Question::create([
-            'title' => 'Quand souhaitez-vous que ce soit prêt ?',
-            'description' => null,
-            'type' => 'select',
-            'project_types' => $typesAutreOnly,
-            'is_required' => true,
-            'sort_order' => 6,
-            'group_label' => 'Votre projet sur mesure',
-            'placeholder' => null,
-            'help_text' => null,
-            'is_active' => true,
-        ]);
-
-        QuestionOption::create(['question_id' => $qDelaiAutre->id, 'label' => 'Moins d\'1 mois', 'value' => 'moins_1_mois', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDelaiAutre->id, 'label' => '1 à 3 mois', 'value' => '1_3_mois', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDelaiAutre->id, 'label' => '3 à 6 mois', 'value' => '3_6_mois', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDelaiAutre->id, 'label' => 'Pas de délai particulier', 'value' => 'aucun', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qDelaiAutre->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
-
-        // Q7 : Budget
-        $qBudgetAutre = Question::create([
-            'title' => 'Quel est votre budget ?',
-            'description' => null,
-            'type' => 'select',
-            'project_types' => $typesAutreOnly,
-            'is_required' => true,
-            'sort_order' => 7,
-            'group_label' => 'Votre projet sur mesure',
-            'placeholder' => null,
-            'help_text' => null,
-            'is_active' => true,
-        ]);
-
-        QuestionOption::create(['question_id' => $qBudgetAutre->id, 'label' => 'Moins de 500 000 FCFA', 'value' => 'moins_500k', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetAutre->id, 'label' => '500 000 à 1 000 000 FCFA', 'value' => '500k_1m', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetAutre->id, 'label' => '1 000 000 à 3 000 000 FCFA', 'value' => '1m_3m', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetAutre->id, 'label' => 'Plus de 3 000 000 FCFA', 'value' => 'plus_3m', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetAutre->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
     }
 }

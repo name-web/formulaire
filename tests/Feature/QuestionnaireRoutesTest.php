@@ -111,19 +111,6 @@ class QuestionnaireRoutesTest extends TestCase
         $this->assertEquals('Logiciel / ERP / CRM', $project->type_labels);
     }
 
-    public function test_project_type_autre_stored_correctly(): void
-    {
-        $this->post(route('questionnaire.start'), [
-            'name' => 'Test Autre',
-            'phone' => '+22501020304',
-            'project_types' => ['autre'],
-        ]);
-
-        $project = Project::first();
-        $this->assertEquals(['autre'], $project->project_type);
-        $this->assertEquals('Autre', $project->type_labels);
-    }
-
     public function test_start_requires_at_least_one_project_type(): void
     {
         $response = $this->post(route('questionnaire.start'), [

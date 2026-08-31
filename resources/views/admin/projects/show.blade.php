@@ -1,6 +1,6 @@
 <x-layouts.admin :title="'Projet '.$project->id">
 
-    {{-- Intro --}}
+            {{-- Intro --}}
     <section class="intro">
         <div>
             <div class="intro-label">
@@ -9,6 +9,20 @@
             </div>
             <h1>Projet {{ $project->id }}</h1>
             <p>{{ $project->client->name ?? 'Client inconnu' }} — {{ $project->created_at->format('d/m/Y H:i') }}</p>
+            @php
+                $types = is_array($project->project_type) ? $project->project_type : [$project->project_type];
+                $typeLabels = collect($types)->map(fn ($t) => config("project_types.types.{$t}.label", $t))->implode(' / ');
+            @endphp
+            <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                @foreach($types as $type)
+                    @php $typeData = config("project_types.types.{$type}"); @endphp
+                    @if($typeData)
+                        <span class="admin-badge badge-in_progress" style="font-size:12px;">
+                            <i class="{{ $typeData['icon'] }}" style="margin-right:4px;"></i>{{ $typeData['label'] }}
+                        </span>
+                    @endif
+                @endforeach
+            </div>
         </div>
         <a href="{{ route('admin.projects.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
     </section>

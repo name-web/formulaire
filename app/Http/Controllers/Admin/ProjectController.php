@@ -13,7 +13,8 @@ class ProjectController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Project::with('client')->withCount('answers');
+        $query = Project::with('client')->withCount('answers')
+            ->where('status', '!=', 'draft');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -52,25 +53,36 @@ class ProjectController extends Controller
 
     public function show(Request $request, Project $project): View
     {
-        $project->load(['client', 'answers.question', 'answers.answerOptions.questionOption', 'files', 'notes.user']);
+        $project->load(['client', 'files', 'notes.user']);
+
+        $projectTypes = is_array($project->project_type) ? $project->project_type : [$project->project_type];
+
+        $answers = $project->answers()
+            ->with(['question', 'answerOptions.questionOption'])
+            ->whereHas('question', function ($q) use ($projectTypes) {
+                foreach ($projectTypes as $type) {
+                    $q->orWhereRaw('JSON_CONTAINS(project_types, ?)', ['"'.$type.'"']);
+                }
+            })
+            ->get();
 
         $perPage = 10;
         $page = $request->input('answers_page', 1);
 
-        $allAnswers = $project->answers->map(function ($answer) {
+        $allAnswers = $answers->map(function ($answer) {
             $question = $answer->question;
             $displayValue = $answer->getDisplayValue();
             $selectValues = $answer->getSelectValues();
 
             return compact('answer', 'question', 'displayValue', 'selectValues');
-        });
+        })->sortBy('question.sort_order')->values();
 
         $total = $allAnswers->count();
-        $answers = $allAnswers->forPage($page, $perPage);
-        $groupedAnswers = $answers->groupBy(fn ($item) => $item['question']->group_label ?? 'Informations');
+        $paginatedAnswers = $allAnswers->forPage($page, $perPage);
+        $groupedAnswers = $paginatedAnswers->groupBy(fn ($item) => $item['question']->group_label ?? 'Informations');
 
         $answersPaginator = new Paginator(
-            $answers,
+            $paginatedAnswers,
             $total,
             $perPage,
             $page,
@@ -80,7 +92,7 @@ class ProjectController extends Controller
             ]
         );
 
-        return view('admin.projects.show', compact('project', 'answers', 'groupedAnswers', 'answersPaginator'));
+        return view('admin.projects.show', compact('project', 'groupedAnswers', 'answersPaginator'));
     }
 
     public function updateStatus(Request $request, Project $project): RedirectResponse

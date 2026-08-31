@@ -43,13 +43,6 @@ return [
             'description' => 'Solution sur mesure',
         ],
 
-        'autre' => [
-            'label' => 'Autre',
-            'icon' => 'fa-solid fa-wand-magic-sparkles',
-            'color' => '#ec4899',
-            'description' => 'Décrivez votre vision',
-        ],
-
     ],
 
 ];

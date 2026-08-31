@@ -30,7 +30,9 @@
                     <select name="status" class="admin-input">
                         <option value="">Tous les statuts</option>
                         @foreach(config('project_status.statuses') as $key => $sc)
-                            <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $sc['label'] }}</option>
+                            @if($key !== 'draft')
+                                <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $sc['label'] }}</option>
+                            @endif
                         @endforeach
                     </select>
                 </div>

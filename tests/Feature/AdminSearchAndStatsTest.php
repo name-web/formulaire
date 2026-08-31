@@ -87,9 +87,9 @@ class AdminSearchAndStatsTest extends TestCase
 
     public function test_projects_by_type_counts_each_project(): void
     {
-        Client::create(['name' => 'A', 'email' => 'a@test.com'])->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
-        Client::create(['name' => 'B', 'email' => 'b@test.com'])->projects()->create(['project_type' => ['site_vitrine', 'ecommerce'], 'status' => 'draft']);
-        Client::create(['name' => 'C', 'email' => 'c@test.com'])->projects()->create(['project_type' => ['ecommerce'], 'status' => 'draft']);
+        Client::create(['name' => 'A', 'email' => 'a@test.com'])->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'submitted']);
+        Client::create(['name' => 'B', 'email' => 'b@test.com'])->projects()->create(['project_type' => ['site_vitrine', 'ecommerce'], 'status' => 'submitted']);
+        Client::create(['name' => 'C', 'email' => 'c@test.com'])->projects()->create(['project_type' => ['ecommerce'], 'status' => 'submitted']);
 
         $controller = new DashboardController;
         $method = new \ReflectionMethod($controller, 'getProjectsByType');

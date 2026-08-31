@@ -52,8 +52,8 @@ class QuestionnaireController extends Controller
         }
 
         // Le home ne collecte que les coordonnées du client : on présélectionne
-        // tous les types réels, mais jamais « autre » (aucun champ de précision ici).
-        return array_values(array_diff(array_keys(config('project_types.types')), ['autre']));
+        // tous les types réels.
+        return array_keys(config('project_types.types'));
     }
 
     public function start(StartQuestionnaireRequest $request): RedirectResponse
@@ -62,17 +62,13 @@ class QuestionnaireController extends Controller
         $projectTypes = $validated['project_types'];
 
         $clientData = collect($validated)
-            ->except(['project_types', 'other_description'])
+            ->except(['project_types'])
             ->toArray();
 
         $project = $this->questionnaireService->startSession(
             $clientData,
             $projectTypes
         );
-
-        if (in_array('autre', $projectTypes) && ! empty($validated['other_description'])) {
-            $project->update(['description' => $validated['other_description']]);
-        }
 
         session([
             'client_id' => $project->client_id,
