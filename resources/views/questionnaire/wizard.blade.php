@@ -554,6 +554,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('wizardForm').addEventListener('change', clearError);
 
     updateProgress();
+
+    // Scroll to focused question when coming from summary "Modifier"
+    const urlParams = new URLSearchParams(window.location.search);
+    const focusId = urlParams.get('focus');
+    if (focusId) {
+        const focusEl = document.querySelector(`[data-question="${focusId}"]`);
+        if (focusEl) {
+            setTimeout(() => {
+                focusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                focusEl.style.boxShadow = '0 0 0 2px var(--accent)';
+                setTimeout(() => { focusEl.style.boxShadow = ''; }, 2000);
+            }, 300);
+        }
+    }
 });
 </script>
 </x-layouts.app>

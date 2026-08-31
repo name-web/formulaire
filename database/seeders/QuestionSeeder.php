@@ -16,6 +16,7 @@ class QuestionSeeder extends Seeder
         $allTypesExceptVitrine = array_values(array_diff($allTypes, ['site_vitrine']));
         $allTypesExceptVitrineAndEcom = array_values(array_diff($allTypes, ['site_vitrine', 'ecommerce']));
         $allTypesExceptVitrineEcomMobile = array_values(array_diff($allTypes, ['site_vitrine', 'ecommerce', 'application_mobile']));
+        $allTypesExceptVitrineEcomMobileLogiciel = array_values(array_diff($allTypes, ['site_vitrine', 'ecommerce', 'application_mobile', 'logiciel']));
         $typesVitrineOnly = ['site_vitrine'];
         $typesEcommerceOnly = ['ecommerce'];
         $typesMobileOnly = ['application_mobile'];
@@ -29,13 +30,13 @@ class QuestionSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         // ============================================================
-        // Q1 : Description du projet (tous les types sauf site vitrine, ecommerce et application mobile)
+        // Q1 : Description du projet (tous les types sauf site vitrine, ecommerce, application mobile et logiciel)
         // ============================================================
         Question::create([
             'title' => 'Décrivez votre projet en quelques mots',
             'description' => 'Expliquez simplement ce que vous voulez créer ou améliorer.',
             'type' => 'textarea',
-            'project_types' => $allTypesExceptVitrineEcomMobile,
+            'project_types' => $allTypesExceptVitrineEcomMobileLogiciel,
             'is_required' => true,
             'sort_order' => 1,
             'group_label' => 'Votre projet',
@@ -51,7 +52,7 @@ class QuestionSeeder extends Seeder
             'title' => 'Quel est votre objectif principal ?',
             'description' => null,
             'type' => 'select',
-            'project_types' => $allTypesExceptVitrineEcomMobile,
+            'project_types' => $allTypesExceptVitrineEcomMobileLogiciel,
             'is_required' => true,
             'sort_order' => 2,
             'group_label' => 'Votre projet',
@@ -74,7 +75,7 @@ class QuestionSeeder extends Seeder
             'title' => 'Quelles fonctionnalités sont essentielles ?',
             'description' => null,
             'type' => 'multiselect',
-            'project_types' => $allTypesExceptVitrineEcomMobile,
+            'project_types' => $allTypesExceptVitrineEcomMobileLogiciel,
             'is_required' => true,
             'sort_order' => 3,
             'group_label' => 'Votre projet',
@@ -505,14 +506,14 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qBudgetMobile->id, 'label' => 'Plus de 5 000 000 FCFA', 'value' => 'plus_5m', 'sort_order' => 4, 'is_active' => true]);
 
         // ============================================================
-        // LOGICIEL / ERP / CRM — Q4 à Q7
+        // LOGICIEL / APPLICATION WEB MÉTIER — Q4 à Q10
         // ============================================================
 
-        // Q4 : Processus
-        $qProcessus = Question::create([
-            'title' => 'Quels processus devez-vous gérer ?',
+        // Q4 : Ce que le client veut gérer
+        $qGérer = Question::create([
+            'title' => 'Que souhaitez-vous principalement gérer avec votre logiciel ?',
             'description' => null,
-            'type' => 'multiselect',
+            'type' => 'select',
             'project_types' => $typesLogicielOnly,
             'is_required' => true,
             'sort_order' => 4,
@@ -522,18 +523,16 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qProcessus->id, 'label' => 'Gestion des ventes', 'value' => 'ventes', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProcessus->id, 'label' => 'Gestion des clients', 'value' => 'clients', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProcessus->id, 'label' => 'Gestion des stocks', 'value' => 'stocks', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProcessus->id, 'label' => 'Facturation', 'value' => 'facturation', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProcessus->id, 'label' => 'Comptabilité', 'value' => 'comptabilite', 'sort_order' => 5, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qProcessus->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 6, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qGérer->id, 'label' => 'Gestion d\'entreprise (clients, ventes, finances...)', 'value' => 'entreprise', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qGérer->id, 'label' => 'Gestion des équipes (employés, tâches, planning...)', 'value' => 'equipes', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qGérer->id, 'label' => 'Gestion des opérations (stocks, commandes, livraisons...)', 'value' => 'operations', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qGérer->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
 
-        // Q5 : Nombre d'utilisateurs
-        $qNbUsers = Question::create([
-            'title' => 'Combien de personnes l\'utiliseront ?',
+        // Q5 : Utilisateurs principaux
+        $qUtilisateursLogiciel = Question::create([
+            'title' => 'Qui utilisera principalement le logiciel ?',
             'description' => null,
-            'type' => 'select',
+            'type' => 'multiselect',
             'project_types' => $typesLogicielOnly,
             'is_required' => true,
             'sort_order' => 5,
@@ -543,16 +542,16 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qNbUsers->id, 'label' => '1 à 5 personnes', 'value' => '1_5', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qNbUsers->id, 'label' => '6 à 20 personnes', 'value' => '6_20', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qNbUsers->id, 'label' => 'Plus de 20 personnes', 'value' => 'plus_20', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qNbUsers->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qUtilisateursLogiciel->id, 'label' => 'Direction / responsables (gérants, managers...)', 'value' => 'direction', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qUtilisateursLogiciel->id, 'label' => 'Employés (agents, collaborateurs...)', 'value' => 'employes', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qUtilisateursLogiciel->id, 'label' => 'Clients (accès à leurs informations ou services...)', 'value' => 'clients', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qUtilisateursLogiciel->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
 
-        // Q6 : Intégrations
-        Question::create([
-            'title' => 'Avez-vous besoin de connecter d\'autres outils ?',
-            'description' => 'Ex : logiciel de comptabilité, CRM, outil de paie…',
-            'type' => 'yes_no',
+        // Q6 : Informations à gérer
+        $qInfos = Question::create([
+            'title' => 'Quelles informations souhaitez-vous principalement gérer ?',
+            'description' => null,
+            'type' => 'multiselect',
             'project_types' => $typesLogicielOnly,
             'is_required' => true,
             'sort_order' => 6,
@@ -562,9 +561,14 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Q7 : Budget
-        $qBudgetLogiciel = Question::create([
-            'title' => 'Quel est votre budget ?',
+        QuestionOption::create(['question_id' => $qInfos->id, 'label' => 'Clients et contacts (coordonnées, historique...)', 'value' => 'clients', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qInfos->id, 'label' => 'Produits et services (catalogue, tarifs...)', 'value' => 'produits', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qInfos->id, 'label' => 'Documents et fichiers (factures, contrats...)', 'value' => 'documents', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qInfos->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q7 : Données existantes
+        $qDonnees = Question::create([
+            'title' => 'Avez-vous déjà des données à intégrer dans le logiciel ?',
             'description' => null,
             'type' => 'select',
             'project_types' => $typesLogicielOnly,
@@ -576,11 +580,67 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
+        QuestionOption::create(['question_id' => $qDonnees->id, 'label' => 'Oui, fichiers Excel (clients, produits, etc.)', 'value' => 'excel', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qDonnees->id, 'label' => 'Oui, une autre application (logiciel existant...)', 'value' => 'application', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qDonnees->id, 'label' => 'Non, je pars de zéro', 'value' => 'zero', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qDonnees->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q8 : Appareils
+        $qAppareilsLogiciel = Question::create([
+            'title' => 'Où souhaitez-vous pouvoir utiliser votre logiciel ?',
+            'description' => null,
+            'type' => 'multiselect',
+            'project_types' => $typesLogicielOnly,
+            'is_required' => true,
+            'sort_order' => 8,
+            'group_label' => 'Votre logiciel',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
+        QuestionOption::create(['question_id' => $qAppareilsLogiciel->id, 'label' => 'Ordinateur (bureau, ordinateur portable...)', 'value' => 'ordinateur', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qAppareilsLogiciel->id, 'label' => 'Téléphone (Android, iPhone...)', 'value' => 'telephone', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qAppareilsLogiciel->id, 'label' => 'Tablette (iPad, Android...)', 'value' => 'tablette', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qAppareilsLogiciel->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q9 : Évolution
+        $qEvolution = Question::create([
+            'title' => 'Pensez-vous que le logiciel devra évoluer avec votre activité ?',
+            'description' => null,
+            'type' => 'select',
+            'project_types' => $typesLogicielOnly,
+            'is_required' => true,
+            'sort_order' => 9,
+            'group_label' => 'Votre logiciel',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
+        QuestionOption::create(['question_id' => $qEvolution->id, 'label' => 'Oui, beaucoup (nouvelles fonctionnalités prévues...)', 'value' => 'beaucoup', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qEvolution->id, 'label' => 'Oui, progressivement (selon les besoins...)', 'value' => 'progressivement', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qEvolution->id, 'label' => 'Non, besoin fixe', 'value' => 'non', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qEvolution->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q10 : Budget (dernière question)
+        $qBudgetLogiciel = Question::create([
+            'title' => 'Quel budget avez-vous prévu pour ce projet ?',
+            'description' => null,
+            'type' => 'select',
+            'project_types' => $typesLogicielOnly,
+            'is_required' => true,
+            'sort_order' => 10,
+            'group_label' => 'Votre logiciel',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
         QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => 'Moins de 1 000 000 FCFA', 'value' => 'moins_1m', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => '1 000 000 à 3 000 000 FCFA', 'value' => '1m_3m', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => '3 000 000 à 5 000 000 FCFA', 'value' => '3m_5m', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => '1 000 000 à 2 000 000 FCFA', 'value' => '1m_2m', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => '2 000 000 à 5 000 000 FCFA', 'value' => '2m_5m', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => 'Plus de 5 000 000 FCFA', 'value' => 'plus_5m', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetLogiciel->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
 
         // ============================================================
         // AUTRE — Q4 à Q7
