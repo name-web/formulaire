@@ -14,6 +14,7 @@ class QuestionSeeder extends Seeder
     {
         $allTypes = array_values(array_keys(config('project_types.types')));
         $allTypesExceptVitrine = array_values(array_diff($allTypes, ['site_vitrine']));
+        $allTypesExceptVitrineAndEcom = array_values(array_diff($allTypes, ['site_vitrine', 'ecommerce']));
         $typesVitrineOnly = ['site_vitrine'];
         $typesEcommerceOnly = ['ecommerce'];
         $typesMobileOnly = ['application_mobile'];
@@ -27,13 +28,13 @@ class QuestionSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         // ============================================================
-        // Q1 : Description du projet (tous les types sauf site vitrine)
+        // Q1 : Description du projet (tous les types sauf site vitrine et ecommerce)
         // ============================================================
         Question::create([
             'title' => 'Décrivez votre projet en quelques mots',
             'description' => 'Expliquez simplement ce que vous voulez créer ou améliorer.',
             'type' => 'textarea',
-            'project_types' => $allTypesExceptVitrine,
+            'project_types' => $allTypesExceptVitrineAndEcom,
             'is_required' => true,
             'sort_order' => 1,
             'group_label' => 'Votre projet',
@@ -49,7 +50,7 @@ class QuestionSeeder extends Seeder
             'title' => 'Quel est votre objectif principal ?',
             'description' => null,
             'type' => 'select',
-            'project_types' => $allTypesExceptVitrine,
+            'project_types' => $allTypesExceptVitrineAndEcom,
             'is_required' => true,
             'sort_order' => 2,
             'group_label' => 'Votre projet',
@@ -72,7 +73,7 @@ class QuestionSeeder extends Seeder
             'title' => 'Quelles fonctionnalités sont essentielles ?',
             'description' => null,
             'type' => 'multiselect',
-            'project_types' => $allTypesExceptVitrine,
+            'project_types' => $allTypesExceptVitrineAndEcom,
             'is_required' => true,
             'sort_order' => 3,
             'group_label' => 'Votre projet',
@@ -229,12 +230,12 @@ class QuestionSeeder extends Seeder
         QuestionOption::create(['question_id' => $qBudgetVitrine->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
 
         // ============================================================
-        // E-COMMERCE — Q4 à Q7
+        // E-COMMERCE — Q4 à Q10
         // ============================================================
 
-        // Q4 : Nombre de produits
-        $qNbProduits = Question::create([
-            'title' => 'Combien de produits comptez-vous vendre ?',
+        // Q4 : Que souhaitez-vous vendre ?
+        $qVendre = Question::create([
+            'title' => 'Que souhaitez-vous vendre sur votre boutique ?',
             'description' => null,
             'type' => 'select',
             'project_types' => $typesEcommerceOnly,
@@ -246,14 +247,14 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => 'Moins de 50 produits', 'value' => 'moins_50', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => '50 à 200 produits', 'value' => '50_200', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => 'Plus de 200 produits', 'value' => 'plus_200', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qVendre->id, 'label' => 'Produits physiques (vêtements, cosmétiques, alimentation...)', 'value' => 'physiques', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qVendre->id, 'label' => 'Services (formation, consultation, réservation...)', 'value' => 'services', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qVendre->id, 'label' => 'Produits numériques (ebooks, logiciels, formations...)', 'value' => 'numeriques', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qVendre->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
 
-        // Q5 : Type de produits
-        $qTypeProduits = Question::create([
-            'title' => 'Quel type de produits vendez-vous ?',
+        // Q5 : Nombre de produits
+        $qNbProduits = Question::create([
+            'title' => 'Combien de produits souhaitez-vous proposer ?',
             'description' => null,
             'type' => 'select',
             'project_types' => $typesEcommerceOnly,
@@ -265,16 +266,16 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qTypeProduits->id, 'label' => 'Produits physiques (vêtements, accessoires…)', 'value' => 'physiques', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qTypeProduits->id, 'label' => 'Produits numériques (e-books, formations…)', 'value' => 'numeriques', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qTypeProduits->id, 'label' => 'Services (consulting, abonnements…)', 'value' => 'services', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qTypeProduits->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => 'Moins de 20 produits', 'value' => 'moins_20', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => '20 à 100 produits', 'value' => '20_100', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => 'Plus de 100 produits', 'value' => 'plus_100', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qNbProduits->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
 
-        // Q6 : Livraison
-        $qLivraison = Question::create([
-            'title' => 'Comment souhaitez-vous gérer la livraison ?',
+        // Q6 : Moyens de paiement
+        $qPaiement = Question::create([
+            'title' => 'Comment souhaitez-vous que vos clients puissent payer ?',
             'description' => null,
-            'type' => 'select',
+            'type' => 'multiselect',
             'project_types' => $typesEcommerceOnly,
             'is_required' => true,
             'sort_order' => 6,
@@ -284,15 +285,14 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        QuestionOption::create(['question_id' => $qLivraison->id, 'label' => 'Livraison à domicile', 'value' => 'domicile', 'sort_order' => 1, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qLivraison->id, 'label' => 'Retrait en point relais', 'value' => 'relais', 'sort_order' => 2, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qLivraison->id, 'label' => 'Les deux', 'value' => 'les_deux', 'sort_order' => 3, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qLivraison->id, 'label' => 'Pas de livraison physique', 'value' => 'numerique', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qLivraison->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPaiement->id, 'label' => 'Mobile Money (Wave, Orange Money, MTN...)', 'value' => 'mobile_money', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPaiement->id, 'label' => 'Carte bancaire (Visa, Mastercard...)', 'value' => 'carte', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPaiement->id, 'label' => 'Paiement à la livraison (paiement à la réception...)', 'value' => 'livraison', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qPaiement->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
 
-        // Q7 : Budget
-        $qBudgetEcom = Question::create([
-            'title' => 'Quel est votre budget ?',
+        // Q7 : Gestion quotidienne
+        $qGestion = Question::create([
+            'title' => 'Qui devra gérer la boutique au quotidien ?',
             'description' => null,
             'type' => 'select',
             'project_types' => $typesEcommerceOnly,
@@ -304,11 +304,67 @@ class QuestionSeeder extends Seeder
             'is_active' => true,
         ]);
 
+        QuestionOption::create(['question_id' => $qGestion->id, 'label' => 'Moi uniquement', 'value' => 'moi', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qGestion->id, 'label' => 'Mon équipe (2 à 5 personnes)', 'value' => 'equipe', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qGestion->id, 'label' => 'Plusieurs personnes (équipe plus large)', 'value' => 'plusieurs', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qGestion->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q8 : Suivi des stocks
+        $qStocks = Question::create([
+            'title' => 'Souhaitez-vous suivre vos stocks ?',
+            'description' => null,
+            'type' => 'select',
+            'project_types' => $typesEcommerceOnly,
+            'is_required' => true,
+            'sort_order' => 8,
+            'group_label' => 'Votre boutique en ligne',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
+        QuestionOption::create(['question_id' => $qStocks->id, 'label' => 'Oui, automatiquement (stocks mis à jour après chaque vente)', 'value' => 'auto', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qStocks->id, 'label' => 'Oui, simplement (suivi manuel)', 'value' => 'manuel', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qStocks->id, 'label' => 'Non', 'value' => 'non', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qStocks->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q9 : Réception des commandes
+        $qCommandes = Question::create([
+            'title' => 'Comment souhaitez-vous recevoir et gérer les commandes ?',
+            'description' => null,
+            'type' => 'multiselect',
+            'project_types' => $typesEcommerceOnly,
+            'is_required' => true,
+            'sort_order' => 9,
+            'group_label' => 'Votre boutique en ligne',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
+        QuestionOption::create(['question_id' => $qCommandes->id, 'label' => 'Depuis la boutique (commandes directement dans la plateforme)', 'value' => 'plateforme', 'sort_order' => 1, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qCommandes->id, 'label' => 'Par WhatsApp (commande reçue sur WhatsApp)', 'value' => 'whatsapp', 'sort_order' => 2, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qCommandes->id, 'label' => 'Par téléphone (commande par appel)', 'value' => 'telephone', 'sort_order' => 3, 'is_active' => true]);
+        QuestionOption::create(['question_id' => $qCommandes->id, 'label' => 'Autre', 'value' => 'autre', 'sort_order' => 4, 'is_active' => true]);
+
+        // Q10 : Budget (dernière question)
+        $qBudgetEcom = Question::create([
+            'title' => 'Quel budget avez-vous prévu pour ce projet ?',
+            'description' => null,
+            'type' => 'select',
+            'project_types' => $typesEcommerceOnly,
+            'is_required' => true,
+            'sort_order' => 10,
+            'group_label' => 'Votre boutique en ligne',
+            'placeholder' => null,
+            'help_text' => null,
+            'is_active' => true,
+        ]);
+
         QuestionOption::create(['question_id' => $qBudgetEcom->id, 'label' => 'Moins de 500 000 FCFA', 'value' => 'moins_500k', 'sort_order' => 1, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qBudgetEcom->id, 'label' => '500 000 à 1 000 000 FCFA', 'value' => '500k_1m', 'sort_order' => 2, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qBudgetEcom->id, 'label' => '1 000 000 à 3 000 000 FCFA', 'value' => '1m_3m', 'sort_order' => 3, 'is_active' => true]);
         QuestionOption::create(['question_id' => $qBudgetEcom->id, 'label' => 'Plus de 3 000 000 FCFA', 'value' => 'plus_3m', 'sort_order' => 4, 'is_active' => true]);
-        QuestionOption::create(['question_id' => $qBudgetEcom->id, 'label' => 'Je ne sais pas encore', 'value' => 'nsa', 'sort_order' => 5, 'is_active' => true]);
 
         // ============================================================
         // APPLICATION MOBILE — Q4 à Q7
