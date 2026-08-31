@@ -7,7 +7,7 @@
                 Détail
             </div>
             <h1>{{ $client->name }}</h1>
-            <p>{{ $client->email }}{{ $client->company_name ? ' — ' . $client->company_name : '' }}</p>
+            <p>{{ $client->email }}{{ $client->phone ? ' — ' . $client->phone : '' }}</p>
         </div>
         <a href="{{ route('admin.clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
     </section>
@@ -49,10 +49,12 @@
                                 <div style="color:var(--text-muted);font-size:14px;">{{ $client->company_name }}</div>
                             </div>
                         @endif
-                        <div>
-                            <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Localisation</div>
-                            <div style="color:var(--text-muted);font-size:14px;">{{ $client->city }}{{ $client->city && $client->country ? ', ' : '' }}{{ $client->country }}</div>
-                        </div>
+                        @if($client->city || $client->country)
+                            <div>
+                                <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Localisation</div>
+                                <div style="color:var(--text-muted);font-size:14px;">{{ $client->city }}{{ $client->city && $client->country ? ', ' : '' }}{{ $client->country }}</div>
+                            </div>
+                        @endif
                         <div>
                             <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Inscrit le</div>
                             <div style="color:var(--text-muted);font-size:14px;">{{ $client->created_at->format('d/m/Y à H:i') }}</div>

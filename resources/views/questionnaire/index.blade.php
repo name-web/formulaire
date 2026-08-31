@@ -3,14 +3,6 @@
 <style>
 #wizardForm { display:flex; flex-direction:column; flex:1; }
 .content-card { overflow:visible !important; }
-.searchable-dropdown { position:relative; width:100%; overflow:visible; }
-.dropdown-list { display:none; position:relative; width:100%; max-height:220px; overflow-y:auto; margin-top:8px; background:#0b1b31; border:1px solid rgba(255,255,255,0.12); border-radius:12px; z-index:10; box-shadow:0 12px 35px rgba(0,0,0,0.4); box-sizing:border-box; }
-.dropdown-list::-webkit-scrollbar { width:4px; }
-.dropdown-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:10px; }
-.dropdown-list .dropdown-item { padding:10px 16px; font-size:13px; color:rgba(255,255,255,0.75); cursor:pointer; transition:background 0.15s, color 0.15s; }
-.dropdown-list .dropdown-item:hover, .dropdown-list .dropdown-item.active { background:rgba(255,183,3,0.15); color:white; }
-.dropdown-list .dropdown-item.no-results { color:var(--text-muted); cursor:default; font-style:italic; }
-.dropdown-list .dropdown-item.no-results:hover { background:transparent; }
 .sidebar { position:fixed; top:0; left:0; bottom:0; width:270px; padding:34px 24px; background:rgba(7,20,38,.92); border-right:1px solid rgba(255,255,255,.08); backdrop-filter:blur(20px); display:flex; flex-direction:column; z-index:100; }
 .sidebar-header { margin-bottom:40px; }
 .sidebar-logo { display:flex; align-items:center; gap:12px; }
@@ -35,7 +27,6 @@
 .content-card { width:100%; max-width:950px; min-height:650px; padding:55px 60px; border-radius:30px; background:linear-gradient(145deg,rgba(18,44,77,.88),rgba(7,20,38,.94)); border:1px solid rgba(255,255,255,.08); box-shadow:0 35px 100px rgba(0,0,0,.35); backdrop-filter:blur(20px); display:flex; flex-direction:column; transform-style:preserve-3d; }
 .top { display:flex; align-items:center; justify-content:space-between; }
 .eyebrow { color:var(--blue-light); font-size:11px; font-weight:800; letter-spacing:2px; }
-.counter { width:58px; height:58px; display:grid; place-items:center; border-radius:50%; background:rgba(255,183,3,.1); border:1px solid rgba(255,183,3,.18); color:var(--blue-light); font-size:13px; font-weight:800; }
 .question-title { max-width:750px; margin:50px 0 15px; font-size:clamp(40px,5vw,64px); line-height:1; letter-spacing:-2.5px; color:white; }
 .question-desc { max-width:700px; margin:0 0 35px; color:rgba(255,255,255,.48); font-size:14px; line-height:1.7; }
 .option-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:15px; }
@@ -47,14 +38,12 @@
 .opt-icon-wrap { width:40px; height:40px; display:grid; place-items:center; border-radius:12px; font-size:15px; }
 .opt-label { font-size:14px; font-weight:800; }
 .opt-desc { margin-top:12px; font-size:12px; line-height:1.6; color:rgba(255,255,255,.42); }
-.other-field { width:100%; }
 .form-label { display:block; margin-bottom:8px; color:rgba(255,255,255,.58); font-size:11px; font-weight:700; }
 .input-icon-wrap { position:relative; width:100%; }
 .input-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,.35); font-size:13px; pointer-events:none; z-index:2; }
 .glass-input { width:100%; height:48px; padding:0 16px 0 45px; border:1px solid rgba(255,255,255,.09); border-radius:12px; outline:none; background:rgba(255,255,255,.035); color:white; font-size:13px; transition:border-color .2s ease, background .2s ease, box-shadow .2s ease; }
 .glass-input::placeholder { color:rgba(255,255,255,.28); }
 .glass-input:focus { border-color:rgba(255,183,3,.55); background:rgba(255,183,3,.05); box-shadow:0 0 0 3px rgba(255,183,3,.08); }
-.glass-input:disabled { opacity:.55; cursor:not-allowed; }
 .card-bottom { margin-top:auto; padding-top:35px; display:flex; align-items:center; gap:25px; }
 .btn-continue { display:inline-flex; align-items:center; gap:10px; padding:16px 25px; border:none; border-radius:13px; background:#ffb703; color:white; font-size:14px; font-weight:800; cursor:pointer; transition:transform .25s ease, background .25s ease, box-shadow .25s ease; }
 .btn-continue:hover { background:#ffc72c; transform:translateY(-2px); box-shadow:0 12px 30px rgba(255,183,3,.25); }
@@ -62,6 +51,7 @@
 .error-box { margin-bottom:20px; padding:15px; border-radius:12px; background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.15); }
 .error-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; color:#f87171; font-size:13px; font-weight:700; }
 .error-msg { color:rgba(255,255,255,.65); font-size:12px; margin-top:4px; }
+.section-label { font-size:11px; font-weight:800; color:rgba(255,255,255,.35); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:14px; margin-top:24px; }
 @media (max-width:1024px) {
     .sidebar { width:240px; padding:24px 20px; }
     .sidebar-logo img { height:36px; }
@@ -95,8 +85,6 @@
     .btn-continue { min-height:48px; }
     .glass-input { height:48px; }
 }
-
-/* ── Hamburger for questionnaire sidebar ── */
 .qm-hamburger {
     display:none; align-items:center; justify-content:center;
     width:44px; height:44px; border:none; background:rgba(255,255,255,.06);
@@ -135,8 +123,12 @@
     <nav class="step-list">
         <div class="step-item active" data-step="1">
             <div class="step-dot active">01</div>
-            <span class="step-label">{{ __('Vos informations') }}</span>
+            <span class="step-label">{{ __('Type de projet') }}</span>
             <i class="fa-solid fa-chevron-right step-arrow"></i>
+        </div>
+        <div class="step-item" data-step="2">
+            <div class="step-dot">02</div>
+            <span class="step-label">{{ __('Vos informations') }}</span>
         </div>
     </nav>
 
@@ -148,7 +140,7 @@
         <div class="progress-bar-track">
             <div class="progress-bar-fill" style="width:0%"></div>
         </div>
-        <div class="progress-step-text">{{ __('Étape') }} <strong>1</strong></div>
+        <div class="progress-step-text">{{ __('Étape') }} <strong>1</strong> {{ __('sur') }} <strong>2</strong></div>
     </div>
 </aside>
 
@@ -172,85 +164,73 @@
             </div>
         @endif
 
-        <form action="{{ route('questionnaire.start') }}" method="POST" id="wizardForm"
-              data-project-types="{{ json_encode(collect($projectTypes)->mapWithKeys(fn($t, $k) => [$k => $t['label']])) }}">
+        <form action="{{ route('questionnaire.start') }}" method="POST" id="wizardForm">
             @csrf
 
-            <div class="top">
-                <div class="eyebrow">{{ __('PARLONS DE VOTRE PROJET') }}</div>
-            </div>
-            <h1 class="question-title anim-slide-in">{{ __('Vos informations') }}</h1>
-            <p class="question-desc anim-up d1">{{ __('Commençons par vos coordonnées.') }}</p>
+            {{-- STEP 1: Project Type --}}
+            <div class="wizard-step active" id="step-1">
+                <div class="top">
+                    <div class="eyebrow">{{ __('PARLONS DE VOTRE PROJET') }}</div>
+                </div>
+                <h1 class="question-title anim-slide-in">{{ __('Type de projet') }}</h1>
+                <p class="question-desc anim-up d1">{{ __('Quel type de projet souhaitez-vous réaliser ?') }}</p>
 
-            <div style="display:flex;flex-direction:column;gap:20px;">
-                <div>
-                    <label class="form-label">{{ __('Nom complet') }} <span style="color:#f87171;">*</span></label>
-                    <div class="input-icon-wrap">
-                        <i class="fa-solid fa-user input-icon"></i>
-                        <input type="text" name="name" value="{{ old('name') }}" class="glass-input" placeholder="Jean Dupont" required>
-                    </div>
+                <div class="option-grid anim-up d2" style="grid-template-columns:repeat(2,1fr);">
+                    @foreach($projectTypes as $key => $type)
+                        <label class="opt-card" data-group="project_types" data-value="{{ $key }}">
+                            <div class="opt-check"><i class="fa-solid fa-check" style="font-size:10px;"></i></div>
+                            <div class="opt-icon-wrap" style="background:{{ $type['color'] }}20;color:{{ $type['color'] }};">
+                                <i class="{{ $type['icon'] }}"></i>
+                            </div>
+                            <div class="opt-label">{{ $type['label'] }}</div>
+                            <div class="opt-desc">{{ $type['description'] }}</div>
+                        </label>
+                    @endforeach
                 </div>
-                <div>
-                    <label class="form-label">{{ __('Email') }} <span style="color:#f87171;">*</span></label>
-                    <div class="input-icon-wrap">
-                        <i class="fa-solid fa-envelope input-icon"></i>
-                        <input type="email" name="email" value="{{ old('email') }}" class="glass-input" placeholder="jean@entreprise.com" required>
-                    </div>
+
+                <input type="hidden" name="project_types" id="projectTypesInput" value="{{ json_encode($selectedProjectTypes) }}">
+
+                <div class="card-bottom anim-up d3">
+                    <div></div>
+                    <button type="button" class="btn-continue" id="btnStep1">
+                        {{ __('Continuer') }} <i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </div>
-                <div class="option-grid" style="grid-template-columns:1fr 1fr;">
+            </div>
+
+            {{-- STEP 2: Client Info --}}
+            <div class="wizard-step" id="step-2" style="display:none;">
+                <div class="top">
+                    <div class="eyebrow">{{ __('VOS INFORMATIONS') }}</div>
+                </div>
+                <h1 class="question-title anim-slide-in">{{ __('Qui êtes-vous ?') }}</h1>
+                <p class="question-desc anim-up d1">{{ __('On a juste besoin de votre nom et numéro pour vous recontacter.') }}</p>
+
+                <div style="display:flex;flex-direction:column;gap:20px;" class="anim-up d2">
                     <div>
-                        <label class="form-label">{{ __('Téléphone') }} <span style="color:#f87171;">*</span></label>
+                        <label class="form-label">{{ __('Nom complet') }} <span style="color:#f87171;">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-user input-icon"></i>
+                            <input type="text" name="name" value="{{ old('name') }}" class="glass-input" placeholder="Jean Dupont" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">{{ __('Numéro joignable') }} <span style="color:#f87171;">*</span></label>
                         <div class="input-icon-wrap">
                             <i class="fa-solid fa-phone input-icon"></i>
-                            <input type="tel" name="phone" value="{{ old('phone') }}" class="glass-input" placeholder="+212 6..." required>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="form-label">{{ __('WhatsApp') }}</label>
-                        <div class="input-icon-wrap">
-                            <i class="fa-brands fa-whatsapp input-icon"></i>
-                            <input type="tel" name="whatsapp" value="{{ old('whatsapp') }}" class="glass-input" placeholder="+212 6...">
+                            <input type="tel" name="phone" value="{{ old('phone') }}" class="glass-input" placeholder="+225 07 07 07 07" required>
                         </div>
                     </div>
                 </div>
-                <div>
-                    <label class="form-label">{{ __('Société') }}</label>
-                    <div class="input-icon-wrap">
-                        <i class="fa-solid fa-building input-icon"></i>
-                        <input type="text" name="company_name" value="{{ old('company_name') }}" class="glass-input" placeholder="Nom de votre société">
-                    </div>
-                </div>
-                <div class="option-grid" style="grid-template-columns:1fr 1fr;">
-                    <div>
-                        <label class="form-label">{{ __('Pays') }} <span style="color:#f87171;">*</span></label>
-                        <div class="searchable-dropdown" id="countryDropdown">
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-earth-africa input-icon"></i>
-                                <input type="text" class="glass-input dropdown-search" placeholder="Chargement des pays…" autocomplete="off" value="{{ old('country') }}" disabled>
-                                <input type="hidden" name="country" id="countryNameInput" value="{{ old('country') }}">
-                            </div>
-                            <div class="dropdown-list" id="countryDropdownList"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="form-label">{{ __('Ville') }} <span style="color:#f87171;">*</span></label>
-                        <div class="searchable-dropdown" id="cityDropdown">
-                            <div class="input-icon-wrap">
-                                <i class="fa-solid fa-location-dot input-icon"></i>
-                                <input type="text" class="glass-input dropdown-search" placeholder="Sélectionnez d'abord un pays…" autocomplete="off" value="{{ old('city') }}" disabled>
-                                <input type="hidden" name="city" id="cityNameInput" value="{{ old('city') }}">
-                            </div>
-                            <div class="dropdown-list" id="cityDropdownList"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <input type="hidden" name="project_types" id="projectTypesInput" value="{{ json_encode($selectedProjectTypes) }}">
-
-            <div class="card-bottom anim-up d3">
-                <div></div>
-                <button type="submit" class="btn-continue">{{ __('Commencer le questionnaire') }} <i class="fa-solid fa-arrow-right"></i></button>
+                <div class="card-bottom anim-up d3">
+                    <button type="button" class="btn-back" onclick="showStep(1)">
+                        <i class="fa-solid fa-arrow-left"></i> {{ __('Retour') }}
+                    </button>
+                    <button type="submit" class="btn-continue">
+                        {{ __('Commencer le questionnaire') }} <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -277,121 +257,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const typesInput = document.getElementById('projectTypesInput');
-    const otherField = document.getElementById('otherField');
 
     document.querySelectorAll('.opt-card[data-group="project_types"]').forEach(card => {
         card.addEventListener('click', () => {
-            card.classList.toggle('selected');
+            document.querySelectorAll('.opt-card[data-group="project_types"]').forEach(c => {
+                c.classList.remove('selected');
+                const ch = c.querySelector('.opt-check');
+                if(ch) { ch.style.opacity = '0'; ch.style.transform = 'scale(0)'; }
+            });
+            card.classList.add('selected');
             const ch = card.querySelector('.opt-check');
-            if(ch) { ch.style.opacity = card.classList.contains('selected') ? '1' : '0'; ch.style.transform = card.classList.contains('selected') ? 'scale(1)' : 'scale(0)'; }
+            if(ch) { ch.style.opacity = '1'; ch.style.transform = 'scale(1)'; }
             card.style.transform = 'translateY(-6px) scale(0.97)';
             setTimeout(() => { card.style.transform = 'translateY(-4px) scale(1)'; }, 100);
-            const selected = [];
-            document.querySelectorAll('.opt-card[data-group="project_types"].selected').forEach(c => selected.push(c.dataset.value));
-            typesInput.value = JSON.stringify(selected);
+            typesInput.value = JSON.stringify([card.dataset.value]);
             typesInput.dispatchEvent(new Event('change'));
-            if(otherField) {
-                const showOther = selected.includes('autre');
-                otherField.style.display = showOther ? 'block' : 'none';
-                const otherInput = otherField.querySelector('input[name="other_description"]');
-                if(otherInput) otherInput.required = showOther;
-            }
         });
     });
 
-    let countriesData = [];
-
-    function initSearchableDropdown(dropdownId, items, onSelect, getLabel, hiddenInputId, listId) {
-        const dropdown = document.getElementById(dropdownId);
-        if(!dropdown) return;
-        const searchInput = dropdown.querySelector('.dropdown-search');
-        const hiddenInput = document.getElementById(hiddenInputId);
-        const list = document.getElementById(listId) || dropdown.querySelector('.dropdown-list');
-        if(!searchInput || !hiddenInput || !list) return;
-        let currentItems = items;
-
-        function renderList(query) {
-            const q = (query || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            const filtered = currentItems.filter(item => {
-                const label = String(getLabel(item));
-                return label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q);
-            });
-            list.innerHTML = '';
-            if(filtered.length === 0) { const div = document.createElement('div'); div.className = 'dropdown-item no-results'; div.textContent = '{{ __("Aucun résultat") }}'; list.appendChild(div); return; }
-            filtered.forEach(item => {
-                const label = String(getLabel(item));
-                const div = document.createElement('div');
-                div.className = 'dropdown-item';
-                if(label === searchInput.value) div.classList.add('active');
-                div.textContent = label;
-                div.addEventListener('mousedown', e => { e.preventDefault(); searchInput.value = label; hiddenInput.value = label; hideList(); if(onSelect) onSelect(item); });
-                list.appendChild(div);
+    window.showStep = function(step) {
+        document.querySelectorAll('.wizard-step').forEach(s => {
+            s.style.display = 'none';
+            s.classList.remove('active');
+        });
+        const target = document.getElementById('step-' + step);
+        if (target) {
+            target.style.display = '';
+            target.classList.add('active');
+            target.querySelectorAll('.anim-up, .anim-slide-in, .anim-scale').forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight;
+                el.style.animation = '';
             });
         }
-
-        function showList() { if(searchInput.disabled) return; renderList(searchInput.value); list.style.position = 'static'; list.style.width = '100%'; list.style.maxWidth = '100%'; list.style.marginTop = '6px'; list.style.display = 'block'; dropdown.classList.add('dropdown-open'); }
-        function hideList() { list.style.display = 'none'; dropdown.classList.remove('dropdown-open'); }
-
-        searchInput.addEventListener('focus', showList);
-        searchInput.addEventListener('click', showList);
-        searchInput.addEventListener('input', () => { if(searchInput.disabled) return; renderList(searchInput.value); list.style.position = 'static'; list.style.width = '100%'; list.style.maxWidth = '100%'; list.style.marginTop = '6px'; list.style.display = 'block'; dropdown.classList.add('dropdown-open'); });
-        window.addEventListener('resize', () => { if(list.style.display === 'block') list.style.width = '100%'; });
-        document.addEventListener('click', e => { if(!dropdown.contains(e.target)) hideList(); });
-        searchInput.addEventListener('keydown', e => {
-            if(e.key === 'Escape') { hideList(); searchInput.blur(); return; }
-            if(e.key === 'Enter') { e.preventDefault(); const first = list.querySelector('.dropdown-item:not(.no-results)'); if(first) first.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); }
+        document.querySelectorAll('.step-item').forEach(item => {
+            const s = parseInt(item.dataset.step);
+            item.classList.remove('active');
+            const dot = item.querySelector('.step-dot');
+            dot.classList.remove('active');
+            if (s === step) {
+                item.classList.add('active');
+                dot.classList.add('active');
+            } else if (s < step) {
+                dot.innerHTML = '<i class="fa-solid fa-check"></i>';
+            }
         });
-        dropdown._updateItems = function(newItems, newGetLabel) { currentItems = Array.isArray(newItems) ? newItems : []; if(newGetLabel) getLabel = newGetLabel; if(list.style.display === 'block') renderList(searchInput.value); };
-    }
+    };
 
-    function resetCityDropdown() {
-        const citySearch = document.querySelector('#cityDropdown .dropdown-search');
-        const cityNameInput = document.getElementById('cityNameInput');
-        const cityList = document.getElementById('cityDropdownList');
-        if(!citySearch) return;
-        citySearch.value = ''; citySearch.disabled = true; citySearch.placeholder = "{{ __("Sélectionnez d'abord un pays…") }}";
-        if(cityNameInput) cityNameInput.value = '';
-        if(cityList) { cityList.innerHTML = ''; cityList.style.display = 'none'; }
-        const cd = document.getElementById('cityDropdown');
-        if(cd) cd.classList.remove('dropdown-open');
-    }
-
-    function loadCitiesForCountry(country) {
-        const citySearch = document.querySelector('#cityDropdown .dropdown-search');
-        const cityList = document.getElementById('cityDropdownList');
-        const cityNameInput = document.getElementById('cityNameInput');
-        const cityDropdown = document.getElementById('cityDropdown');
-        if(!citySearch || !cityList || !cityNameInput) return;
-        citySearch.disabled = true; citySearch.placeholder = '{{ __("Chargement…") }}';
-        cityNameInput.value = ''; citySearch.value = ''; cityList.innerHTML = ''; cityList.style.display = 'none';
-        if(cityDropdown) cityDropdown.classList.remove('dropdown-open');
-        fetch('/api/countries/' + encodeURIComponent(country.code) + '/cities')
-            .then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-            .then(data => {
-                const cities = Array.isArray(data.cities) ? data.cities : [];
-                citySearch.disabled = false;
-                citySearch.placeholder = cities.length ? '{{ __("Rechercher une ville…") }}' : '{{ __("Aucune ville disponible") }}';
-                if(cityDropdown && cityDropdown._updateItems) cityDropdown._updateItems(cities, item => item);
-            })
-            .catch(() => { citySearch.disabled = false; citySearch.placeholder = '{{ __("Erreur de chargement — réessayez") }}'; });
-    }
-
-    fetch('/api/countries').then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(data => {
-        countriesData = Array.isArray(data) ? data : [];
-        const cs = document.querySelector('#countryDropdown .dropdown-search');
-        if(cs) { cs.disabled = false; cs.placeholder = '{{ __("Rechercher un pays…") }}'; }
-        initSearchableDropdown('countryDropdown', countriesData, country => {
-            document.getElementById('countryNameInput').value = country.name;
-            const cd = document.getElementById('countryDropdown'); const cl = document.getElementById('countryDropdownList');
-            if(cl) cl.style.display = 'none'; if(cd) cd.classList.remove('dropdown-open');
-            resetCityDropdown(); loadCitiesForCountry(country);
-        }, item => item.name, 'countryNameInput', 'countryDropdownList');
-        initSearchableDropdown('cityDropdown', [], city => { document.getElementById('cityNameInput').value = city; }, item => item, 'cityNameInput', 'cityDropdownList');
-        const oldCountry = document.getElementById('countryNameInput').value;
-        if(oldCountry) { const c = countriesData.find(c => c.name === oldCountry); if(c) loadCitiesForCountry(c); }
-    }).catch(() => {
-        const cs = document.querySelector('#countryDropdown .dropdown-search');
-        if(cs) { cs.disabled = false; cs.placeholder = '{{ __("Erreur de chargement — réessayez") }}'; }
+    document.getElementById('btnStep1').addEventListener('click', () => {
+        const val = typesInput.value;
+        if (!val || val === '[]' || val === 'null') return;
+        showStep(2);
     });
 });
 </script>

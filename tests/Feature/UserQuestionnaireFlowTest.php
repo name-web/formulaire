@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Question;
 use Database\Seeders\QuestionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class UserQuestionnaireFlowTest extends TestCase
@@ -16,29 +15,6 @@ class UserQuestionnaireFlowTest extends TestCase
     {
         parent::setUp();
         $this->seed(QuestionSeeder::class);
-    }
-
-    private function seedCountriesCache(): void
-    {
-        Http::fake([
-            'countriesnow.space/api/v0.1/countries' => Http::response([
-                'error' => false,
-                'data' => [
-                    [
-                        'iso2' => 'CI',
-                        'iso3' => 'CIV',
-                        'country' => "Côte d'Ivoire",
-                        'cities' => ['Abidjan', 'Bouaké', 'Yamoussoukro'],
-                    ],
-                    [
-                        'iso2' => 'FR',
-                        'iso3' => 'FRA',
-                        'country' => 'France',
-                        'cities' => ['Paris', 'Marseille', 'Lyon'],
-                    ],
-                ],
-            ]),
-        ]);
     }
 
     public function test_index_page_loads(): void
@@ -56,36 +32,22 @@ class UserQuestionnaireFlowTest extends TestCase
 
     public function test_start_creates_session_and_redirects_to_wizard(): void
     {
-        $this->seedCountriesCache();
-
         $response = $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'email' => 'jean@test.com',
             'phone' => '+22501020304',
-            'whatsapp' => '',
-            'company_name' => '',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ]);
 
         $response->assertRedirect(route('questionnaire.wizard'));
-        $this->assertDatabaseHas('clients', ['email' => 'jean@test.com']);
+        $this->assertDatabaseHas('clients', ['name' => 'Jean Dupont']);
         $this->assertDatabaseHas('projects', ['status' => 'draft']);
     }
 
     public function test_wizard_loads_after_start(): void
     {
-        $this->seedCountriesCache();
-
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'email' => 'jean@test.com',
             'phone' => '+22501020304',
-            'whatsapp' => '',
-            'company_name' => '',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -93,37 +55,11 @@ class UserQuestionnaireFlowTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_step1_loads(): void
-    {
-        $this->seedCountriesCache();
-
-        $this->post('/questionnaire/start', [
-            'name' => 'Jean Dupont',
-            'email' => 'jean@test.com',
-            'phone' => '+22501020304',
-            'whatsapp' => '',
-            'company_name' => '',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
-            'project_types' => ['site_vitrine'],
-        ]);
-
-        $response = $this->get('/questionnaire/step/1');
-        $response->assertStatus(200);
-    }
-
     public function test_wizard_submit_answers(): void
     {
-        $this->seedCountriesCache();
-
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'email' => 'jean@test.com',
             'phone' => '+22501020304',
-            'whatsapp' => '',
-            'company_name' => '',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -156,16 +92,9 @@ class UserQuestionnaireFlowTest extends TestCase
 
     public function test_summary_loads(): void
     {
-        $this->seedCountriesCache();
-
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'email' => 'jean@test.com',
             'phone' => '+22501020304',
-            'whatsapp' => '',
-            'company_name' => '',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -175,17 +104,10 @@ class UserQuestionnaireFlowTest extends TestCase
 
     public function test_full_flow_start_to_thankyou(): void
     {
-        $this->seedCountriesCache();
-
         // Start
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'email' => 'jean@test.com',
             'phone' => '+22501020304',
-            'whatsapp' => '',
-            'company_name' => '',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ]);
 

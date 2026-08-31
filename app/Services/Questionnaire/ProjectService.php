@@ -15,24 +15,22 @@ class ProjectService
         $types = is_array($projectTypes) ? $projectTypes : [$projectTypes];
 
         return DB::transaction(function () use ($clientData, $types) {
-            $email = trim($clientData['email'] ?? '');
+            $phone = trim($clientData['phone'] ?? '');
+            $email = ($phone ? preg_replace('/[^0-9]/', '', $phone) : 'noemail').'@dominium.tech';
 
             $client = Client::where('email', $email)->first();
 
             if ($client) {
                 $client->update(array_filter([
                     'name' => $clientData['name'] ?? null,
-                    'company_name' => $clientData['company_name'] ?? null,
                     'phone' => $clientData['phone'] ?? null,
-                    'whatsapp' => $clientData['whatsapp'] ?? null,
-                    'city' => $clientData['city'] ?? null,
-                    'country' => $clientData['country'] ?? null,
                 ], fn ($v) => $v !== null));
             } else {
-                $client = Client::create(array_merge(
-                    ['email' => $email],
-                    array_filter($clientData, fn ($v) => $v !== null)
-                ));
+                $client = Client::create([
+                    'name' => $clientData['name'] ?? '',
+                    'email' => $email,
+                    'phone' => $clientData['phone'] ?? '',
+                ]);
             }
 
             return Project::create([

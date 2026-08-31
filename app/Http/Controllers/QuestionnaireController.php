@@ -74,8 +74,6 @@ class QuestionnaireController extends Controller
             $project->update(['description' => $validated['other_description']]);
         }
 
-        // Q7 is answered in the wizard, not pre-saved here
-
         session([
             'client_id' => $project->client_id,
             'project_id' => $project->id,

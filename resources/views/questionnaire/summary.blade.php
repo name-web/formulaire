@@ -75,16 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="sidebar-label">{{ __('VOTRE PROGRESSION') }}</div>
 
         <nav class="step-list">
-            {{-- Questions du questionnaire --}}
-            @if(!empty($summary['questions']))
-                @foreach($summary['questions'] as $item)
-                    @php $q = $item['question']; @endphp
-                    <div class="step-item done">
-                        <div class="step-dot done"><i class="fa-solid fa-check" style="font-size:11px;"></i></div>
-                        <span class="step-label">{{ $q->title }}</span>
-                    </div>
-                @endforeach
-            @endif
+            <div class="step-item done">
+                <div class="step-dot done"><i class="fa-solid fa-check" style="font-size:11px;"></i></div>
+                <span class="step-label">{{ __('Type de projet') }}</span>
+            </div>
+            <div class="step-item done">
+                <div class="step-dot done"><i class="fa-solid fa-check" style="font-size:11px;"></i></div>
+                <span class="step-label">{{ __('Vos informations') }}</span>
+            </div>
+            <div class="step-item done">
+                <div class="step-dot done"><i class="fa-solid fa-check" style="font-size:11px;"></i></div>
+                <span class="step-label">{{ __('Vos réponses') }}</span>
+            </div>
             <div class="step-item active">
                 <div class="step-dot active"><i class="fa-solid fa-clipboard-check" style="font-size:10px;"></i></div>
                 <span class="step-label">{{ __('Récapitulatif') }}</span>
@@ -157,21 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div style="font-size:14px;color:var(--text-secondary);line-height:1.9;">
                         <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Nom :') }}</strong> {{ $summary['client']->name ?? '—' }}</p>
-                        <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Email :') }}</strong> {{ $summary['client']->email ?? '—' }}</p>
                         @if(!empty($summary['client']->phone))
                             <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Téléphone :') }}</strong> {{ $summary['client']->phone }}</p>
-                        @endif
-                        @if(!empty($summary['client']->company_name))
-                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Société :') }}</strong> {{ $summary['client']->company_name }}</p>
-                        @endif
-                        @if(!empty($summary['client']->whatsapp))
-                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('WhatsApp :') }}</strong> {{ $summary['client']->whatsapp }}</p>
-                        @endif
-                        @if(!empty($summary['client']->city))
-                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Ville :') }}</strong> {{ $summary['client']->city }}</p>
-                        @endif
-                        @if(!empty($summary['client']->country))
-                            <p><strong style="color:rgba(255,255,255,0.85);">{{ __('Pays :') }}</strong> {{ $summary['client']->country }}</p>
                         @endif
                     </div>
                 </div>
@@ -230,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="card-bottom anim-up d5">
-                <a href="{{ route('questionnaire.step', 1) }}?edit=1" class="btn-back" style="text-decoration:none;">
+                <a href="{{ route('questionnaire.wizard') }}" class="btn-back" style="text-decoration:none;">
                     <i class="fa-solid fa-arrow-left"></i> {{ __('Modifier') }}
                 </a>
                 <div style="display:inline-flex;">

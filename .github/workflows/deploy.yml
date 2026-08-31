@@ -1,4 +1,4 @@
-name: Test SSH cPanel
+name: Deploy Laravel to cPanel
 
 on:
   push:
@@ -6,17 +6,10 @@ on:
       - kamal
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test SSH ports
+      - name: Trigger cPanel deployment
         run: |
-          echo "Testing port 22..."
-          timeout 5 bash -c '</dev/tcp/web51.lws-hosting.com/22' && echo "PORT 22 OPEN" || echo "PORT 22 CLOSED"
-
-          echo "Testing port 2222..."
-          timeout 5 bash -c '</dev/tcp/web51.lws-hosting.com/2222' && echo "PORT 2222 OPEN" || echo "PORT 2222 CLOSED"
-
-          echo "Testing port 2200..."
-          timeout 5 bash -c '</dev/tcp/web51.lws-hosting.com/2200' && echo "PORT 2200 OPEN" || echo "PORT 2200 CLOSED"
+          curl -fsS -X POST "https://centremedicaldescites.com/cpanel-deploy-webhook"

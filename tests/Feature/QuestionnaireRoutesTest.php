@@ -8,39 +8,11 @@ use App\Models\Project;
 use App\Models\Question;
 use App\Models\QuestionOption;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class QuestionnaireRoutesTest extends TestCase
 {
     use RefreshDatabase;
-
-    /**
-     * Fake the CountriesNow API so tests can submit country/city
-     * without hitting the real external API.
-     */
-    private function seedCountriesCache(): void
-    {
-        Http::fake([
-            'countriesnow.space/api/v0.1/countries' => Http::response([
-                'error' => false,
-                'data' => [
-                    [
-                        'iso2' => 'CI',
-                        'iso3' => 'CIV',
-                        'country' => "Côte d'Ivoire",
-                        'cities' => ['Abidjan', 'Bouaké', 'Yamoussoukro'],
-                    ],
-                    [
-                        'iso2' => 'FR',
-                        'iso3' => 'FRA',
-                        'country' => 'France',
-                        'cities' => ['Paris', 'Marseille', 'Lyon'],
-                    ],
-                ],
-            ]),
-        ]);
-    }
 
     public function test_questionnaire_index_page_loads(): void
     {
@@ -51,14 +23,9 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_start_creates_client_and_project(): void
     {
-        $this->seedCountriesCache();
-
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
             'phone' => '+225 07070707',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -66,7 +33,7 @@ class QuestionnaireRoutesTest extends TestCase
 
         $this->assertDatabaseHas('clients', [
             'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
+            'phone' => '+225 07070707',
         ]);
 
         $this->assertDatabaseHas('projects', [
@@ -80,14 +47,9 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_start_accepts_multiple_project_types(): void
     {
-        $this->seedCountriesCache();
-
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
             'phone' => '+225 07070707',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine', 'ecommerce', 'application_mobile'],
         ]);
 
@@ -99,14 +61,9 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_project_type_site_vitrine_stored_correctly(): void
     {
-        $this->seedCountriesCache();
-
         $this->post(route('questionnaire.start'), [
             'name' => 'Test Vitrine',
-            'email' => 'vitrine@test.com',
             'phone' => '+22501020304',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -117,14 +74,9 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_project_type_ecommerce_stored_correctly(): void
     {
-        $this->seedCountriesCache();
-
         $this->post(route('questionnaire.start'), [
             'name' => 'Test E-commerce',
-            'email' => 'ecom@test.com',
             'phone' => '+22501020304',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['ecommerce'],
         ]);
 
@@ -135,14 +87,9 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_project_type_application_mobile_stored_correctly(): void
     {
-        $this->seedCountriesCache();
-
         $this->post(route('questionnaire.start'), [
             'name' => 'Test Mobile',
-            'email' => 'mobile@test.com',
             'phone' => '+22501020304',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['application_mobile'],
         ]);
 
@@ -153,14 +100,9 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_project_type_logiciel_stored_correctly(): void
     {
-        $this->seedCountriesCache();
-
         $this->post(route('questionnaire.start'), [
             'name' => 'Test Logiciel',
-            'email' => 'logiciel@test.com',
             'phone' => '+22501020304',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['logiciel'],
         ]);
 
@@ -171,34 +113,22 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_project_type_autre_stored_correctly(): void
     {
-        $this->seedCountriesCache();
-
         $this->post(route('questionnaire.start'), [
             'name' => 'Test Autre',
-            'email' => 'autre@test.com',
             'phone' => '+22501020304',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['autre'],
-            'other_description' => 'Un projet sur mesure',
         ]);
 
         $project = Project::first();
         $this->assertEquals(['autre'], $project->project_type);
         $this->assertEquals('Autre', $project->type_labels);
-        $this->assertEquals('Un projet sur mesure', $project->description);
     }
 
     public function test_start_requires_at_least_one_project_type(): void
     {
-        $this->seedCountriesCache();
-
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
             'phone' => '+225 07070707',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => [],
         ]);
 
@@ -207,14 +137,9 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_start_rejects_invalid_project_type(): void
     {
-        $this->seedCountriesCache();
-
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
             'phone' => '+225 07070707',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['invalid_type'],
         ]);
 
@@ -223,93 +148,24 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_start_requires_phone(): void
     {
-        $this->seedCountriesCache();
-
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ]);
 
         $response->assertSessionHasErrors(['phone']);
     }
 
-    public function test_start_requires_country_and_city(): void
-    {
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
-            'phone' => '+225 07070707',
-            'project_types' => ['site_vitrine'],
-        ]);
-
-        $response->assertSessionHasErrors(['country', 'city']);
-    }
-
-    public function test_start_rejects_city_from_different_country(): void
-    {
-        $this->seedCountriesCache();
-
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
-            'phone' => '+225 07070707',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Paris',
-            'project_types' => ['site_vitrine'],
-        ]);
-
-        $response->assertSessionHasErrors(['city']);
-    }
-
-    public function test_start_requires_other_description_when_autre_selected(): void
-    {
-        $this->seedCountriesCache();
-
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
-            'phone' => '+225 07070707',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
-            'project_types' => ['site_vitrine', 'autre'],
-        ]);
-
-        $response->assertSessionHasErrors(['other_description']);
-    }
-
-    public function test_start_accepts_other_description_when_autre_selected(): void
-    {
-        $this->seedCountriesCache();
-
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'email' => 'jean@example.com',
-            'phone' => '+225 07070707',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
-            'project_types' => ['site_vitrine', 'autre'],
-            'other_description' => 'Une application sur mesure',
-        ]);
-
-        $response->assertRedirect();
-
-        $project = Project::first();
-        $this->assertEquals(['site_vitrine', 'autre'], $project->project_type);
-    }
-
-    public function test_start_requires_name_and_email(): void
+    public function test_start_requires_name_and_phone(): void
     {
         $response = $this->post(route('questionnaire.start'), []);
 
-        $response->assertSessionHasErrors(['name', 'email', 'phone', 'country', 'city', 'project_types']);
+        $response->assertSessionHasErrors(['name', 'phone', 'project_types']);
     }
 
     public function test_step_page_loads_with_valid_session(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
 
         Question::create([
@@ -330,7 +186,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_step_page_loads_with_multiple_project_types(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine', 'ecommerce'], 'status' => 'draft']);
 
         Question::create([
@@ -365,7 +221,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_store_answer_for_text_question(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
 
         $question = Question::create([
@@ -395,7 +251,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_store_answer_for_select_question(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
 
         $question = Question::create([
@@ -430,7 +286,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_store_answer_for_multiselect_with_other(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
 
         $question = Question::create([
@@ -477,7 +333,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_previous_route_redirects_correctly(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
 
         $question1 = Question::create([
@@ -513,7 +369,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_summary_page_loads(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
 
         $question = Question::create([
@@ -540,7 +396,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_submit_changes_project_status(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
 
         $response = $this->withSession([
@@ -559,7 +415,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_submit_clears_session(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com']);
+        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
         $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
 
         $response = $this->withSession([
@@ -581,58 +437,5 @@ class QuestionnaireRoutesTest extends TestCase
         $response = $this->get(route('questionnaire.thankyou'));
 
         $response->assertStatus(200);
-    }
-
-    public function test_countries_api_returns_list(): void
-    {
-        Http::fake([
-            'countriesnow.space/api/v0.1/countries' => Http::response([
-                'error' => false,
-                'data' => [
-                    ['iso2' => 'CI', 'iso3' => 'CIV', 'country' => "Côte d'Ivoire", 'cities' => ['Abidjan']],
-                    ['iso2' => 'FR', 'iso3' => 'FRA', 'country' => 'France', 'cities' => ['Paris']],
-                ],
-            ]),
-        ]);
-
-        $response = $this->get(route('api.countries'));
-
-        $response->assertStatus(200);
-        $response->assertJsonCount(2);
-        $response->assertJsonFragment(['name' => "Côte d'Ivoire", 'code' => 'CI']);
-        $response->assertJsonFragment(['name' => 'France', 'code' => 'FR']);
-    }
-
-    public function test_cities_api_returns_cities_for_country(): void
-    {
-        Http::fake([
-            'countriesnow.space/api/v0.1/countries' => Http::response([
-                'error' => false,
-                'data' => [
-                    ['iso2' => 'CI', 'iso3' => 'CIV', 'country' => "Côte d'Ivoire", 'cities' => ['Abidjan', 'Bouaké']],
-                    ['iso2' => 'FR', 'iso3' => 'FRA', 'country' => 'France', 'cities' => ['Paris']],
-                ],
-            ]),
-        ]);
-
-        $response = $this->get(route('api.cities', 'CI'));
-
-        $response->assertStatus(200);
-        $response->assertJsonCount(2, 'cities');
-        $response->assertJsonFragment(['cities' => ['Abidjan', 'Bouaké']]);
-    }
-
-    public function test_cities_api_returns_404_for_unknown_country(): void
-    {
-        Http::fake([
-            'countriesnow.space/api/v0.1/countries' => Http::response([
-                'error' => false,
-                'data' => [],
-            ]),
-        ]);
-
-        $response = $this->get(route('api.cities', 'XX'));
-
-        $response->assertStatus(404);
     }
 }

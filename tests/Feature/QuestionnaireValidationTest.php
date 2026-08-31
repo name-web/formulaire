@@ -6,7 +6,6 @@ use App\Models\Client;
 use App\Models\Project;
 use App\Models\Question;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class QuestionnaireValidationTest extends TestCase
@@ -19,8 +18,6 @@ class QuestionnaireValidationTest extends TestCase
             'name' => 'Jean Test',
             'email' => 'jean@test.com',
             'phone' => '+225000000',
-            'country' => 'CI',
-            'city' => 'Abidjan',
         ]);
 
         return $client->projects()->create([
@@ -58,7 +55,6 @@ class QuestionnaireValidationTest extends TestCase
             'answers' => [$questionA->id => ['option_ids' => [$optionB->id]]],
         ])->assertRedirect(route('questionnaire.summary'));
 
-        // L'option appartient à une autre question : aucune réponse ne doit être enregistrée
         $this->assertDatabaseMissing('answers', [
             'project_id' => $project->id,
             'question_id' => $questionA->id,
@@ -68,7 +64,6 @@ class QuestionnaireValidationTest extends TestCase
             'question_option_id' => $optionB->id,
         ]);
 
-        // Sanity check : une option valide est bien acceptée
         $this->withSession([
             'project_id' => $project->id,
             'project_type' => ['site_vitrine'],
@@ -112,7 +107,6 @@ class QuestionnaireValidationTest extends TestCase
         $question = $this->createSelectQuestion(['is_required' => false]);
         $autre = $question->options()->create(['label' => 'Autre', 'value' => 'autre', 'sort_order' => 1, 'is_active' => true]);
 
-        // "Autre" sélectionné sans précision → la règle Closure doit être appliquée
         $this->withSession([
             'project_id' => $project->id,
             'project_type' => ['site_vitrine'],
@@ -121,7 +115,6 @@ class QuestionnaireValidationTest extends TestCase
             'other_value' => '',
         ])->assertSessionHasErrors('other_value');
 
-        // Avec précision → la réponse est enregistrée
         $this->withSession([
             'project_id' => $project->id,
             'project_type' => ['site_vitrine'],
@@ -144,7 +137,6 @@ class QuestionnaireValidationTest extends TestCase
         $question = $this->createSelectQuestion(['is_required' => false]);
         $question->options()->create(['label' => 'Choix 1', 'value' => 'choix_1', 'sort_order' => 1, 'is_active' => true]);
 
-        // L'option vide "" du menu déroulant ne doit pas provoquer d'erreur de validation
         $this->withSession([
             'project_id' => $project->id,
             'project_type' => ['site_vitrine'],
@@ -155,30 +147,18 @@ class QuestionnaireValidationTest extends TestCase
 
     public function test_start_is_rate_limited(): void
     {
-        Http::fake([
-            'countriesnow.space/*' => Http::response([
-                'error' => false,
-                'data' => [
-                    ['iso2' => 'CI', 'iso3' => 'CIV', 'country' => "Côte d'Ivoire", 'cities' => ['Abidjan']],
-                ],
-            ]),
-        ]);
-
         $payload = [
             'name' => 'Jean Rate',
-            'email' => 'rate1@test.com',
             'phone' => '+225000000',
-            'country' => "Côte d'Ivoire",
-            'city' => 'Abidjan',
             'project_types' => ['site_vitrine'],
         ];
 
         foreach (range(1, 5) as $i) {
-            $payload['email'] = "rate{$i}@test.com";
+            $payload['phone'] = "+22500000{$i}";
             $this->post(route('questionnaire.start'), $payload)->assertRedirect();
         }
 
-        $payload['email'] = 'rate6@test.com';
+        $payload['phone'] = '+225000006';
         $this->post(route('questionnaire.start'), $payload)->assertStatus(429);
     }
 }
