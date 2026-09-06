@@ -2,8 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Client;
-use App\Models\Project;
+use App\Models\PendingSubmission;
 use App\Models\Question;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -12,17 +11,20 @@ class QuestionnaireValidationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createProject(): Project
+    private function createPending(array $clientData = [], array $projectTypes = ['site_vitrine']): PendingSubmission
     {
-        $client = Client::create([
+        $defaults = [
             'name' => 'Jean Test',
             'email' => 'jean@test.com',
             'phone' => '+225000000',
-        ]);
+        ];
 
-        return $client->projects()->create([
-            'project_type' => ['site_vitrine'],
-            'status' => 'draft',
+        return PendingSubmission::create([
+            'client_data' => array_merge($defaults, $clientData),
+            'project_data' => ['project_types' => $projectTypes],
+            'answers_data' => [],
+            'files_data' => [],
+            'status' => 'collecting',
         ]);
     }
 
@@ -40,7 +42,7 @@ class QuestionnaireValidationTest extends TestCase
 
     public function test_wizard_ignores_options_from_other_questions(): void
     {
-        $project = $this->createProject();
+        $pending = $this->createPending();
 
         $questionA = $this->createSelectQuestion(['title' => 'Q A', 'sort_order' => 1]);
         $optionA = $questionA->options()->create(['label' => 'Opt A', 'value' => 'opt_a', 'sort_order' => 1, 'is_active' => true]);
@@ -49,37 +51,30 @@ class QuestionnaireValidationTest extends TestCase
         $optionB = $questionB->options()->create(['label' => 'Opt B', 'value' => 'opt_b', 'sort_order' => 1, 'is_active' => true]);
 
         $this->withSession([
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.wizard.submit'), [
             'answers' => [$questionA->id => ['option_ids' => [$optionB->id]]],
         ])->assertRedirect(route('questionnaire.summary'));
 
-        $this->assertDatabaseMissing('answers', [
-            'project_id' => $project->id,
-            'question_id' => $questionA->id,
-        ]);
-
-        $this->assertDatabaseMissing('answer_options', [
-            'question_option_id' => $optionB->id,
-        ]);
+        $pending->refresh();
+        $this->assertArrayNotHasKey((string) $questionA->id, $pending->answers_data ?? []);
 
         $this->withSession([
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.wizard.submit'), [
             'answers' => [$questionA->id => ['option_ids' => [$optionA->id]]],
         ])->assertRedirect(route('questionnaire.summary'));
 
-        $this->assertDatabaseHas('answers', [
-            'project_id' => $project->id,
-            'question_id' => $questionA->id,
-        ]);
+        $pending->refresh();
+        $this->assertArrayHasKey((string) $questionA->id, $pending->answers_data);
+        $this->assertEquals([$optionA->id], $pending->answers_data[$questionA->id]['option_ids']);
     }
 
     public function test_wizard_rejects_overlong_value(): void
     {
-        $project = $this->createProject();
+        $pending = $this->createPending();
 
         $question = Question::create([
             'title' => 'Question texte',
@@ -91,24 +86,25 @@ class QuestionnaireValidationTest extends TestCase
         ]);
 
         $this->withSession([
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.wizard.submit'), [
             'answers' => [$question->id => ['value' => str_repeat('a', 5001)]],
         ])->assertSessionHasErrors();
 
-        $this->assertDatabaseCount('answers', 0);
+        $pending->refresh();
+        $this->assertEmpty($pending->answers_data);
     }
 
     public function test_optional_select_with_autre_option_requires_precise_value(): void
     {
-        $project = $this->createProject();
+        $pending = $this->createPending();
 
         $question = $this->createSelectQuestion(['is_required' => false]);
         $autre = $question->options()->create(['label' => 'Autre', 'value' => 'autre', 'sort_order' => 1, 'is_active' => true]);
 
         $this->withSession([
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.step.store', 1), [
             'option_ids' => [$autre->id],
@@ -116,29 +112,27 @@ class QuestionnaireValidationTest extends TestCase
         ])->assertSessionHasErrors('other_value');
 
         $this->withSession([
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.step.store', 1), [
             'option_ids' => [$autre->id],
             'other_value' => 'Ma précision',
         ])->assertRedirect(route('questionnaire.summary'));
 
-        $this->assertDatabaseHas('answers', [
-            'project_id' => $project->id,
-            'question_id' => $question->id,
-            'other_value' => 'Ma précision',
-        ]);
+        $pending->refresh();
+        $this->assertArrayHasKey((string) $question->id, $pending->answers_data);
+        $this->assertEquals('Ma précision', $pending->answers_data[$question->id]['other_value']);
     }
 
     public function test_optional_select_accepts_empty_selection(): void
     {
-        $project = $this->createProject();
+        $pending = $this->createPending();
 
         $question = $this->createSelectQuestion(['is_required' => false]);
         $question->options()->create(['label' => 'Choix 1', 'value' => 'choix_1', 'sort_order' => 1, 'is_active' => true]);
 
         $this->withSession([
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.step.store', 1), [
             'option_ids' => [''],

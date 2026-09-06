@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\PendingSubmission;
 use App\Models\Question;
 use Database\Seeders\QuestionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -39,8 +40,9 @@ class UserQuestionnaireFlowTest extends TestCase
         ]);
 
         $response->assertRedirect(route('questionnaire.wizard'));
-        $this->assertDatabaseHas('clients', ['name' => 'Jean Dupont']);
-        $this->assertDatabaseHas('projects', ['status' => 'draft']);
+        $this->assertDatabaseHas('pending_submissions', [
+            'status' => 'collecting',
+        ]);
     }
 
     public function test_wizard_loads_after_start(): void
@@ -150,9 +152,8 @@ class UserQuestionnaireFlowTest extends TestCase
         // Thank you
         $this->get('/questionnaire/thankyou')->assertStatus(200);
 
-        // Project is now submitted
-        $this->assertDatabaseHas('projects', [
-            'status' => 'submitted',
-        ]);
+        // Pending submission is no longer in collecting status
+        $pending = PendingSubmission::first();
+        $this->assertNotEquals('collecting', $pending->status);
     }
 }

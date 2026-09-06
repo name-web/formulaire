@@ -2,9 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Answer;
-use App\Models\Client;
-use App\Models\Project;
+use App\Models\PendingSubmission;
 use App\Models\Question;
 use App\Models\QuestionOption;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,6 +12,23 @@ class QuestionnaireRoutesTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function createPending(array $clientData = [], array $projectTypes = ['site_vitrine']): PendingSubmission
+    {
+        $defaults = [
+            'name' => 'Test',
+            'email' => 'test@test.com',
+            'phone' => '+225000000',
+        ];
+
+        return PendingSubmission::create([
+            'client_data' => array_merge($defaults, $clientData),
+            'project_data' => ['project_types' => $projectTypes],
+            'answers_data' => [],
+            'files_data' => [],
+            'status' => 'collecting',
+        ]);
+    }
+
     public function test_questionnaire_index_page_loads(): void
     {
         $response = $this->get(route('questionnaire.index'));
@@ -21,7 +36,7 @@ class QuestionnaireRoutesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_start_creates_client_and_project(): void
+    public function test_start_creates_pending_submission(): void
     {
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
@@ -31,18 +46,14 @@ class QuestionnaireRoutesTest extends TestCase
 
         $response->assertRedirect();
 
-        $this->assertDatabaseHas('clients', [
-            'name' => 'Jean Dupont',
-            'phone' => '+225 07070707',
+        $this->assertDatabaseHas('pending_submissions', [
+            'status' => 'collecting',
         ]);
 
-        $this->assertDatabaseHas('projects', [
-            'status' => 'draft',
-        ]);
-
-        $project = Project::first();
-        $this->assertIsArray($project->project_type);
-        $this->assertEquals(['site_vitrine'], $project->project_type);
+        $pending = PendingSubmission::first();
+        $this->assertEquals('Jean Dupont', $pending->client_data['name']);
+        $this->assertEquals('+225 07070707', $pending->client_data['phone']);
+        $this->assertEquals(['site_vitrine'], $pending->project_data['project_types']);
     }
 
     public function test_start_accepts_multiple_project_types(): void
@@ -55,8 +66,8 @@ class QuestionnaireRoutesTest extends TestCase
 
         $response->assertRedirect();
 
-        $project = Project::first();
-        $this->assertEquals(['site_vitrine', 'ecommerce', 'application_mobile'], $project->project_type);
+        $pending = PendingSubmission::first();
+        $this->assertEquals(['site_vitrine', 'ecommerce', 'application_mobile'], $pending->project_data['project_types']);
     }
 
     public function test_project_type_site_vitrine_stored_correctly(): void
@@ -67,9 +78,8 @@ class QuestionnaireRoutesTest extends TestCase
             'project_types' => ['site_vitrine'],
         ]);
 
-        $project = Project::first();
-        $this->assertEquals(['site_vitrine'], $project->project_type);
-        $this->assertEquals('Site vitrine', $project->type_labels);
+        $pending = PendingSubmission::first();
+        $this->assertEquals(['site_vitrine'], $pending->project_data['project_types']);
     }
 
     public function test_project_type_ecommerce_stored_correctly(): void
@@ -80,9 +90,8 @@ class QuestionnaireRoutesTest extends TestCase
             'project_types' => ['ecommerce'],
         ]);
 
-        $project = Project::first();
-        $this->assertEquals(['ecommerce'], $project->project_type);
-        $this->assertEquals('Boutique en ligne', $project->type_labels);
+        $pending = PendingSubmission::first();
+        $this->assertEquals(['ecommerce'], $pending->project_data['project_types']);
     }
 
     public function test_project_type_application_mobile_stored_correctly(): void
@@ -93,9 +102,8 @@ class QuestionnaireRoutesTest extends TestCase
             'project_types' => ['application_mobile'],
         ]);
 
-        $project = Project::first();
-        $this->assertEquals(['application_mobile'], $project->project_type);
-        $this->assertEquals('Application mobile', $project->type_labels);
+        $pending = PendingSubmission::first();
+        $this->assertEquals(['application_mobile'], $pending->project_data['project_types']);
     }
 
     public function test_project_type_logiciel_stored_correctly(): void
@@ -106,9 +114,8 @@ class QuestionnaireRoutesTest extends TestCase
             'project_types' => ['logiciel'],
         ]);
 
-        $project = Project::first();
-        $this->assertEquals(['logiciel'], $project->project_type);
-        $this->assertEquals('Logiciel / ERP / CRM', $project->type_labels);
+        $pending = PendingSubmission::first();
+        $this->assertEquals(['logiciel'], $pending->project_data['project_types']);
     }
 
     public function test_start_requires_at_least_one_project_type(): void
@@ -152,8 +159,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_step_page_loads_with_valid_session(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
+        $pending = $this->createPending();
 
         Question::create([
             'title' => 'Quel type de projet ?',
@@ -163,8 +169,7 @@ class QuestionnaireRoutesTest extends TestCase
         ]);
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->get(route('questionnaire.step', 1));
 
@@ -173,8 +178,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_step_page_loads_with_multiple_project_types(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine', 'ecommerce'], 'status' => 'draft']);
+        $pending = $this->createPending(projectTypes: ['site_vitrine', 'ecommerce']);
 
         Question::create([
             'title' => 'Question pour site vitrine',
@@ -191,8 +195,7 @@ class QuestionnaireRoutesTest extends TestCase
         ]);
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine', 'ecommerce'],
         ])->get(route('questionnaire.step', 1));
 
@@ -208,8 +211,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_store_answer_for_text_question(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
+        $pending = $this->createPending();
 
         $question = Question::create([
             'title' => 'Décrivez votre projet',
@@ -220,8 +222,7 @@ class QuestionnaireRoutesTest extends TestCase
         ]);
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.step.store', 1), [
             'value' => 'Je veux un site vitrine',
@@ -229,17 +230,13 @@ class QuestionnaireRoutesTest extends TestCase
 
         $response->assertRedirect();
 
-        $this->assertDatabaseHas('answers', [
-            'project_id' => $project->id,
-            'question_id' => $question->id,
-            'text_value' => 'Je veux un site vitrine',
-        ]);
+        $pending->refresh();
+        $this->assertEquals('Je veux un site vitrine', $pending->answers_data[$question->id]['text_value']);
     }
 
     public function test_store_answer_for_select_question(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
+        $pending = $this->createPending();
 
         $question = Question::create([
             'title' => 'Quel type de projet ?',
@@ -257,8 +254,7 @@ class QuestionnaireRoutesTest extends TestCase
         ]);
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.step.store', 1), [
             'option_ids' => [$option->id],
@@ -266,15 +262,13 @@ class QuestionnaireRoutesTest extends TestCase
 
         $response->assertRedirect();
 
-        $this->assertDatabaseHas('answer_options', [
-            'question_option_id' => $option->id,
-        ]);
+        $pending->refresh();
+        $this->assertEquals([$option->id], $pending->answers_data[$question->id]['option_ids']);
     }
 
     public function test_store_answer_for_multiselect_with_other(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
+        $pending = $this->createPending();
 
         $question = Question::create([
             'title' => 'Quelles pages souhaitez-vous ?',
@@ -299,8 +293,7 @@ class QuestionnaireRoutesTest extends TestCase
         ]);
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.step.store', 1), [
             'option_ids' => [$option1->id, $optionOther->id],
@@ -309,19 +302,14 @@ class QuestionnaireRoutesTest extends TestCase
 
         $response->assertRedirect();
 
-        $answer = Answer::where('project_id', $project->id)
-            ->where('question_id', $question->id)
-            ->first();
-
-        $this->assertNotNull($answer);
-        $this->assertEquals('Page portfolio', $answer->other_value);
-        $this->assertCount(2, $answer->answerOptions);
+        $pending->refresh();
+        $this->assertCount(2, $pending->answers_data[$question->id]['option_ids']);
+        $this->assertEquals('Page portfolio', $pending->answers_data[$question->id]['other_value']);
     }
 
     public function test_previous_route_redirects_correctly(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
+        $pending = $this->createPending();
 
         $question1 = Question::create([
             'title' => 'Question 1',
@@ -339,15 +327,15 @@ class QuestionnaireRoutesTest extends TestCase
             'sort_order' => 2,
         ]);
 
-        Answer::create([
-            'project_id' => $project->id,
-            'question_id' => $question1->id,
-            'text_value' => 'Réponse 1',
-        ]);
+        $pending->update(['answers_data' => [
+            $question1->id => [
+                'question_id' => $question1->id,
+                'text_value' => 'Réponse 1',
+            ],
+        ]]);
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->get(route('questionnaire.previous'));
 
@@ -356,8 +344,7 @@ class QuestionnaireRoutesTest extends TestCase
 
     public function test_summary_page_loads(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
+        $pending = $this->createPending();
 
         $question = Question::create([
             'title' => 'Question 1',
@@ -366,56 +353,49 @@ class QuestionnaireRoutesTest extends TestCase
             'sort_order' => 1,
         ]);
 
-        Answer::create([
-            'project_id' => $project->id,
-            'question_id' => $question->id,
-            'text_value' => 'Réponse test',
-        ]);
+        $pending->update(['answers_data' => [
+            $question->id => [
+                'question_id' => $question->id,
+                'text_value' => 'Réponse test',
+            ],
+        ]]);
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->get(route('questionnaire.summary'));
 
         $response->assertStatus(200);
     }
 
-    public function test_submit_changes_project_status(): void
+    public function test_submit_changes_pending_status(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
+        $pending = $this->createPending();
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.submit'));
 
         $response->assertRedirect(route('questionnaire.thankyou'));
 
-        $this->assertDatabaseHas('projects', [
-            'id' => $project->id,
-            'status' => 'submitted',
-        ]);
+        $pending->refresh();
+        $this->assertNotEquals('collecting', $pending->status);
     }
 
     public function test_submit_clears_session(): void
     {
-        $client = Client::create(['name' => 'Test', 'email' => 'test@test.com', 'phone' => '+225000000']);
-        $project = $client->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'draft']);
+        $pending = $this->createPending();
 
         $response = $this->withSession([
-            'client_id' => $client->id,
-            'project_id' => $project->id,
+            'pending_submission_uuid' => $pending->uuid,
             'project_type' => ['site_vitrine'],
         ])->post(route('questionnaire.submit'));
 
         $response->assertRedirect(route('questionnaire.thankyou'));
 
         $session = $this->app['session.store'];
-        $this->assertNull($session->get('project_id'));
-        $this->assertNull($session->get('client_id'));
+        $this->assertNull($session->get('pending_submission_uuid'));
         $this->assertNull($session->get('project_type'));
     }
 

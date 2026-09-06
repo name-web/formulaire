@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\QuestionOption;
-use App\Services\Questionnaire\AnswerService;
+use App\Services\Questionnaire\PendingSubmissionService;
 use App\Services\Questionnaire\QuestionnaireService;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -29,24 +29,38 @@ class SubmitAnswerRequest extends FormRequest
 
     public function rules(): array
     {
-        $projectId = session('project_id');
-        $projectType = session('project_type');
         $step = (int) $this->route('step');
 
-        if (! $projectId || ! $projectType || $step < 1) {
+        if ($step < 1) {
             return [];
         }
 
+        $pendingUuid = session('pending_submission_uuid');
+
+        if ($pendingUuid) {
+            return $this->resolveRulesForPending($pendingUuid, $step);
+        }
+
+        return [];
+    }
+
+    private function resolveRulesForPending(string $pendingUuid, int $step): array
+    {
+        $pendingService = app(PendingSubmissionService::class);
         $questionnaireService = app(QuestionnaireService::class);
-        $visibleQuestions = $questionnaireService->getVisibleQuestions($projectId, $projectType);
+
+        $pending = $pendingService->find($pendingUuid);
+        if (! $pending) {
+            return [];
+        }
+
+        $visibleQuestions = $questionnaireService->getVisibleQuestionsForPending($pending);
+        $answeredIds = $pendingService->getAnsweredQuestionIds($pending);
         $isEditing = $this->query('edit') === '1';
 
         if ($isEditing) {
             $question = $visibleQuestions->get($step - 1);
         } else {
-            // Apply same skip logic as controller: skip already-answered questions
-            $answeredService = app(AnswerService::class);
-            $answeredIds = $answeredService->getAnsweredQuestionIds($projectId);
             $unansweredIndex = $step - 1;
             while ($unansweredIndex < $visibleQuestions->count()) {
                 $candidate = $visibleQuestions->get($unansweredIndex);
@@ -62,6 +76,11 @@ class SubmitAnswerRequest extends FormRequest
             return [];
         }
 
+        return $this->buildRulesForQuestion($question);
+    }
+
+    private function buildRulesForQuestion($question): array
+    {
         $rules = [];
         $presence = $question->is_required ? 'required' : 'nullable';
 

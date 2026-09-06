@@ -305,6 +305,7 @@ class QuestionnaireService
 
         $labels = $question->options()
             ->whereIn('id', $optionIds)
+            ->get()
             ->map(function ($option) use ($otherValue) {
                 if ($option->value === 'autre' && $otherValue) {
                     return 'Autre : '.$otherValue;
