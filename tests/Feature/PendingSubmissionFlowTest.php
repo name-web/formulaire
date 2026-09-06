@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\PendingSubmission;
 use App\Models\Question;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class PendingSubmissionFlowTest extends TestCase
@@ -119,6 +120,13 @@ class PendingSubmissionFlowTest extends TestCase
 
     public function test_submit_does_not_create_pending_submission_or_mark_sending(): void
     {
+        config(['external_submission.url' => 'https://external.example.com']);
+        config(['external_submission.token' => 'test-token']);
+
+        Http::fake([
+            'external.example.com/api/submissions' => Http::response(['status' => 'received'], 200),
+        ]);
+
         $pending = PendingSubmission::create([
             'client_data' => ['name' => 'Test', 'phone' => '123'],
             'project_data' => ['project_types' => ['site_vitrine']],
@@ -134,8 +142,8 @@ class PendingSubmissionFlowTest extends TestCase
         $response->assertRedirect('/questionnaire/thankyou');
 
         $pending->refresh();
-        $this->assertEquals('sending', $pending->status);
-        $this->assertNotNull($pending->sent_at);
+        $this->assertEquals('imported', $pending->status);
+        $this->assertNotNull($pending->imported_at);
     }
 
     public function test_submit_creates_no_client_or_project(): void
