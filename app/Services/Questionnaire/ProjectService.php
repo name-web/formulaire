@@ -6,41 +6,9 @@ use App\Models\Answer;
 use App\Models\Client;
 use App\Models\Project;
 use App\Models\Question;
-use Illuminate\Support\Facades\DB;
 
 class ProjectService
 {
-    public function createDraft(array $clientData, string|array $projectTypes): Project
-    {
-        $types = is_array($projectTypes) ? $projectTypes : [$projectTypes];
-
-        return DB::transaction(function () use ($clientData, $types) {
-            $phone = trim($clientData['phone'] ?? '');
-            $email = ($phone ? preg_replace('/[^0-9]/', '', $phone) : 'noemail').'@dominium.tech';
-
-            $client = Client::where('email', $email)->first();
-
-            if ($client) {
-                $client->update(array_filter([
-                    'name' => $clientData['name'] ?? null,
-                    'phone' => $clientData['phone'] ?? null,
-                ], fn ($v) => $v !== null));
-            } else {
-                $client = Client::create([
-                    'name' => $clientData['name'] ?? '',
-                    'email' => $email,
-                    'phone' => $clientData['phone'] ?? '',
-                ]);
-            }
-
-            return Project::create([
-                'client_id' => $client->id,
-                'project_type' => $types,
-                'status' => 'draft',
-            ]);
-        });
-    }
-
     public function find(int $projectId): ?Project
     {
         return Project::find($projectId);

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ImportService
 {
-    public function import(string $uuid, array $clientData, array $projectData, array $answersData, array $filesData): array
+    public function import(string $uuid, array $clientData, array $projectData, ?array $answersData = null, ?array $filesData = null): array
     {
         $pending = PendingSubmission::where('uuid', $uuid)->first();
 
@@ -119,8 +119,12 @@ class ImportService
         ]);
     }
 
-    private function createAnswers(Project $project, array $answersData): void
+    private function createAnswers(Project $project, ?array $answersData): void
     {
+        if (empty($answersData)) {
+            return;
+        }
+
         foreach ($answersData as $questionId => $answerData) {
             $questionId = (int) $questionId;
             $question = Question::find($questionId);
@@ -147,7 +151,7 @@ class ImportService
         }
     }
 
-    private function createProjectFiles(Project $project, PendingSubmission $pending, array $filesData): void
+    private function createProjectFiles(Project $project, PendingSubmission $pending, ?array $filesData): void
     {
         $pendingFiles = $pending->files_data ?? [];
 

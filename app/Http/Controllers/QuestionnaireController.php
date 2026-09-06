@@ -9,7 +9,6 @@ use App\Models\Question;
 use App\Services\ExternalSubmission\ExternalSubmissionService;
 use App\Services\Questionnaire\FileService;
 use App\Services\Questionnaire\PendingSubmissionService;
-use App\Services\Questionnaire\ProjectService;
 use App\Services\Questionnaire\QuestionnaireService;
 use App\Services\Questionnaire\QuestionService;
 use Illuminate\Http\RedirectResponse;
@@ -25,7 +24,6 @@ class QuestionnaireController extends Controller
         private PendingSubmissionService $pendingSubmissionService,
         private ExternalSubmissionService $externalSubmissionService,
         private FileService $fileService,
-        private ProjectService $projectService,
     ) {}
 
     public function index(): View

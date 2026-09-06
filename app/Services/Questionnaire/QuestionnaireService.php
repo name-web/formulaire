@@ -5,7 +5,6 @@ namespace App\Services\Questionnaire;
 use App\Models\Answer;
 use App\Models\AnswerOption;
 use App\Models\PendingSubmission;
-use App\Models\Project;
 use App\Models\Question;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -19,11 +18,6 @@ class QuestionnaireService
         private ProjectService $projectService,
         private PendingSubmissionService $pendingSubmissionService,
     ) {}
-
-    public function startSession(array $clientData, string|array $projectTypes): Project
-    {
-        return $this->projectService->createDraft($clientData, $projectTypes);
-    }
 
     public function getCurrentStep(int $projectId, string|array $projectType): ?Question
     {
