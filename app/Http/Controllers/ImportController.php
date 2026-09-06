@@ -15,7 +15,7 @@ class ImportController extends Controller
 
     public function import(Request $request): JsonResponse
     {
-        $secret = $request->header('X-External-Submission-Secret');
+        $secret = $request->header('X-Import-Secret');
         $expectedSecret = config('external_submission.import_secret');
 
         if (empty($expectedSecret) || $secret !== $expectedSecret) {

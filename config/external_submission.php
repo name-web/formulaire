@@ -28,7 +28,7 @@ return [
     |
     | Secret used to authenticate incoming import requests from the external
     | system. The external system must send this secret in the
-    | X-External-Submission-Secret header.
+    | X-Import-Secret header.
     |
     */
 

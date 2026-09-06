@@ -13,6 +13,7 @@ class PendingSubmission extends Model
         'project_data',
         'answers_data',
         'files_data',
+        'snapshot_data',
         'status',
         'failure_reason',
         'last_error',
@@ -25,6 +26,7 @@ class PendingSubmission extends Model
         'project_data' => 'array',
         'answers_data' => 'array',
         'files_data' => 'array',
+        'snapshot_data' => 'array',
         'sent_at' => 'datetime',
         'imported_at' => 'datetime',
     ];

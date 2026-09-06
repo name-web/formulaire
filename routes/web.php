@@ -11,6 +11,7 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionnaireController;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -41,7 +42,9 @@ Route::prefix('questionnaire')->name('questionnaire.')->group(function () {
     Route::get('/thankyou', [QuestionnaireController::class, 'thankyou'])->name('thankyou');
 });
 
-Route::post('/internal/import', [ImportController::class, 'import'])->name('internal.import');
+Route::post('/internal/import', [ImportController::class, 'import'])
+    ->withoutMiddleware(PreventRequestForgery::class)
+    ->name('internal.import');
 
 Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');

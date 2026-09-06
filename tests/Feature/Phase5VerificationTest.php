@@ -62,7 +62,7 @@ class Phase5VerificationTest extends TestCase
             'project_data' => ['project_types' => ['site_vitrine']],
             'answers_data' => [],
         ], [
-            'X-External-Submission-Secret' => 'test-secret-key',
+            'X-Import-Secret' => 'test-secret-key',
         ]);
 
         $response->assertOk();
@@ -176,7 +176,7 @@ class Phase5VerificationTest extends TestCase
             'client_data' => ['name' => 'Test'],
             'project_data' => ['project_types' => ['site_vitrine']],
         ], [
-            'X-External-Submission-Secret' => 'test-secret-key',
+            'X-Import-Secret' => 'test-secret-key',
         ]);
 
         $response->assertStatus(404);
@@ -201,7 +201,7 @@ class Phase5VerificationTest extends TestCase
             'client_data' => ['name' => 'Jean Dupont', 'phone' => '+22501020304'],
             'project_data' => ['project_types' => ['site_vitrine']],
         ];
-        $headers = ['X-External-Submission-Secret' => 'test-secret-key'];
+        $headers = ['X-Import-Secret' => 'test-secret-key'];
 
         $this->postJson('/internal/import', $data, $headers)->assertOk();
         $this->postJson('/internal/import', $data, $headers)->assertOk();
@@ -238,7 +238,7 @@ class Phase5VerificationTest extends TestCase
             'client_data' => ['name' => 'Test'],
             'project_data' => ['project_types' => ['site_vitrine']],
         ], [
-            'X-External-Submission-Secret' => 'test-secret-key',
+            'X-Import-Secret' => 'test-secret-key',
         ])->assertOk();
 
         $this->assertDatabaseCount('projects', 1);
@@ -300,7 +300,7 @@ class Phase5VerificationTest extends TestCase
             'project_data' => ['project_types' => ['site_vitrine']],
             'answers_data' => [],
         ], [
-            'X-External-Submission-Secret' => 'test-secret-key',
+            'X-Import-Secret' => 'test-secret-key',
         ])->assertOk();
 
         $project = Project::first();
@@ -342,7 +342,7 @@ class Phase5VerificationTest extends TestCase
             'client_data' => ['name' => 'Test'],
             'project_data' => ['project_types' => ['site_vitrine']],
         ], [
-            'X-External-Submission-Secret' => 'test-secret-key',
+            'X-Import-Secret' => 'test-secret-key',
         ])->assertStatus(422);
 
         Storage::disk('local')->assertExists($tempDir.'/'.$tempFile);
