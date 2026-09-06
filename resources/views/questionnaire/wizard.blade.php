@@ -181,11 +181,11 @@
                             @php
                                 $selectedId = old("answers.{$question->id}.option_ids.0");
                                 if($selectedId === null && $existingAnswer) {
-                                    $selectedId = $existingAnswer->answerOptions->first()?->question_option_id;
+                                    $selectedId = isset($existingAnswer->option_ids) ? ($existingAnswer->option_ids[0] ?? null) : ($existingAnswer->answerOptions->first()?->question_option_id ?? null);
                                 }
                                 $otherOption = $options->firstWhere('value', 'autre');
                                 $showOther = $selectedId && $otherOption && $selectedId == $otherOption->id;
-                                $isNsa = $selectedId && $existingAnswer && $existingAnswer->answerOptions->first()?->questionOption?->value === 'nsa';
+                                $isNsa = false;
                             @endphp
                             <div style="display:flex;flex-direction:column;gap:10px;max-width:500px;">
                                 <div class="input-icon-wrap">
@@ -215,12 +215,12 @@
                             @php
                                 $selectedValues = old("answers.{$question->id}.option_ids");
                                 if(!is_array($selectedValues) && $existingAnswer) {
-                                    $selectedValues = $existingAnswer->answerOptions->pluck('question_option_id')->toArray();
+                                    $selectedValues = isset($existingAnswer->option_ids) ? $existingAnswer->option_ids : ($existingAnswer->answerOptions->pluck('question_option_id')->toArray());
                                 }
                                 $selectedValues = $selectedValues ?? [];
                                 $otherOption = $options->firstWhere('value', 'autre');
                                 $showOther = $otherOption && in_array($otherOption->id, $selectedValues);
-                                $isNsa = in_array('nsa', collect($options->where('value', 'nsa'))->pluck('id')->toArray()) && count(array_intersect($selectedValues, $options->where('value', 'nsa')->pluck('id')->toArray())) > 0;
+                                $isNsa = false;
                             @endphp
                             <div style="display:flex;flex-direction:column;gap:10px;">
                                 <div class="option-grid" data-other-option="{{ $otherOption?->id }}">

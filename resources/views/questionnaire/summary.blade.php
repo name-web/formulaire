@@ -202,11 +202,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.06em;">{{ __('Fichiers joints') }}</span>
                     </div>
                     <div style="display:flex;flex-direction:column;gap:8px;">
-                        @foreach($files as $file)
+                        @foreach($files as $index => $file)
+                            @php
+                                $fileName = is_array($file) ? ($file['original_name'] ?? '') : ($file->original_name ?? '');
+                                $fileSize = is_array($file) ? ($file['size'] ?? 0) : ($file->size ?? 0);
+                            @endphp
                             <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.05);font-size:13px;min-width:0;">
                                 <i class="fa-solid fa-file" style="color:var(--accent-light);flex-shrink:0;"></i>
-                                <span style="color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">{{ $file->original_name }}</span>
-                                <span style="margin-left:auto;color:var(--text-muted);font-size:11px;flex-shrink:0;">{{ round($file->size / 1024) }} KB</span>
+                                <span style="color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">{{ $fileName }}</span>
+                                <span style="margin-left:auto;color:var(--text-muted);font-size:11px;flex-shrink:0;">{{ round($fileSize / 1024) }} KB</span>
                             </div>
                         @endforeach
                     </div>

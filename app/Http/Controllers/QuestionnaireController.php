@@ -4,19 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StartQuestionnaireRequest;
 use App\Http\Requests\SubmitAnswerRequest;
-use App\Models\Answer;
-use App\Models\Project;
-use App\Models\ProjectFile;
+use App\Models\PendingSubmission;
 use App\Models\Question;
-use App\Services\Questionnaire\AnswerService;
 use App\Services\Questionnaire\FileService;
+use App\Services\Questionnaire\PendingSubmissionService;
 use App\Services\Questionnaire\ProjectService;
 use App\Services\Questionnaire\QuestionnaireService;
 use App\Services\Questionnaire\QuestionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class QuestionnaireController extends Controller
@@ -24,7 +21,7 @@ class QuestionnaireController extends Controller
     public function __construct(
         private QuestionnaireService $questionnaireService,
         private QuestionService $questionService,
-        private AnswerService $answerService,
+        private PendingSubmissionService $pendingSubmissionService,
         private FileService $fileService,
         private ProjectService $projectService,
     ) {}
@@ -51,8 +48,6 @@ class QuestionnaireController extends Controller
             return $old;
         }
 
-        // Le home ne collecte que les coordonnées du client : on présélectionne
-        // tous les types réels.
         return array_keys(config('project_types.types'));
     }
 
@@ -65,15 +60,14 @@ class QuestionnaireController extends Controller
             ->except(['project_types'])
             ->toArray();
 
-        $project = $this->questionnaireService->startSession(
+        $pending = $this->pendingSubmissionService->createDraft(
             $clientData,
             $projectTypes
         );
 
         session([
-            'client_id' => $project->client_id,
-            'project_id' => $project->id,
-            'project_type' => $project->project_type,
+            'pending_submission_uuid' => $pending->uuid,
+            'project_type' => $pending->project_data['project_types'],
         ]);
 
         return redirect()->route('questionnaire.wizard');
@@ -81,31 +75,22 @@ class QuestionnaireController extends Controller
 
     public function wizard(): View
     {
-        $projectId = session('project_id');
-        $projectType = session('project_type');
-        abort_unless($projectId && $projectType, 404);
+        $pending = $this->resolvePendingSubmission();
 
-        $project = $this->projectService->find($projectId);
-        abort_unless($project, 404);
-
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $project->project_type ?? $projectType);
-        $answeredAnswers = Answer::where('project_id', $projectId)
-            ->with('answerOptions')
-            ->get()
-            ->keyBy('question_id');
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestionsForPending($pending);
+        $answers = $this->pendingSubmissionService->getAnswersCollection($pending);
 
         $steps = $this->buildSteps($visibleQuestions);
 
         return view('questionnaire.wizard', [
-            'project' => $project,
+            'pending' => $pending,
             'steps' => $steps,
-            'answers' => $answeredAnswers,
+            'answers' => $answers,
         ]);
     }
 
     private function buildSteps(Collection $questions): Collection
     {
-        // Each question becomes its own wizard step (one question per page)
         return $questions
             ->sortBy('sort_order')
             ->values()
@@ -119,9 +104,7 @@ class QuestionnaireController extends Controller
 
     public function submitWizard(Request $request): RedirectResponse
     {
-        $projectId = session('project_id');
-        $projectType = session('project_type');
-        abort_unless($projectId && $projectType, 404);
+        $pending = $this->resolvePendingSubmission();
 
         $answers = collect($request->input('answers', []))
             ->map(function ($data) {
@@ -147,68 +130,59 @@ class QuestionnaireController extends Controller
             'answers.*.option_ids.*' => ['integer'],
         ]);
 
-        DB::transaction(function () use ($request, $projectId, $answers) {
-            foreach ($answers as $questionId => $data) {
-                $questionId = (int) $questionId;
-                $question = Question::find($questionId);
-                if (! $question) {
-                    continue;
-                }
-
-                $questionData = $data;
-
-                if ($question->type === 'file' && $request->hasFile("answers.{$questionId}.file")) {
-                    $request->validate([
-                        "answers.{$questionId}.file" => ['required', 'file', 'max:5120', 'mimes:png,jpg,jpeg,gif,pdf,svg,doc,docx,xls,xlsx,zip'],
-                    ]);
-                    $filePath = $this->fileService->storeAnswerFile(
-                        $request->file("answers.{$questionId}.file"),
-                        $projectId
-                    );
-                    $questionData['file_path'] = $filePath;
-                    unset($questionData['file']);
-                }
-
-                // Only keep option ids that actually belong to this question
-                if (isset($questionData['option_ids']) && is_array($questionData['option_ids'])) {
-                    $validOptionIds = $question->options()
-                        ->whereIn('id', $questionData['option_ids'])
-                        ->pluck('id')
-                        ->all();
-                    $questionData['option_ids'] = $validOptionIds;
-                }
-
-                $hasContent = false;
-                if ($question->type === 'file') {
-                    $hasContent = ! empty($questionData['file_path']);
-                } elseif ($question->type === 'multiselect' || $question->type === 'select') {
-                    $optionIds = $questionData['option_ids'] ?? [];
-                    $hasContent = ! empty($optionIds);
-                } else {
-                    $hasContent = ! empty($questionData['value']);
-                }
-
-                if ($hasContent) {
-                    $this->answerService->save($projectId, $questionId, $questionData);
-                    $this->syncProjectTypeFromAnswer($projectId, $question);
-                }
+        foreach ($answers as $questionId => $data) {
+            $questionId = (int) $questionId;
+            $question = Question::find($questionId);
+            if (! $question) {
+                continue;
             }
-        });
+
+            $questionData = $data;
+
+            if ($question->type === 'file' && $request->hasFile("answers.{$questionId}.file")) {
+                $request->validate([
+                    "answers.{$questionId}.file" => ['required', 'file', 'max:5120', 'mimes:png,jpg,jpeg,gif,pdf,svg,doc,docx,xls,xlsx,zip'],
+                ]);
+                $filePath = $this->pendingSubmissionService->storeAnswerFile(
+                    $pending,
+                    $request->file("answers.{$questionId}.file"),
+                    $questionId
+                );
+                $questionData['file_path'] = $filePath;
+                unset($questionData['file']);
+            }
+
+            if (isset($questionData['option_ids']) && is_array($questionData['option_ids'])) {
+                $validOptionIds = $question->options()
+                    ->whereIn('id', $questionData['option_ids'])
+                    ->pluck('id')
+                    ->all();
+                $questionData['option_ids'] = $validOptionIds;
+            }
+
+            $hasContent = false;
+            if ($question->type === 'file') {
+                $hasContent = ! empty($questionData['file_path']);
+            } elseif ($question->type === 'multiselect' || $question->type === 'select') {
+                $optionIds = $questionData['option_ids'] ?? [];
+                $hasContent = ! empty($optionIds);
+            } else {
+                $hasContent = ! empty($questionData['value']);
+            }
+
+            if ($hasContent) {
+                $this->pendingSubmissionService->saveAnswer($pending, $questionId, $questionData);
+            }
+        }
 
         return redirect()->route('questionnaire.summary');
     }
 
     public function show(int $step): View|RedirectResponse
     {
-        $projectId = session('project_id');
-        $projectType = session('project_type');
+        $pending = $this->resolvePendingSubmission();
 
-        abort_unless($projectId && $projectType, 404);
-
-        $project = $this->projectService->find($projectId);
-        abort_unless($project, 404);
-
-        $result = $this->resolveCurrentQuestion($projectId, $project, $step);
+        $result = $this->resolveCurrentQuestionForPending($pending, $step);
 
         if ($result instanceof RedirectResponse) {
             return $result;
@@ -216,8 +190,8 @@ class QuestionnaireController extends Controller
 
         ['question' => $currentQuestion, 'step' => $resolvedStep, 'isEditing' => $isEditing] = $result;
 
-        $existingAnswer = $this->answerService->getForQuestion($projectId, $currentQuestion->id);
-        $progress = $this->questionnaireService->getProgress($projectId, $project->project_type ?? $projectType);
+        $existingAnswer = $this->pendingSubmissionService->getAnswer($pending, $currentQuestion->id);
+        $progress = $this->questionnaireService->getProgressForPending($pending);
 
         return view('questionnaire.step', [
             'question' => $currentQuestion,
@@ -226,24 +200,18 @@ class QuestionnaireController extends Controller
             'step' => $resolvedStep,
             'totalSteps' => $progress['total'],
             'progress' => $progress,
-            'project' => $project,
-            'visibleQuestions' => $this->questionnaireService->getVisibleQuestions($projectId, $project->project_type ?? $projectType),
-            'answeredIds' => $this->answerService->getAnsweredQuestionIds($projectId),
+            'pending' => $pending,
+            'visibleQuestions' => $this->questionnaireService->getVisibleQuestionsForPending($pending),
+            'answeredIds' => $this->pendingSubmissionService->getAnsweredQuestionIds($pending),
             'isEditing' => $isEditing,
         ]);
     }
 
     public function store(SubmitAnswerRequest $request, int $step): RedirectResponse
     {
-        $projectId = session('project_id');
-        $projectType = session('project_type');
+        $pending = $this->resolvePendingSubmission();
 
-        abort_unless($projectId && $projectType, 404);
-
-        $project = $this->projectService->find($projectId);
-        $effectiveType = $project->project_type ?? $projectType;
-
-        $result = $this->resolveCurrentQuestion($projectId, $project, $step);
+        $result = $this->resolveCurrentQuestionForPending($pending, $step);
 
         if ($result instanceof RedirectResponse) {
             return $result;
@@ -254,21 +222,23 @@ class QuestionnaireController extends Controller
         $data = $request->validated();
 
         if ($currentQuestion->type === 'file' && $request->hasFile('file')) {
-            $filePath = $this->fileService->storeAnswerFile($request->file('file'), $projectId);
+            $filePath = $this->pendingSubmissionService->storeAnswerFile(
+                $pending,
+                $request->file('file'),
+                $currentQuestion->id
+            );
             $data['file_path'] = $filePath;
             unset($data['file']);
         }
 
-        $this->answerService->save($projectId, $currentQuestion->id, $data);
-
-        $this->syncProjectTypeFromAnswer($projectId, $currentQuestion);
+        $this->pendingSubmissionService->saveAnswer($pending, $currentQuestion->id, $data);
 
         if ($isEditing) {
             return redirect()->route('questionnaire.summary');
         }
 
         $nextStep = $resolvedStep + 1;
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $effectiveType);
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestionsForPending($pending);
 
         if ($nextStep > $visibleQuestions->count()) {
             return redirect()->route('questionnaire.summary');
@@ -277,11 +247,10 @@ class QuestionnaireController extends Controller
         return redirect()->route('questionnaire.step', $nextStep);
     }
 
-    private function resolveCurrentQuestion(int $projectId, Project $project, int $step): array|RedirectResponse
+    private function resolveCurrentQuestionForPending(PendingSubmission $pending, int $step): array|RedirectResponse
     {
-        $effectiveType = $project->project_type ?? session('project_type');
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $effectiveType);
-        $answeredIds = $this->answerService->getAnsweredQuestionIds($projectId);
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestionsForPending($pending);
+        $answeredIds = $this->pendingSubmissionService->getAnsweredQuestionIds($pending);
         $isEditing = request()->query('edit') === '1';
 
         if ($isEditing) {
@@ -313,21 +282,15 @@ class QuestionnaireController extends Controller
 
     public function previous(): RedirectResponse
     {
-        $projectId = session('project_id');
-        $projectType = session('project_type');
+        $pending = $this->resolvePendingSubmission();
 
-        abort_unless($projectId && $projectType, 404);
-
-        $project = $this->projectService->find($projectId);
-        $effectiveType = $project->project_type ?? $projectType;
-
-        $previousQuestion = $this->questionnaireService->getPreviousQuestion($projectId, $effectiveType);
+        $previousQuestion = $this->questionnaireService->getPreviousQuestionForPending($pending);
 
         if (! $previousQuestion) {
             return redirect()->route('questionnaire.wizard');
         }
 
-        $visibleQuestions = $this->questionnaireService->getVisibleQuestions($projectId, $effectiveType);
+        $visibleQuestions = $this->questionnaireService->getVisibleQuestionsForPending($pending);
         $previousStep = ($visibleQuestions->search(fn ($q) => $q->id === $previousQuestion->id) ?? 0) + 1;
 
         return redirect()->route('questionnaire.step', $previousStep);
@@ -335,15 +298,11 @@ class QuestionnaireController extends Controller
 
     public function summary(): View
     {
-        $projectId = session('project_id');
-        $projectType = session('project_type');
+        $pending = $this->resolvePendingSubmission();
 
-        abort_unless($projectId && $projectType, 404);
-
-        $summary = $this->questionnaireService->getSummary($projectId);
-        $files = $this->fileService->getForProject($projectId);
-        $project = $summary['project'] ?? $this->projectService->find($projectId);
-        $progress = $this->questionnaireService->getProgress($projectId, $project->project_type ?? $projectType);
+        $summary = $this->questionnaireService->getSummaryForPending($pending);
+        $files = $this->pendingSubmissionService->getFiles($pending);
+        $progress = $this->questionnaireService->getProgressForPending($pending);
 
         return view('questionnaire.summary', [
             'summary' => $summary,
@@ -354,17 +313,15 @@ class QuestionnaireController extends Controller
 
     public function submit(): RedirectResponse
     {
-        $projectId = session('project_id');
+        $pending = $this->resolvePendingSubmission();
 
-        abort_unless($projectId, 404);
-
-        if ($this->projectService->isSubmitted($projectId)) {
+        if ($pending->status !== 'collecting') {
             return redirect()->route('questionnaire.thankyou');
         }
 
-        $this->questionnaireService->submitProject($projectId);
+        $this->pendingSubmissionService->markAsSending($pending);
 
-        session()->forget(['client_id', 'project_id', 'project_type']);
+        session()->forget(['pending_submission_uuid', 'project_type']);
 
         return redirect()->route('questionnaire.thankyou');
     }
@@ -376,61 +333,34 @@ class QuestionnaireController extends Controller
 
     public function storeFile(Request $request): RedirectResponse
     {
-        $projectId = session('project_id');
-
-        abort_unless($projectId, 404);
+        $pending = $this->resolvePendingSubmission();
 
         $request->validate([
             'file' => ['required', 'file', 'max:5120', 'mimes:png,jpg,jpeg,gif,pdf,svg,doc,docx,xls,xlsx,zip'],
         ]);
 
-        $this->fileService->storeUploadedFile($request->file('file'), $projectId);
+        $this->pendingSubmissionService->storeFile($pending, $request->file('file'));
 
         return redirect()->route('questionnaire.summary');
     }
 
-    public function destroyFile(int $fileId): RedirectResponse
+    public function destroyFile(int $fileIndex): RedirectResponse
     {
-        $projectId = session('project_id');
+        $pending = $this->resolvePendingSubmission();
 
-        abort_unless($projectId, 404);
-
-        $file = ProjectFile::find($fileId);
-        abort_unless($file && $file->project_id === $projectId, 404);
-
-        $this->fileService->delete($fileId);
+        $this->pendingSubmissionService->deleteFile($pending, $fileIndex);
 
         return redirect()->route('questionnaire.summary');
     }
 
-    private function syncProjectTypeFromAnswer(int $projectId, Question $question): void
+    private function resolvePendingSubmission(): PendingSubmission
     {
-        $projectTypeKeys = array_keys(config('project_types.types'));
+        $uuid = session('pending_submission_uuid');
+        abort_unless($uuid, 404);
 
-        $optionValues = $question->options()->pluck('value')->toArray();
+        $pending = $this->pendingSubmissionService->find($uuid);
+        abort_unless($pending, 404);
 
-        if (empty(array_intersect($optionValues, $projectTypeKeys))) {
-            return;
-        }
-
-        $answer = Answer::where('project_id', $projectId)
-            ->where('question_id', $question->id)
-            ->first();
-
-        if (! $answer) {
-            return;
-        }
-
-        $selectedValues = $answer->answerOptions
-            ->map(fn ($ao) => $ao->questionOption?->value)
-            ->filter()
-            ->toArray();
-
-        $projectTypes = array_values(array_intersect($selectedValues, $projectTypeKeys));
-
-        if (! empty($projectTypes)) {
-            Project::where('id', $projectId)->update(['project_type' => $projectTypes]);
-            session(['project_type' => $projectTypes]);
-        }
+        return $pending;
     }
 }

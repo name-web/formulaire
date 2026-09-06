@@ -169,7 +169,7 @@
                     @php
                         $selectedId = old('option_ids.0');
                         if($selectedId === null && $answer) {
-                            $selectedId = $answer->answerOptions->first()?->question_option_id;
+                            $selectedId = isset($answer->option_ids) ? ($answer->option_ids[0] ?? null) : ($answer->answerOptions->first()?->question_option_id ?? null);
                         }
                         $otherOption = $options->firstWhere('value', 'autre');
                         $showOther = $selectedId && $otherOption && $selectedId == $otherOption->id;
@@ -203,7 +203,7 @@
                     @php
                         $selectedValues = old('option_ids');
                         if(!is_array($selectedValues) && $answer) {
-                            $selectedValues = $answer->answerOptions->pluck('question_option_id')->toArray();
+                            $selectedValues = isset($answer->option_ids) ? $answer->option_ids : ($answer->answerOptions->pluck('question_option_id')->toArray());
                         }
                         $selectedValues = $selectedValues ?? [];
                         $otherOption = $options->firstWhere('value', 'autre');
