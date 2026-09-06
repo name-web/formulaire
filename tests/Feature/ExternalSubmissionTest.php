@@ -41,8 +41,8 @@ class ExternalSubmissionTest extends TestCase
         $this->assertTrue($result);
 
         $pending->refresh();
-        $this->assertEquals('imported', $pending->status);
-        $this->assertNotNull($pending->imported_at);
+        $this->assertEquals('sent', $pending->status);
+        $this->assertNotNull($pending->sent_at);
     }
 
     public function test_submission_fails_on_http_error(): void
@@ -219,12 +219,12 @@ class ExternalSubmissionTest extends TestCase
 
         $service->submit($pending);
         $pending->refresh();
-        $this->assertEquals('imported', $pending->status);
+        $this->assertEquals('sent', $pending->status);
 
         $pending->update(['status' => 'collecting']);
         $service->submit($pending);
         $pending->refresh();
-        $this->assertEquals('imported', $pending->status);
+        $this->assertEquals('sent', $pending->status);
 
         $this->assertDatabaseCount('pending_submissions', 1);
     }

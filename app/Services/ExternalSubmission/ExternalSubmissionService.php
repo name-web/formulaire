@@ -37,7 +37,7 @@ class ExternalSubmissionService
             $response = $this->client->sendSubmission($data, $files);
 
             if ($response->successful()) {
-                $this->pendingSubmissionService->markAsImported($pending);
+                $this->pendingSubmissionService->markAsSent($pending);
 
                 Log::info('External submission sent successfully.', [
                     'pending_uuid' => $pending->uuid,

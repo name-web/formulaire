@@ -142,8 +142,8 @@ class PendingSubmissionFlowTest extends TestCase
         $response->assertRedirect('/questionnaire/thankyou');
 
         $pending->refresh();
-        $this->assertEquals('imported', $pending->status);
-        $this->assertNotNull($pending->imported_at);
+        $this->assertEquals('sent', $pending->status);
+        $this->assertNotNull($pending->sent_at);
     }
 
     public function test_submit_creates_no_client_or_project(): void

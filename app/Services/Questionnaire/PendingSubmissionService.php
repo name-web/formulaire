@@ -148,6 +148,13 @@ class PendingSubmissionService
     {
         $pending->update([
             'status' => 'sending',
+        ]);
+    }
+
+    public function markAsSent(PendingSubmission $pending): void
+    {
+        $pending->update([
+            'status' => 'sent',
             'sent_at' => now(),
         ]);
     }
