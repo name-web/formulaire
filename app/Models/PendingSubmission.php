@@ -14,12 +14,10 @@ class PendingSubmission extends Model
         'answers_data',
         'files_data',
         'status',
-        'decision',
         'failure_reason',
         'last_error',
         'sent_at',
         'imported_at',
-        'expires_at',
     ];
 
     protected $casts = [
@@ -29,7 +27,6 @@ class PendingSubmission extends Model
         'files_data' => 'array',
         'sent_at' => 'datetime',
         'imported_at' => 'datetime',
-        'expires_at' => 'datetime',
     ];
 
     public static function boot(): void
@@ -38,7 +35,6 @@ class PendingSubmission extends Model
 
         static::creating(function (self $model) {
             $model->uuid = $model->uuid ?? Str::uuid();
-            $model->expires_at = $model->expires_at ?? now()->addHours(48);
         });
     }
 
@@ -67,26 +63,6 @@ class PendingSubmission extends Model
         return $this->status === 'imported';
     }
 
-    public function isExpired(): bool
-    {
-        return $this->status === 'expired';
-    }
-
-    public function isAccepted(): bool
-    {
-        return $this->decision === 'accepted';
-    }
-
-    public function isRejected(): bool
-    {
-        return $this->decision === 'rejected';
-    }
-
-    public function hasDecision(): bool
-    {
-        return $this->decision !== null;
-    }
-
     public function markAsSending(): void
     {
         $this->update(['status' => 'sending']);
@@ -113,21 +89,7 @@ class PendingSubmission extends Model
     {
         $this->update([
             'status' => 'imported',
-            'decision' => 'accepted',
             'imported_at' => now(),
         ]);
-    }
-
-    public function markAsRejected(?string $reason = null): void
-    {
-        $this->update([
-            'decision' => 'rejected',
-            'failure_reason' => $reason,
-        ]);
-    }
-
-    public function markAsExpired(): void
-    {
-        $this->update(['status' => 'expired']);
     }
 }
