@@ -30,7 +30,6 @@ class ProjectController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('client', function ($client) use ($search) {
                     $client->whereRaw('name LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
-                        ->orWhereRaw('email LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
                         ->orWhereRaw('company_name LIKE ? ESCAPE ?', ["%{$search}%", '\\']);
                 })->orWhereRaw('title LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
                     ->orWhereRaw('description LIKE ? ESCAPE ?', ["%{$search}%", '\\']);

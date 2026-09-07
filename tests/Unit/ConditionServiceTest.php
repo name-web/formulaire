@@ -25,7 +25,7 @@ class ConditionServiceTest extends TestCase
 
     public function test_question_without_conditions_is_always_visible(): void
     {
-        $project = Client::create(['name' => 'Test', 'email' => 'test@test.com'])
+        $project = Client::create(['name' => 'Test', 'phone' => '+22501020304'])
             ->projects()->create(['project_type' => 'site_vitrine', 'status' => 'draft']);
 
         $question = Question::create([
@@ -40,7 +40,7 @@ class ConditionServiceTest extends TestCase
 
     public function test_equals_condition_with_option_value(): void
     {
-        $project = Client::create(['name' => 'Test', 'email' => 'test@test.com'])
+        $project = Client::create(['name' => 'Test', 'phone' => '+22501020304'])
             ->projects()->create(['project_type' => 'site_vitrine', 'status' => 'draft']);
 
         $sourceQuestion = Question::create([
@@ -83,7 +83,7 @@ class ConditionServiceTest extends TestCase
 
     public function test_equals_condition_with_text_value(): void
     {
-        $project = Client::create(['name' => 'Test', 'email' => 'test@test.com'])
+        $project = Client::create(['name' => 'Test', 'phone' => '+22501020304'])
             ->projects()->create(['project_type' => 'site_vitrine', 'status' => 'draft']);
 
         $sourceQuestion = Question::create([
@@ -118,7 +118,7 @@ class ConditionServiceTest extends TestCase
 
     public function test_not_equals_condition(): void
     {
-        $project = Client::create(['name' => 'Test', 'email' => 'test@test.com'])
+        $project = Client::create(['name' => 'Test', 'phone' => '+22501020304'])
             ->projects()->create(['project_type' => 'site_vitrine', 'status' => 'draft']);
 
         $sourceQuestion = Question::create([
@@ -153,7 +153,7 @@ class ConditionServiceTest extends TestCase
 
     public function test_contains_condition(): void
     {
-        $project = Client::create(['name' => 'Test', 'email' => 'test@test.com'])
+        $project = Client::create(['name' => 'Test', 'phone' => '+22501020304'])
             ->projects()->create(['project_type' => 'site_vitrine', 'status' => 'draft']);
 
         $sourceQuestion = Question::create([
@@ -188,7 +188,7 @@ class ConditionServiceTest extends TestCase
 
     public function test_not_contains_condition(): void
     {
-        $project = Client::create(['name' => 'Test', 'email' => 'test@test.com'])
+        $project = Client::create(['name' => 'Test', 'phone' => '+22501020304'])
             ->projects()->create(['project_type' => 'site_vitrine', 'status' => 'draft']);
 
         $sourceQuestion = Question::create([
@@ -223,7 +223,7 @@ class ConditionServiceTest extends TestCase
 
     public function test_multiple_conditions_in_and(): void
     {
-        $project = Client::create(['name' => 'Test', 'email' => 'test@test.com'])
+        $project = Client::create(['name' => 'Test', 'phone' => '+22501020304'])
             ->projects()->create(['project_type' => 'site_vitrine', 'status' => 'draft']);
 
         $sourceQuestion1 = Question::create([
@@ -280,7 +280,7 @@ class ConditionServiceTest extends TestCase
 
     public function test_condition_fails_when_answer_missing(): void
     {
-        $project = Client::create(['name' => 'Test', 'email' => 'test@test.com'])
+        $project = Client::create(['name' => 'Test', 'phone' => '+22501020304'])
             ->projects()->create(['project_type' => 'site_vitrine', 'status' => 'draft']);
 
         $sourceQuestion = Question::create([

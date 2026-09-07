@@ -217,10 +217,7 @@
                                 <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Nom</div>
                                 <div style="color:var(--black);font-size:14px;font-weight:700;">{{ $project->client->name }}</div>
                             </div>
-                            <div>
-                                <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Email</div>
-                                <div style="color:var(--text-muted);font-size:14px;">{{ $project->client->email }}</div>
-                            </div>
+
                             @if($project->client->phone)
                                 <div>
                                     <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Téléphone</div>

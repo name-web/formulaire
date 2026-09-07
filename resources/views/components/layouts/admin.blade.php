@@ -238,7 +238,7 @@
         }
         .table-row:hover .client-avatar { transform: scale(1.08); background: var(--yellow); color: var(--black); }
         .client-name { font-size: 14px; font-weight: 800; }
-        .client-email { margin-top: 3px; color: #aaa; font-size: 12px; }
+
 
         .project { color: #333; font-size: 14px; font-weight: 600; }
         .date { color: #888; font-size: 13px; }
@@ -524,7 +524,7 @@
             .search-form > div { min-width: 0 !important; width: 100%; }
             .search-form > div:last-child { flex-direction: row; }
             .modal-content { margin: 16px; max-height: calc(100vh - 32px); overflow-y: auto; }
-            .client-name, .client-email, .project-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+            .client-name, .project-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
             .error-box { word-break: break-word; }
         }
         @media (max-width: 550px) {

@@ -18,7 +18,6 @@ class ClientController extends Controller
             $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('name LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
-                    ->orWhereRaw('email LIKE ? ESCAPE ?', ["%{$search}%", '\\'])
                     ->orWhereRaw('company_name LIKE ? ESCAPE ?', ["%{$search}%", '\\']);
             });
         }

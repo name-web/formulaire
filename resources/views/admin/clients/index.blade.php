@@ -17,7 +17,7 @@
             <form method="GET" class="search-form" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
                 <div style="flex:1;min-width:250px;">
                     <label class="admin-label">Recherche</label>
-                    <input type="text" name="search" class="admin-input" placeholder="Rechercher par nom, email, entreprise..." value="{{ request('search') }}">
+                    <input type="text" name="search" class="admin-input" placeholder="Rechercher par nom, entreprise..." value="{{ request('search') }}">
                 </div>
                 <div style="display:flex;gap:8px;">
                     <button type="submit" class="admin-btn btn-primary"><i class="fa-solid fa-search"></i> Rechercher</button>
@@ -46,9 +46,8 @@
                 </div>
             @else
                 <div class="table-wrap">
-                <div class="table-head" style="grid-template-columns:1.3fr 1.3fr 1fr 1fr .6fr .8fr 52px;">
+                <div class="table-head" style="grid-template-columns:1.3fr 1fr 1fr .6fr .8fr 52px;">
                     <div>Nom</div>
-                    <div>Email</div>
                     <div>Entreprise</div>
                     <div>Localisation</div>
                     <div>Projets</div>
@@ -57,14 +56,13 @@
                 </div>
 
                 @foreach($clients as $client)
-                    <div class="table-row" style="grid-template-columns:1.3fr 1.3fr 1fr 1fr .6fr .8fr 52px;cursor:pointer;" onclick="window.location='{{ route('admin.clients.show', $client) }}'">
+                    <div class="table-row" style="grid-template-columns:1.3fr 1fr 1fr .6fr .8fr 52px;cursor:pointer;" onclick="window.location='{{ route('admin.clients.show', $client) }}'">
                         <div class="client">
                             <div class="client-avatar">{{ strtoupper(substr($client->name, 0, 2)) }}</div>
                             <div>
                                 <div class="client-name">{{ $client->name }}</div>
                             </div>
                         </div>
-                        <div class="project">{{ $client->email }}</div>
                         <div class="project">{{ $client->company_name ?? '—' }}</div>
                         <div class="date">{{ $client->city }}{{ $client->city && $client->country ? ', ' : '' }}{{ $client->country }}</div>
                         <div><span class="admin-badge badge-in_progress">{{ $client->projects_count }}</span></div>

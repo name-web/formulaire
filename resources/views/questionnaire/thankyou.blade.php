@@ -24,14 +24,6 @@
 
             <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:44px;" class="anim-up d4">
                 <div style="padding:18px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:16px;text-align:left;">                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,183,3,0.12);display:flex;align-items:center;justify-content:center;font-size:17px;color:#ffb703;flex-shrink:0;">
-                            <i class="fa-solid fa-envelope"></i>
-                    </div>
-                    <div>
-                        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">{{ __('Email de confirmation') }}</div>
-                        <div style="font-size:13px;color:rgba(255,255,255,0.85);">{{ __('Un récapitulatif a été envoyé à votre adresse') }}</div>
-                    </div>
-                </div>
-                <div style="padding:18px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:16px;text-align:left;">                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,183,3,0.12);display:flex;align-items:center;justify-content:center;font-size:17px;color:#ffb703;flex-shrink:0;">
                             <i class="fa-solid fa-clock"></i>
                     </div>
                     <div>

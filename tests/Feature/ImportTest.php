@@ -247,7 +247,7 @@ class ImportTest extends TestCase
         $this->assertDatabaseCount('projects', 0);
     }
 
-    public function test_import_creates_client_with_correct_email(): void
+    public function test_import_creates_client_with_correct_phone(): void
     {
         $pending = PendingSubmission::create([
             'client_data' => ['name' => 'Jean Dupont', 'phone' => '+22501020304'],
@@ -267,7 +267,8 @@ class ImportTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('clients', [
-            'email' => '22501020304@dominium.tech',
+            'name' => 'Jean Dupont',
+            'phone' => '+22501020304',
         ]);
     }
 

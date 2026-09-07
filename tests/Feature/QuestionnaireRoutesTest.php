@@ -16,7 +16,6 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $defaults = [
             'name' => 'Test',
-            'email' => 'test@test.com',
             'phone' => '+225000000',
         ];
 

@@ -81,7 +81,6 @@
                             <div class="client-avatar">{{ strtoupper(substr($project->client->name ?? '?', 0, 2)) }}</div>
                             <div>
                                 <div class="client-name">{{ $project->client->name ?? '—' }}</div>
-                                <div class="client-email">{{ $project->client->email ?? '' }}</div>
                             </div>
                         </div>
                         <div class="project">{{ $project->type_labels ?: '—' }}</div>
@@ -120,7 +119,7 @@
                             <div class="activity-dot"></div>
                             <div>
                                 <div class="activity-title">{{ $client->name }}</div>
-                                <div class="activity-time">{{ $client->email }}</div>
+                                <div class="activity-time">{{ $client->phone }}</div>
                             </div>
                         </a>
                     @endforeach

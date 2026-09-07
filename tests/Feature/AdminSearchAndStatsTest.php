@@ -28,11 +28,11 @@ class AdminSearchAndStatsTest extends TestCase
     {
         $admin = $this->createAdmin();
 
-        $matching = Client::create(['name' => 'Jean Dupont', 'email' => 'jean@match.com']);
+        $matching = Client::create(['name' => 'Jean Dupont', 'phone' => '+22501020304']);
         $matching->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'submitted']);
 
-        // Client dont l'email matche la recherche mais sans projet soumis
-        Client::create(['name' => 'Autre Personne', 'email' => 'jean-autre@match.com']);
+        // Client dont le nom matche la recherche mais sans projet soumis
+        Client::create(['name' => 'Autre Personne', 'phone' => '+22509999999']);
 
         $response = $this->actingAs($admin)->get('/admin/clients?search=jean');
 
@@ -45,13 +45,13 @@ class AdminSearchAndStatsTest extends TestCase
     {
         $admin = $this->createAdmin();
 
-        Client::create(['name' => 'Client A', 'email' => 'clienta@test.com'])->projects()->create([
+        Client::create(['name' => 'Client A', 'phone' => '+22501111111'])->projects()->create([
             'title' => 'Site ecommerce',
             'project_type' => ['ecommerce'],
             'status' => 'draft',
         ]);
 
-        Client::create(['name' => 'Client B', 'email' => 'clientb@test.com'])->projects()->create([
+        Client::create(['name' => 'Client B', 'phone' => '+22502222222'])->projects()->create([
             'title' => 'Vitrine informatique',
             'project_type' => ['site_vitrine'],
             'status' => 'submitted',
@@ -87,9 +87,9 @@ class AdminSearchAndStatsTest extends TestCase
 
     public function test_projects_by_type_counts_each_project(): void
     {
-        Client::create(['name' => 'A', 'email' => 'a@test.com'])->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'submitted']);
-        Client::create(['name' => 'B', 'email' => 'b@test.com'])->projects()->create(['project_type' => ['site_vitrine', 'ecommerce'], 'status' => 'submitted']);
-        Client::create(['name' => 'C', 'email' => 'c@test.com'])->projects()->create(['project_type' => ['ecommerce'], 'status' => 'submitted']);
+        Client::create(['name' => 'A', 'phone' => '+22501111111'])->projects()->create(['project_type' => ['site_vitrine'], 'status' => 'submitted']);
+        Client::create(['name' => 'B', 'phone' => '+22502222222'])->projects()->create(['project_type' => ['site_vitrine', 'ecommerce'], 'status' => 'submitted']);
+        Client::create(['name' => 'C', 'phone' => '+22503333333'])->projects()->create(['project_type' => ['ecommerce'], 'status' => 'submitted']);
 
         $controller = new DashboardController;
         $method = new \ReflectionMethod($controller, 'getProjectsByType');

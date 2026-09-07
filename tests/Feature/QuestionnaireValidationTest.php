@@ -15,7 +15,6 @@ class QuestionnaireValidationTest extends TestCase
     {
         $defaults = [
             'name' => 'Jean Test',
-            'email' => 'jean@test.com',
             'phone' => '+225000000',
         ];
 
