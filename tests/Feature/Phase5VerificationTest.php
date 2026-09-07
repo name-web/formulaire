@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Client;
 use App\Models\PendingSubmission;
 use App\Models\Project;
 use App\Models\Question;
@@ -26,18 +27,11 @@ class Phase5VerificationTest extends TestCase
     }
 
     // ──────────────────────────────────────────────
-    // 1. Flux complet : soumission → import
+    // 1. Flux direct : submit crée tout immédiatement
     // ──────────────────────────────────────────────
 
-    public function test_full_flow_start_to_import_creates_correct_data(): void
+    public function test_full_flow_start_to_submit_creates_all_entities(): void
     {
-        config(['external_submission.url' => 'https://external.example.com']);
-        config(['external_submission.token' => 'test-token']);
-
-        Http::fake([
-            'external.example.com/api/submissions' => Http::response(['status' => 'received'], 200),
-        ]);
-
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
             'phone' => '+22501020304',
@@ -50,31 +44,19 @@ class Phase5VerificationTest extends TestCase
         $this->assertDatabaseCount('projects', 0);
 
         $this->post('/questionnaire/submit');
-        $pending->refresh();
-        $this->assertEquals('sent', $pending->status);
-
-        $this->assertDatabaseCount('clients', 0);
-        $this->assertDatabaseCount('projects', 0);
-
-        $response = $this->postJson('/internal/import', [
-            'submission_uuid' => $pending->uuid,
-            'client_data' => ['name' => 'Jean Dupont', 'phone' => '+22501020304'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-        ], [
-            'X-Import-Secret' => 'test-secret-key',
-        ]);
-
-        $response->assertOk();
-        $this->assertDatabaseHas('clients', ['name' => 'Jean Dupont']);
-        $this->assertDatabaseHas('projects', ['status' => 'submitted']);
 
         $pending->refresh();
         $this->assertEquals('imported', $pending->status);
+
+        $this->assertDatabaseHas('clients', ['name' => 'Jean Dupont']);
+        $this->assertDatabaseHas('projects', ['status' => 'submitted']);
+
+        $project = Project::first();
+        $this->assertNotNull($project->submitted_at);
     }
 
     // ──────────────────────────────────────────────
-    // 3. Aucun Client/Project avant l'import
+    // 2. Aucun Client/Project pendant la phase collecting
     // ──────────────────────────────────────────────
 
     public function test_no_client_or_project_during_collecting_phase(): void
@@ -100,7 +82,8 @@ class Phase5VerificationTest extends TestCase
     }
 
     // ──────────────────────────────────────────────
-    // 5. Gestion des erreurs
+    // 3. Gestion des erreurs ExternalSubmissionService
+    //    (reste intacte pour Ayoosi plus tard)
     // ──────────────────────────────────────────────
 
     public function test_external_system_unavailable_marks_as_failed(): void
@@ -150,6 +133,10 @@ class Phase5VerificationTest extends TestCase
         $this->assertEquals('failed', $pending->status);
     }
 
+    // ──────────────────────────────────────────────
+    // 4. Import endpoint (reste fonctionnel pour Ayoosi)
+    // ──────────────────────────────────────────────
+
     public function test_import_rejects_missing_secret(): void
     {
         $pending = PendingSubmission::create([
@@ -183,7 +170,7 @@ class Phase5VerificationTest extends TestCase
     }
 
     // ──────────────────────────────────────────────
-    // 6. Idempotence
+    // 5. Idempotence de l'import
     // ──────────────────────────────────────────────
 
     public function test_same_import_called_twice_does_not_duplicate(): void
@@ -246,7 +233,7 @@ class Phase5VerificationTest extends TestCase
     }
 
     // ──────────────────────────────────────────────
-    // 7. Sécurité — sessions isolées
+    // 6. Sécurité — sessions isolées
     // ──────────────────────────────────────────────
 
     public function test_cannot_access_pending_submission_from_different_session(): void
@@ -268,7 +255,7 @@ class Phase5VerificationTest extends TestCase
     }
 
     // ──────────────────────────────────────────────
-    // 8. Fichiers
+    // 7. Fichiers via import
     // ──────────────────────────────────────────────
 
     public function test_import_copies_files_to_permanent_storage(): void
@@ -349,7 +336,7 @@ class Phase5VerificationTest extends TestCase
     }
 
     // ──────────────────────────────────────────────
-    // 9. Aucun chemin de création directe
+    // 8. Absence d'anciennes méthodes
     // ──────────────────────────────────────────────
 
     public function test_project_service_has_no_create_draft(): void
@@ -365,7 +352,7 @@ class Phase5VerificationTest extends TestCase
     }
 
     // ──────────────────────────────────────────────
-    // 10. Pas de référence au nom du système externe
+    // 9. Pas de référence au nom du système externe
     // ──────────────────────────────────────────────
 
     public function test_no_ayoosi_reference_in_codebase(): void
@@ -375,6 +362,7 @@ class Phase5VerificationTest extends TestCase
             app_path('Services/ExternalSubmission/ImportService.php'),
             app_path('Services/ExternalSubmission/ExternalSubmissionService.php'),
             app_path('Services/ExternalSubmission/ExternalSubmissionClient.php'),
+            app_path('Services/Submission/SubmissionService.php'),
             config_path('external_submission.php'),
         ]);
 

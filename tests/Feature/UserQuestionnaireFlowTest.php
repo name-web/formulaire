@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\PendingSubmission;
+use App\Models\Project;
 use App\Models\Question;
 use Database\Seeders\QuestionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -152,8 +153,16 @@ class UserQuestionnaireFlowTest extends TestCase
         // Thank you
         $this->get('/questionnaire/thankyou')->assertStatus(200);
 
-        // Pending submission is no longer in collecting status
+        // Pending submission is marked as imported
         $pending = PendingSubmission::first();
-        $this->assertNotEquals('collecting', $pending->status);
+        $this->assertEquals('imported', $pending->status);
+
+        // Client + Project are created immediately
+        $this->assertDatabaseHas('clients', ['name' => 'Jean Dupont']);
+        $this->assertDatabaseHas('projects', ['status' => 'submitted']);
+
+        $project = Project::first();
+        $this->assertNotNull($project);
+        $this->assertNotNull($project->submitted_at);
     }
 }

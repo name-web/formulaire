@@ -6,11 +6,11 @@ use App\Http\Requests\StartQuestionnaireRequest;
 use App\Http\Requests\SubmitAnswerRequest;
 use App\Models\PendingSubmission;
 use App\Models\Question;
-use App\Services\ExternalSubmission\ExternalSubmissionService;
 use App\Services\Questionnaire\FileService;
 use App\Services\Questionnaire\PendingSubmissionService;
 use App\Services\Questionnaire\QuestionnaireService;
 use App\Services\Questionnaire\QuestionService;
+use App\Services\Submission\SubmissionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -22,7 +22,7 @@ class QuestionnaireController extends Controller
         private QuestionnaireService $questionnaireService,
         private QuestionService $questionService,
         private PendingSubmissionService $pendingSubmissionService,
-        private ExternalSubmissionService $externalSubmissionService,
+        private SubmissionService $submissionService,
         private FileService $fileService,
     ) {}
 
@@ -319,7 +319,7 @@ class QuestionnaireController extends Controller
             return redirect()->route('questionnaire.thankyou');
         }
 
-        $this->externalSubmissionService->submit($pending);
+        $this->submissionService->submitPendingSubmission($pending);
 
         session()->forget(['pending_submission_uuid', 'project_type']);
 
