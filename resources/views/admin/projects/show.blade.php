@@ -75,7 +75,7 @@
                                 </div>
                                 <div style="font-size:14px;color:var(--text-muted);line-height:1.6;word-break:break-word;">
                                     @if(!empty($displayValue))
-                                        @if($question->type === 'multiselect' && count($selectValues) > 1)
+                                        @if($question->type === 'multiselect' && count($selectValues) >= 1)
                                             <div style="display:flex;flex-wrap:wrap;gap:6px;">
                                                 @foreach($selectValues as $tag)
                                                     <span class="admin-badge badge-in_progress">{{ $tag }}</span>
