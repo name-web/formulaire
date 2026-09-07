@@ -261,9 +261,10 @@ class PendingSubmissionFlowTest extends TestCase
 
         $this->post('/questionnaire/submit');
 
-        // Verify the SubmissionService was used (client email derived from phone)
+        // Verify the SubmissionService was used (client found by phone)
         $this->assertDatabaseHas('clients', [
-            'email' => '22501020304@dominium.tech',
+            'name' => 'Service Test',
+            'phone' => '+22501020304',
         ]);
 
         // Verify project is immediately submitted
@@ -347,5 +348,79 @@ class PendingSubmissionFlowTest extends TestCase
         ]);
 
         $this->assertEquals('collecting', $pending->status);
+    }
+
+    public function test_start_stores_country_from_ip_geolocation(): void
+    {
+        config(['geo.database_path' => database_path('geoip/GeoLite2-Country.mmdb')]);
+
+        $response = $this->post('/questionnaire/start', [
+            'name' => 'Jean Dupont',
+            'phone' => '+22501020304',
+            'project_types' => ['site_vitrine'],
+        ]);
+
+        $response->assertRedirect('/questionnaire/wizard');
+
+        $pending = PendingSubmission::first();
+        $this->assertNotNull($pending);
+        // country key should exist in client_data (value may be null if no .mmdb)
+        $this->assertArrayHasKey('country', $pending->client_data);
+    }
+
+    public function test_start_country_is_null_when_geolocation_fails(): void
+    {
+        config(['geo.database_path' => '/nonexistent/path.mmdb']);
+        config(['geo.default_country' => null]);
+
+        $this->post('/questionnaire/start', [
+            'name' => 'Jean Dupont',
+            'phone' => '+22501020304',
+            'project_types' => ['site_vitrine'],
+        ]);
+
+        $pending = PendingSubmission::first();
+        $this->assertNull($pending->client_data['country'] ?? null);
+    }
+
+    public function test_submit_stores_country_in_client(): void
+    {
+        config(['geo.database_path' => '/nonexistent/path.mmdb']);
+        config(['geo.default_country' => null]);
+
+        $pending = PendingSubmission::create([
+            'client_data' => ['name' => 'Test', 'phone' => '+22501020304', 'country' => null],
+            'project_data' => ['project_types' => ['site_vitrine']],
+            'answers_data' => [],
+            'files_data' => [],
+            'status' => 'collecting',
+        ]);
+
+        session(['pending_submission_uuid' => $pending->uuid]);
+
+        $this->post('/questionnaire/submit');
+
+        $client = Client::where('name', 'Test')->first();
+        $this->assertNotNull($client);
+        $this->assertNull($client->country);
+    }
+
+    public function test_submit_stores_detected_country_in_client(): void
+    {
+        $pending = PendingSubmission::create([
+            'client_data' => ['name' => 'Geo Test', 'phone' => '+22501020304', 'country' => 'France'],
+            'project_data' => ['project_types' => ['site_vitrine']],
+            'answers_data' => [],
+            'files_data' => [],
+            'status' => 'collecting',
+        ]);
+
+        session(['pending_submission_uuid' => $pending->uuid]);
+
+        $this->post('/questionnaire/submit');
+
+        $client = Client::where('name', 'Geo Test')->first();
+        $this->assertNotNull($client);
+        $this->assertEquals('France', $client->country);
     }
 }

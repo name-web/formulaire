@@ -43,14 +43,16 @@ class SubmissionService
     }
 
     /**
-     * Find an existing Client by phone-derived email, or create a new one.
+     * Find an existing Client by phone, or create a new one.
      */
     public function findOrCreateClient(array $clientData): Client
     {
         $phone = trim($clientData['phone'] ?? '');
-        $email = ($phone ? preg_replace('/[^0-9]/', '', $phone) : 'noemail').'@dominium.tech';
+        $normalizedPhone = preg_replace('/[^0-9+]/', '', $phone);
 
-        $client = Client::where('email', $email)->first();
+        $client = $normalizedPhone
+            ? Client::where('phone', 'like', '%'.$normalizedPhone.'%')->first()
+            : null;
 
         if ($client) {
             $client->update(array_filter([
@@ -64,12 +66,11 @@ class SubmissionService
         } else {
             $client = Client::create([
                 'name' => $clientData['name'] ?? '',
-                'email' => $email,
                 'phone' => $clientData['phone'] ?? '',
                 'company_name' => $clientData['company_name'] ?? null,
                 'whatsapp' => $clientData['whatsapp'] ?? null,
                 'city' => $clientData['city'] ?? null,
-                'country' => $clientData['country'] ?? "Cote d'Ivoire",
+                'country' => $clientData['country'] ?? null,
             ]);
         }
 

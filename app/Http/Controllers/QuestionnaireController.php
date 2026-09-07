@@ -6,6 +6,7 @@ use App\Http\Requests\StartQuestionnaireRequest;
 use App\Http\Requests\SubmitAnswerRequest;
 use App\Models\PendingSubmission;
 use App\Models\Question;
+use App\Services\Geo\IpGeolocationService;
 use App\Services\Questionnaire\FileService;
 use App\Services\Questionnaire\PendingSubmissionService;
 use App\Services\Questionnaire\QuestionnaireService;
@@ -51,7 +52,7 @@ class QuestionnaireController extends Controller
         return array_keys(config('project_types.types'));
     }
 
-    public function start(StartQuestionnaireRequest $request): RedirectResponse
+    public function start(StartQuestionnaireRequest $request, IpGeolocationService $geoService): RedirectResponse
     {
         $validated = $request->validated();
         $projectTypes = $validated['project_types'];
@@ -59,6 +60,8 @@ class QuestionnaireController extends Controller
         $clientData = collect($validated)
             ->except(['project_types'])
             ->toArray();
+
+        $clientData['country'] = $geoService->getCountry($request->ip());
 
         $pending = $this->pendingSubmissionService->createDraft(
             $clientData,
