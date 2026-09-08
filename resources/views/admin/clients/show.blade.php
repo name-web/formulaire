@@ -11,10 +11,10 @@
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
             @if($client->isProspect())
-                <form method="POST" action="{{ route('admin.clients.convert', $client) }}" onsubmit="return confirm('Convertir ce prospect en client ?');">
+                <button type="button" class="top-btn primary" id="convertBtn" style="background:#176139;color:#fff;border:none;"><i class="fa-solid fa-check" style="margin-right:4px;"></i> Rendre client</button>
+                <form method="POST" action="{{ route('admin.clients.convert', $client) }}" id="convertForm" style="display:none;">
                     @csrf
                     @method('PATCH')
-                    <button type="submit" class="top-btn primary" style="background:#16a34a;color:#fff;border:none;"><i class="fa-solid fa-check" style="margin-right:4px;"></i> Rendre client</button>
                 </form>
             @endif
             <a href="{{ route('admin.clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
@@ -122,5 +122,159 @@
         </div>
 
     </section>
+
+    {{-- Confirm modal --}}
+    <div id="confirmOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;">
+        <div id="confirmBox" style="background:#fff;border-radius:12px;padding:48px 52px;max-width:560px;width:92%;box-shadow:0 20px 50px rgba(0,0,0,.18);transform:scale(.85);transition:transform .4s cubic-bezier(.175,.885,.32,1.275),opacity .3s ease;opacity:0;">
+            <div id="confirmContent">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
+                    <div style="width:44px;height:44px;border-radius:50%;background:#17613910;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-user-check" style="color:#176139;font-size:18px;"></i>
+                    </div>
+                    <div style="font-size:18px;font-weight:800;color:var(--black);">Rendre ce prospect client ?</div>
+                </div>
+                <p style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:28px;">Cette action convertira <strong style="color:var(--black);">{{ $client->name }}</strong> en client. Le statut et l'identité visuelle seront mis à jour.</p>
+                <div style="display:flex;gap:10px;justify-content:flex-end;">
+                    <button type="button" id="confirmCancel" style="padding:11px 22px;border-radius:5px;border:1px solid var(--line);background:white;color:#666;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;">Annuler</button>
+                    <button type="button" id="confirmOk" style="padding:11px 22px;border-radius:5px;border:none;background:#176139;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;">Confirmer</button>
+                </div>
+            </div>
+            <div id="confirmSuccess" style="display:none;flex-direction:column;align-items:center;padding:40px 0 24px;">
+                <svg id="checkSvg" width="120" height="120" viewBox="0 0 120 120" fill="none">
+                    <path id="checkPath" d="M24 62L48 86L96 30" stroke="#176139" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div id="successLabel" style="margin-top:24px;font-size:16px;font-weight:700;color:var(--black);opacity:0;transform:translateY(6px);">Prospect converti en client</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var convertBtn = document.getElementById('convertBtn');
+        var convertForm = document.getElementById('convertForm');
+        var overlay = document.getElementById('confirmOverlay');
+        var box = document.getElementById('confirmBox');
+        var confirmOk = document.getElementById('confirmOk');
+        var confirmCancel = document.getElementById('confirmCancel');
+        var confirmContent = document.getElementById('confirmContent');
+        var confirmSuccess = document.getElementById('confirmSuccess');
+        var checkSvg = document.getElementById('checkSvg');
+        var checkPath = document.getElementById('checkPath');
+        var successLabel = document.getElementById('successLabel');
+
+        if (!convertBtn) return;
+
+        var isProcessing = false;
+
+        function openModal() {
+            overlay.style.opacity = '1';
+            overlay.style.pointerEvents = 'auto';
+            requestAnimationFrame(function() {
+                box.style.opacity = '1';
+                box.style.transform = 'scale(1)';
+            });
+        }
+
+        function closeModal() {
+            box.style.opacity = '0';
+            box.style.transform = 'scale(.85)';
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none';
+            setTimeout(function() {
+                confirmContent.style.display = '';
+                confirmSuccess.style.display = 'none';
+                checkSvg.style.transition = 'none';
+                checkSvg.style.transform = 'scale(0)';
+                checkPath.style.transition = 'none';
+                checkPath.style.strokeDashoffset = checkPath.getTotalLength();
+                successLabel.style.transition = 'none';
+                successLabel.style.opacity = '0';
+                successLabel.style.transform = 'translateY(6px)';
+            }, 400);
+        }
+
+        convertBtn.addEventListener('click', function() {
+            openModal();
+        });
+
+        confirmCancel.addEventListener('click', function() {
+            closeModal();
+        });
+
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) closeModal();
+        });
+
+        confirmOk.addEventListener('click', function() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            confirmOk.style.opacity = '.5';
+            confirmOk.style.pointerEvents = 'none';
+            confirmCancel.style.opacity = '.5';
+            confirmCancel.style.pointerEvents = 'none';
+
+            confirmContent.style.display = 'none';
+            confirmSuccess.style.display = 'flex';
+
+            checkSvg.style.transform = 'scale(0)';
+            checkSvg.style.transition = 'none';
+
+            var pathLen = checkPath.getTotalLength();
+            checkPath.style.strokeDasharray = pathLen;
+            checkPath.style.strokeDashoffset = pathLen;
+            checkPath.style.transition = 'none';
+
+            successLabel.style.opacity = '0';
+            successLabel.style.transition = 'none';
+
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    checkSvg.style.transition = 'transform .4s cubic-bezier(.175,.885,.32,1.275)';
+                    checkSvg.style.transform = 'scale(1)';
+
+                    setTimeout(function() {
+                        checkPath.style.transition = 'stroke-dashoffset .55s cubic-bezier(.4,0,.2,1)';
+                        checkPath.style.strokeDashoffset = '0';
+                    }, 120);
+
+                    setTimeout(function() {
+                        successLabel.style.transition = 'all .3s ease';
+                        successLabel.style.opacity = '1';
+                        successLabel.style.transform = 'translateY(0)';
+                    }, 480);
+                });
+            });
+
+            setTimeout(function() {
+                convertForm.submit();
+
+                var badge = document.querySelector('.badge-pending');
+                if (badge) {
+                    badge.className = 'admin-badge badge-client';
+                    badge.textContent = 'CLIENT';
+                    badge.style.cssText = 'background:#176139;color:#fff;font-size:12px;font-weight:700;';
+                }
+                convertBtn.style.display = 'none';
+                convertForm.style.display = 'none';
+
+                setTimeout(function() {
+                    closeModal();
+                    isProcessing = false;
+                    confirmOk.style.opacity = '';
+                    confirmOk.style.pointerEvents = '';
+                    confirmCancel.style.opacity = '';
+                    confirmCancel.style.pointerEvents = '';
+                }, 800);
+            }, 900);
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && overlay.style.pointerEvents === 'auto' && !isProcessing) {
+                closeModal();
+            }
+        });
+    });
+    </script>
 
 </x-layouts.admin>

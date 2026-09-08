@@ -76,7 +76,7 @@
                 <div class="card-header">
                     <div>
                         <div class="card-title">
-                            <i class="fa-solid fa-folder-open" style="color:#16a34a;margin-right:6px;"></i>
+                            <i class="fa-solid fa-folder-open" style="color:#176139;margin-right:6px;"></i>
                             Projets
                         </div>
                         <div class="card-subtitle">{{ $client->projects->count() }} projet{{ $client->projects->count() > 1 ? 's' : '' }}</div>
@@ -96,7 +96,7 @@
                                 $sc = \App\Models\Project::getStatusConfig($project->status);
                             @endphp
                             <a href="{{ route('admin.projects.show', $project) }}" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
-                                <div style="width:40px;height:40px;border-radius:6px;background:#16a34a;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <div style="width:40px;height:40px;border-radius:6px;background:#176139;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <i class="fa-solid fa-folder" style="color:#fff;font-size:14px;"></i>
                                 </div>
                                 <div style="flex:1;min-width:0;overflow:hidden;">

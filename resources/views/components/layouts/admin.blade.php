@@ -367,12 +367,12 @@
         .badge-inactive { background: var(--line); color: var(--muted); }
         .badge-admin { background: var(--yellow); color: var(--black); }
         .badge-user { background: var(--line); color: var(--text); }
-        .badge-client { background: #16a34a; color: #fff; }
+        .badge-client { background: #176139; color: #fff; }
 
         /* ── Client identity (conditional green) ── */
-        .client-name-is-client { color: #16a34a !important; }
-        .client-avatar-is-client { background: #16a34a !important; color: #fff !important; }
-        .side-heading-client { color: #16a34a; }
+        .client-name-is-client { color: #176139 !important; }
+        .client-avatar-is-client { background: #176139 !important; color: #fff !important; }
+        .side-heading-client { color: #176139; }
 
         /* ── Admin inputs/labels ── */
         .admin-input {
