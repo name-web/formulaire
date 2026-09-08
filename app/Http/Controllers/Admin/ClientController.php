@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -11,7 +12,8 @@ class ClientController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Client::withCount('projects')
+        $query = Client::prospects()
+            ->withCount('projects')
             ->whereHas('projects', fn ($q) => $q->where('status', 'submitted'));
 
         if ($request->filled('search')) {
@@ -32,5 +34,17 @@ class ClientController extends Controller
         $client->load('projects');
 
         return view('admin.clients.show', compact('client'));
+    }
+
+    public function convert(Client $client): RedirectResponse
+    {
+        if ($client->isClient()) {
+            return back()->with('error', 'Ce prospect est déjà un client.');
+        }
+
+        $client->update(['status' => 'client']);
+
+        return redirect()->route('admin.client-clients.show', $client)
+            ->with('success', 'Le prospect a été converti en client.');
     }
 }

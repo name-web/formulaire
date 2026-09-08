@@ -9,7 +9,16 @@
             <h1>{{ $client->name }}</h1>
             <p>{{ $client->phone }}</p>
         </div>
-        <a href="{{ route('admin.clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
+        <div style="display:flex;gap:8px;align-items:center;">
+            @if($client->isProspect())
+                <form method="POST" action="{{ route('admin.clients.convert', $client) }}" onsubmit="return confirm('Convertir ce prospect en client ?');">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="top-btn primary" style="background:#16a34a;color:#fff;border:none;"><i class="fa-solid fa-check" style="margin-right:4px;"></i> Rendre client</button>
+                </form>
+            @endif
+            <a href="{{ route('admin.clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
+        </div>
     </section>
 
     <section class="content content-reverse" style="align-items:start;">
@@ -26,6 +35,11 @@
                         <div>
                             <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Nom</div>
                             <div style="color:var(--black);font-size:14px;font-weight:700;">{{ $client->name }}</div>
+                        </div>
+
+                        <div>
+                            <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Statut</div>
+                            <span class="admin-badge badge-pending" style="font-size:12px;font-weight:700;">PROSPECT</span>
                         </div>
 
                         @if($client->phone)

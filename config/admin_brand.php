@@ -35,6 +35,12 @@ return [
             'label' => 'Prospects',
         ],
         [
+            'route' => 'admin.client-clients.index',
+            'route_pattern' => 'admin.client-clients.*',
+            'icon' => 'fa-solid fa-user-check',
+            'label' => 'Clients',
+        ],
+        [
             'route' => 'admin.questions.index',
             'route_pattern' => 'admin.questions.*',
             'icon' => 'fa-solid fa-circle-question',

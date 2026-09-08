@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ClientClientController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -63,6 +64,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('projects/{project}/status', [ProjectController::class, 'updateStatus'])->name('projects.update-status');
 
     Route::resource('clients', ClientController::class)->only(['index', 'show']);
+    Route::patch('clients/{client}/convert', [ClientController::class, 'convert'])->name('clients.convert');
+
+    Route::resource('client-clients', ClientClientController::class)->only(['index', 'show']);
 
     Route::resource('users', UserController::class)->only(['index', 'store', 'update']);
     Route::patch('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');

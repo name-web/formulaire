@@ -62,15 +62,18 @@ class SubmissionService
                 'whatsapp' => $clientData['whatsapp'] ?? null,
                 'city' => $clientData['city'] ?? null,
                 'country' => $clientData['country'] ?? null,
+                'ip_address' => $clientData['ip_address'] ?? null,
             ], fn ($v) => $v !== null));
         } else {
             $client = Client::create([
                 'name' => $clientData['name'] ?? '',
+                'status' => 'prospect',
                 'phone' => $clientData['phone'] ?? '',
                 'company_name' => $clientData['company_name'] ?? null,
                 'whatsapp' => $clientData['whatsapp'] ?? null,
                 'city' => $clientData['city'] ?? null,
                 'country' => $clientData['country'] ?? null,
+                'ip_address' => $clientData['ip_address'] ?? null,
             ]);
         }
 
