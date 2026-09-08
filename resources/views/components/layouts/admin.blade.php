@@ -508,7 +508,8 @@
             .main { padding-left: 25px; padding-right: 25px; }
             .intro { flex-direction: column; align-items: flex-start; gap: 14px; }
         }
-        @media (max-width: 800px) {
+        /* ── Sidebar responsive: hidden on tablet/mobile ── */
+        @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
                 width: 280px;
@@ -525,6 +526,17 @@
                 padding-right: 16px !important;
             }
             .hamburger { display: flex; }
+            .sidebar-overlay {
+                position: fixed; inset: 0; background: rgba(0,0,0,.5);
+                z-index: 99; pointer-events: none; opacity: 0;
+                transition: opacity .3s ease; backdrop-filter: blur(2px);
+            }
+            .sidebar.open ~ .sidebar-overlay {
+                pointer-events: auto; opacity: 1;
+            }
+        }
+
+        @media (max-width: 800px) {
             .stats { grid-template-columns: 1fr 1fr; gap: 0; }
             .stat { border-bottom: 1px solid var(--line); min-height: 100px; padding: 18px; }
             .stat:nth-child(2) { border-right: 0; }
@@ -536,14 +548,6 @@
             .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
             .table-head, .table-row { min-width: 540px; }
             .form-grid { grid-template-columns: 1fr !important; }
-            .sidebar-overlay {
-                position: fixed; inset: 0; background: rgba(0,0,0,.5);
-                z-index: 99; pointer-events: none; opacity: 0;
-                transition: opacity .3s ease; backdrop-filter: blur(2px);
-            }
-            .sidebar.open ~ .sidebar-overlay {
-                pointer-events: auto; opacity: 1;
-            }
             .intro h1 { font-size: 28px; letter-spacing: -1px; }
             .admin-header { flex-direction: column; align-items: flex-start; gap: 12px; }
             .admin-title { font-size: 28px; letter-spacing: -1px; }
@@ -786,14 +790,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.querySelectorAll('.nav-item').forEach(function(item) {
         item.addEventListener('click', function() {
-            if (window.innerWidth <= 800) {
+            if (window.innerWidth <= 1024) {
                 closeSidebar();
             }
         });
     });
 
     window.addEventListener('resize', function() {
-        if (window.innerWidth > 800 && sidebar.classList.contains('open')) {
+        if (window.innerWidth > 1024 && sidebar.classList.contains('open')) {
             closeSidebar();
         }
     });
