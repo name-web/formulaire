@@ -175,31 +175,14 @@
         {{-- Right panel --}}
         <div style="display:flex;flex-direction:column;gap:18px;position:sticky;top:90px;">
 
-            {{-- Status Management --}}
+            {{-- Delete Project --}}
             <div class="card">
                 <div class="side-section">
-                    <div class="side-heading">
-                        <i class="fa-solid fa-gear" style="color:var(--yellow);margin-right:5px;"></i>
-                        Gestion
-                    </div>
-                    <form method="POST" action="{{ route('admin.projects.update-status', $project) }}">
+                    <form method="POST" action="{{ route('admin.projects.destroy', $project) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');">
                         @csrf
-                        @method('PATCH')
-                        <label class="admin-label">Statut du projet</label>
-                        <select name="status" class="admin-input" style="margin-bottom:12px;">
-                            @foreach(config('project_status.statuses') as $key => $sc)
-                                <option value="{{ $key }}" {{ $project->status === $key ? 'selected' : '' }}>{{ $sc['label'] }}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="admin-btn btn-primary" style="width:100%;justify-content:center;"><i class="fa-solid fa-check"></i> Mettre à jour</button>
+                        @method('DELETE')
+                        <button type="submit" class="admin-btn btn-danger" style="width:100%;justify-content:center;"><i class="fa-solid fa-trash"></i> Supprimer</button>
                     </form>
-
-                    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line);">
-                        <form method="POST" action="{{ route('admin.projects.destroy', $project) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="admin-btn btn-danger" style="width:100%;justify-content:center;"><i class="fa-solid fa-trash"></i> Supprimer</button>
-                        </form>
                     </div>
                 </div>
             </div>

@@ -63,7 +63,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('projects', ProjectController::class)->only(['index', 'show', 'destroy']);
-    Route::patch('projects/{project}/status', [ProjectController::class, 'updateStatus'])->name('projects.update-status');
 
     Route::resource('clients', ClientController::class)->only(['index', 'show']);
     Route::patch('clients/{client}/convert', [ClientController::class, 'convert'])->name('clients.convert');
