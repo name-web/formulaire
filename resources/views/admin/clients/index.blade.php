@@ -1,4 +1,4 @@
-<x-layouts.admin :title="'Clients'">
+<x-layouts.admin :title="'Prospects'">
 
     <section class="intro">
         <div>
@@ -6,8 +6,8 @@
                 <span></span>
                 Gestion
             </div>
-            <h1>Clients</h1>
-            <p>Tous les clients ayant soumis un projet</p>
+            <h1>Prospects</h1>
+            <p>Tous les prospects ayant soumis un projet</p>
         </div>
     </section>
 
@@ -34,15 +34,15 @@
         <div class="card">
             <div class="card-header">
                 <div>
-                    <div class="card-title">Tous les clients</div>
-                    <div class="card-subtitle">Liste complète des clients</div>
+                    <div class="card-title">Tous les prospects</div>
+                    <div class="card-subtitle">Liste complète des prospects</div>
                 </div>
             </div>
 
             @if($clients->isEmpty())
                 <div class="empty-state">
                     <i class="fa-regular fa-user"></i>
-                    <p>Aucun client trouvé.</p>
+                    <p>Aucun prospect trouvé.</p>
                 </div>
             @else
                 <div class="table-wrap">

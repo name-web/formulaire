@@ -8,7 +8,7 @@
                 Détail
             </div>
             <h1>Projet {{ $project->id }}</h1>
-            <p>{{ $project->client->name ?? 'Client inconnu' }} — {{ $project->created_at->format('d/m/Y H:i') }}</p>
+            <p>{{ $project->client->name ?? 'Prospect inconnu' }} — {{ $project->created_at->format('d/m/Y H:i') }}</p>
             @php
                 $types = is_array($project->project_type) ? $project->project_type : [$project->project_type];
                 $typeLabels = collect($types)->map(fn ($t) => config("project_types.types.{$t}.label", $t))->implode(' / ');
@@ -204,12 +204,12 @@
                 </div>
             </div>
 
-            {{-- Client Info --}}
+            {{-- Prospect Info --}}
             <div class="card">
                 <div class="side-section">
                     <div class="side-heading">
                         <i class="fa-solid fa-user" style="color:var(--yellow);margin-right:5px;"></i>
-                        Client
+                        Prospect
                     </div>
                     @if($project->client)
                         <div style="display:flex;flex-direction:column;gap:12px;">
@@ -243,9 +243,9 @@
                                 </div>
                             @endif
                         </div>
-                        <a href="{{ route('admin.clients.show', $project->client) }}" class="quick-action" style="margin-top:16px;text-align:center;"><i class="fa-solid fa-arrow-right" style="margin-right:4px;"></i> Voir le profil client</a>
+                        <a href="{{ route('admin.clients.show', $project->client) }}" class="quick-action" style="margin-top:16px;text-align:center;"><i class="fa-solid fa-arrow-right" style="margin-right:4px;"></i> Voir le profil prospect</a>
                     @else
-                        <p style="color:var(--muted);font-size:14px;">Client inconnu</p>
+                        <p style="color:var(--muted);font-size:14px;">Prospect inconnu</p>
                     @endif
                 </div>
             </div>

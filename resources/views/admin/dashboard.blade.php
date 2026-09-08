@@ -69,7 +69,7 @@
             @else
                 <div class="table-wrap">
                 <div class="table-head">
-                    <div>Client</div>
+                    <div>Prospect</div>
                     <div>Projet</div>
                     <div>Date</div>
                     <div>Statut</div>
@@ -108,11 +108,11 @@
                 <div class="progress"><span style="width:{{ $pct }}%"></span></div>
             </div>
 
-            {{-- Clients --}}
+            {{-- Prospects --}}
             <div class="side-section">
-                <div class="side-heading">Clients récents</div>
+                <div class="side-heading">Prospects récents</div>
                 @if($recentClients->isEmpty())
-                    <p style="color:var(--muted);font-size:13px;">Aucun client.</p>
+                    <p style="color:var(--muted);font-size:13px;">Aucun prospect.</p>
                 @else
                     @foreach($recentClients as $client)
                         <a href="{{ route('admin.clients.show', $client) }}" class="activity" style="text-decoration:none;">

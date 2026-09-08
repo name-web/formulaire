@@ -32,7 +32,7 @@ return [
             'route' => 'admin.clients.index',
             'route_pattern' => 'admin.clients.*',
             'icon' => 'fa-solid fa-users',
-            'label' => 'Clients',
+            'label' => 'Prospects',
         ],
         [
             'route' => 'admin.questions.index',

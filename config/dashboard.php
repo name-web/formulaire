@@ -60,7 +60,7 @@ return [
             'icon' => 'fa-solid fa-users',
             'color' => '#000000',
             'bg' => '#ffb703',
-            'label' => 'Clients',
+            'label' => 'Prospects',
         ],
 
     ],

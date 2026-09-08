@@ -7,7 +7,7 @@
                 Gestion
             </div>
             <h1>Projets</h1>
-            <p>{{ $totalResults }} résultat{{ $totalResults !== 1 ? 's' : '' }} — projets soumis par les clients</p>
+            <p>{{ $totalResults }} résultat{{ $totalResults !== 1 ? 's' : '' }} — projets soumis par les prospects</p>
         </div>
         <div style="display:flex;gap:6px;">
             <form method="POST" action="{{ route('admin.projects.index') }}" style="display:inline;">
@@ -23,7 +23,7 @@
             <form method="GET" class="search-form" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
                 <div style="flex:1;min-width:200px;">
                     <label class="admin-label">Recherche</label>
-                    <input type="text" name="search" class="admin-input" placeholder="Client, projet..." value="{{ request('search') }}">
+                    <input type="text" name="search" class="admin-input" placeholder="Prospect, projet..." value="{{ request('search') }}">
                 </div>
                 <div style="min-width:140px;">
                     <label class="admin-label">Statut</label>
@@ -85,7 +85,7 @@
                 <div class="table-wrap">
                 <div class="table-head" style="grid-template-columns:.5fr 1.4fr 1.2fr .6fr .7fr .8fr 52px;">
                     <div>N°</div>
-                    <div>Client</div>
+                    <div>Prospect</div>
                     <div>Type de projet</div>
                     <div>Réponses</div>
                     <div>Statut</div>

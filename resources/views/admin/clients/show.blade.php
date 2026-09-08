@@ -1,4 +1,4 @@
-<x-layouts.admin :title="'Client — ' . $client->name">
+<x-layouts.admin :title="'Prospect — ' . $client->name">
 
     <section class="intro">
         <div>
@@ -52,6 +52,10 @@
                                 <div style="color:var(--text-muted);font-size:14px;">{{ $client->city }}{{ $client->city && $client->country ? ', ' : '' }}{{ $client->country }}</div>
                             </div>
                         @endif
+                        <div>
+                            <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Adresse IP</div>
+                            <div style="color:var(--text-muted);font-size:14px;">{{ $client->ip_address ?? 'Non disponible' }}</div>
+                        </div>
                         <div>
                             <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Inscrit le</div>
                             <div style="color:var(--text-muted);font-size:14px;">{{ $client->created_at->format('d/m/Y à H:i') }}</div>
