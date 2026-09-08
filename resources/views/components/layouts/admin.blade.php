@@ -67,8 +67,14 @@
             position: fixed; top: 0; left: 0; bottom: 0; width: 218px;
             height: 100vh; height: 100dvh;
             background: var(--black); color: white;
-            display: flex; flex-direction: column; z-index: 100;
+            display: flex; flex-direction: column;
+            z-index: 200; overflow: hidden;
             transition: transform .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        /* ── Overlay ── */
+        .sidebar-overlay {
+            display: none;
         }
 
         .brand {
@@ -545,11 +551,10 @@
             .sidebar {
                 transform: translateX(-100%);
                 width: 280px;
-                box-shadow: none;
+                z-index: 300;
             }
             .sidebar.open {
                 transform: translateX(0);
-                box-shadow: 4px 0 24px rgba(0,0,0,.3);
             }
             .sidebar-close { display: flex; }
             .main {
@@ -557,14 +562,22 @@
                 padding-left: 16px !important;
                 padding-right: 16px !important;
             }
+            .topbar { z-index: 310; }
             .hamburger { display: flex; }
             .sidebar-overlay {
-                position: fixed; inset: 0; background: rgba(0,0,0,.5);
-                z-index: 99; pointer-events: none; opacity: 0;
-                transition: opacity .3s ease; backdrop-filter: blur(2px);
+                display: block;
+                position: fixed; inset: 0;
+                background: rgba(0,0,0,.45);
+                z-index: 250;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .3s ease;
+                -webkit-backdrop-filter: blur(2px);
+                backdrop-filter: blur(2px);
             }
-            .sidebar.open ~ .sidebar-overlay {
-                pointer-events: auto; opacity: 1;
+            .sidebar-overlay.visible {
+                opacity: 1;
+                pointer-events: auto;
             }
         }
 
@@ -760,14 +773,12 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebar.classList.add('open');
         toggle.classList.add('active');
         overlay.classList.add('visible');
-        document.body.style.overflow = 'hidden';
     }
 
     function closeSidebar() {
         sidebar.classList.remove('open');
         toggle.classList.remove('active');
         overlay.classList.remove('visible');
-        document.body.style.overflow = '';
     }
 
     if (toggle && sidebar) {
