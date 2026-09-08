@@ -64,17 +64,18 @@
 
         /* ── Sidebar ── */
         .sidebar {
-            position: fixed; inset: 0 auto 0 0; width: 218px;
+            position: fixed; top: 0; left: 0; bottom: 0; width: 218px;
+            height: 100vh; height: 100dvh;
             background: var(--black); color: white;
             display: flex; flex-direction: column; z-index: 100;
-            animation: fadeIn .4s ease;
-            transition: width .3s cubic-bezier(.4,0,.2,1);
+            transition: transform .3s cubic-bezier(.4,0,.2,1);
         }
 
         .brand {
             height: 70px; padding: 0 22px;
             display: flex; align-items: center; gap: 10px;
             border-bottom: 1px solid #292929;
+            flex-shrink: 0;
         }
 
         .brand-logo {
@@ -85,7 +86,26 @@
 
         .brand-name { font-size: 14px; font-weight: 800; letter-spacing: 2px; }
 
-        .navigation { padding: 25px 12px; }
+        .sidebar-close {
+            display: none;
+            align-items: center; justify-content: center;
+            width: 32px; height: 32px; border: none; background: rgba(255,255,255,.08);
+            color: #929292; font-size: 14px; cursor: pointer;
+            border-radius: 6px; transition: all .2s;
+            position: absolute; top: 19px; right: 16px;
+            z-index: 10;
+        }
+        .sidebar-close:hover { background: rgba(255,255,255,.15); color: white; }
+
+        .navigation {
+            padding: 25px 12px;
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        .navigation::-webkit-scrollbar { width: 4px; }
+        .navigation::-webkit-scrollbar-track { background: transparent; }
+        .navigation::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        .navigation::-webkit-scrollbar-thumb:hover { background: #444; }
 
         .nav-heading {
             padding: 0 10px; margin-bottom: 12px;
@@ -491,12 +511,14 @@
         @media (max-width: 800px) {
             .sidebar {
                 transform: translateX(-100%);
-                width: 260px;
-                transition: transform .35s cubic-bezier(.4,0,.2,1);
+                width: 280px;
+                box-shadow: none;
             }
             .sidebar.open {
                 transform: translateX(0);
+                box-shadow: 4px 0 24px rgba(0,0,0,.3);
             }
+            .sidebar-close { display: flex; }
             .main {
                 margin-left: 0 !important;
                 padding-left: 16px !important;
@@ -655,6 +677,9 @@
 <body>
 
 <aside class="sidebar" id="adminSidebar">
+    <button class="sidebar-close" id="sidebarClose" aria-label="Fermer le menu">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
     <div class="brand">
         <img src="{{ asset(config('admin_brand.logo', 'IMAGES/Logo dominium.png')) }}"
              alt="{{ config('admin_brand.brand_name', 'DOMINIUM') }}" class="brand-logo">
@@ -724,29 +749,53 @@
 document.addEventListener('DOMContentLoaded', function() {
     var sidebar = document.getElementById('adminSidebar');
     var toggle = document.getElementById('sidebarToggle');
+    var closeBtn = document.getElementById('sidebarClose');
     var overlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        toggle.classList.add('active');
+        overlay.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        toggle.classList.remove('active');
+        overlay.classList.remove('visible');
+        document.body.style.overflow = '';
+    }
+
     if (toggle && sidebar) {
         toggle.addEventListener('click', function() {
-            sidebar.classList.toggle('open');
-            toggle.classList.toggle('active');
-            overlay.classList.toggle('visible');
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
         });
     }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeSidebar);
+    }
+
     if (overlay && sidebar) {
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('open');
-            toggle.classList.remove('active');
-            overlay.classList.remove('visible');
-        });
+        overlay.addEventListener('click', closeSidebar);
     }
+
     document.querySelectorAll('.nav-item').forEach(function(item) {
         item.addEventListener('click', function() {
             if (window.innerWidth <= 800) {
-                sidebar.classList.remove('open');
-                toggle.classList.remove('active');
-                overlay.classList.remove('visible');
+                closeSidebar();
             }
         });
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 800 && sidebar.classList.contains('open')) {
+            closeSidebar();
+        }
     });
 
     document.querySelectorAll('.admin-table tr[onclick], .table-row[onclick]').forEach(function(row) {
