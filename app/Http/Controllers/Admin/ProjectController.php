@@ -94,6 +94,17 @@ class ProjectController extends Controller
         return view('admin.projects.show', compact('project', 'groupedAnswers', 'answersPaginator'));
     }
 
+    public function updateStatus(Request $request, Project $project): RedirectResponse
+    {
+        $request->validate([
+            'status' => ['required', 'in:'.implode(',', array_keys(config('project_status.statuses')))],
+        ]);
+
+        $project->update(['status' => $request->status]);
+
+        return redirect()->route('admin.projects.show', $project)->with('success', 'Statut mis à jour.');
+    }
+
     public function destroy(Project $project): RedirectResponse
     {
         $project->delete();
