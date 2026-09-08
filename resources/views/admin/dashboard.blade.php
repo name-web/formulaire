@@ -78,9 +78,9 @@
                 @foreach($recentProjects as $project)
                     <div class="table-row" style="cursor:pointer;" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
                         <div class="client">
-                            <div class="client-avatar">{{ strtoupper(substr($project->client->name ?? '?', 0, 2)) }}</div>
+                            <div class="client-avatar {{ ($project->client?->isClient()) ? 'client-avatar-is-client' : '' }}">{{ strtoupper(substr($project->client->name ?? '?', 0, 2)) }}</div>
                             <div>
-                                <div class="client-name">{{ $project->client->name ?? '—' }}</div>
+                                <div class="client-name {{ ($project->client?->isClient()) ? 'client-name-is-client' : '' }}">{{ $project->client->name ?? '—' }}</div>
                             </div>
                         </div>
                         <div class="project">{{ $project->type_labels ?: '—' }}</div>
@@ -118,7 +118,7 @@
                         <a href="{{ route('admin.clients.show', $client) }}" class="activity" style="text-decoration:none;">
                             <div class="activity-dot"></div>
                             <div>
-                                <div class="activity-title">{{ $client->name }}</div>
+                                <div class="activity-title {{ $client->isClient() ? 'client-name-is-client' : '' }}">{{ $client->name }}</div>
                                 <div class="activity-time">{{ $client->phone }}</div>
                             </div>
                         </a>

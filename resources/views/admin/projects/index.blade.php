@@ -97,9 +97,9 @@
                     <div class="table-row" style="grid-template-columns:.5fr 1.4fr 1.2fr .6fr .7fr .8fr 52px;cursor:pointer;" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
                         <div class="date" style="font-weight:700;">{{ $project->id }}</div>
                         <div class="client">
-                            <div class="client-avatar">{{ strtoupper(substr($project->client->name ?? '?', 0, 2)) }}</div>
+                            <div class="client-avatar {{ ($project->client?->isClient()) ? 'client-avatar-is-client' : '' }}">{{ strtoupper(substr($project->client->name ?? '?', 0, 2)) }}</div>
                             <div>
-                                <div class="client-name">{{ $project->client->name ?? '—' }}</div>
+                                <div class="client-name {{ ($project->client?->isClient()) ? 'client-name-is-client' : '' }}">{{ $project->client->name ?? '—' }}</div>
                             </div>
                         </div>
                         <div>

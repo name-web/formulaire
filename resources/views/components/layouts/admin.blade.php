@@ -367,6 +367,12 @@
         .badge-inactive { background: var(--line); color: var(--muted); }
         .badge-admin { background: var(--yellow); color: var(--black); }
         .badge-user { background: var(--line); color: var(--text); }
+        .badge-client { background: #16a34a; color: #fff; }
+
+        /* ── Client identity (conditional green) ── */
+        .client-name-is-client { color: #16a34a !important; }
+        .client-avatar-is-client { background: #16a34a !important; color: #fff !important; }
+        .side-heading-client { color: #16a34a; }
 
         /* ── Admin inputs/labels ── */
         .admin-input {

@@ -58,14 +58,14 @@
                 @foreach($clients as $client)
                     <div class="table-row" style="grid-template-columns:1.3fr 1fr 1fr .6fr .8fr 52px;cursor:pointer;" onclick="window.location='{{ route('admin.client-clients.show', $client) }}'">
                         <div class="client">
-                            <div class="client-avatar">{{ strtoupper(substr($client->name, 0, 2)) }}</div>
+                            <div class="client-avatar client-avatar-is-client">{{ strtoupper(substr($client->name, 0, 2)) }}</div>
                             <div>
-                                <div class="client-name">{{ $client->name }}</div>
+                                <div class="client-name client-name-is-client">{{ $client->name }}</div>
                             </div>
                         </div>
                         <div class="project">{{ $client->company_name ?? '—' }}</div>
                         <div class="date">{{ $client->city }}{{ $client->city && $client->country ? ', ' : '' }}{{ $client->country }}</div>
-                        <div><span class="admin-badge badge-in_progress">{{ $client->projects_count }}</span></div>
+                        <div><span class="admin-badge badge-client">{{ $client->projects_count }}</span></div>
                         <div class="date">{{ $client->created_at->format('d/m/Y') }}</div>
                         <a href="{{ route('admin.client-clients.show', $client) }}" class="open" onclick="event.stopPropagation();">↗</a>
                     </div>

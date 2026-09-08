@@ -8,7 +8,7 @@
                 Détail
             </div>
             <h1>Projet {{ $project->id }}</h1>
-            <p>{{ $project->client->name ?? 'Prospect inconnu' }} — {{ $project->created_at->format('d/m/Y H:i') }}</p>
+            <p>{{ $project->client->name ?? ($project->client?->isClient() ? 'Client inconnu' : 'Prospect inconnu') }} — {{ $project->created_at->format('d/m/Y H:i') }}</p>
             @php
                 $types = is_array($project->project_type) ? $project->project_type : [$project->project_type];
                 $typeLabels = collect($types)->map(fn ($t) => config("project_types.types.{$t}.label", $t))->implode(' / ');
@@ -204,19 +204,32 @@
                 </div>
             </div>
 
-            {{-- Prospect Info --}}
+            {{-- Prospect/Client Info --}}
             <div class="card">
                 <div class="side-section">
-                    <div class="side-heading">
-                        <i class="fa-solid fa-user" style="color:var(--yellow);margin-right:5px;"></i>
-                        Prospect
-                    </div>
+                    @if($project->client?->isClient())
+                        <div class="side-heading side-heading-client">
+                            <i class="fa-solid fa-user" style="color:currentColor;margin-right:5px;"></i>
+                            Client
+                        </div>
+                    @else
+                        <div class="side-heading">
+                            <i class="fa-solid fa-user" style="color:var(--yellow);margin-right:5px;"></i>
+                            Prospect
+                        </div>
+                    @endif
                     @if($project->client)
                         <div style="display:flex;flex-direction:column;gap:12px;">
                             <div>
                                 <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Nom</div>
-                                <div style="color:var(--black);font-size:14px;font-weight:700;">{{ $project->client->name }}</div>
+                                <div class="{{ $project->client->isClient() ? 'client-name-is-client' : '' }}" style="font-size:14px;font-weight:700;">{{ $project->client->name }}</div>
                             </div>
+                            @if($project->client->isClient())
+                                <div>
+                                    <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Statut</div>
+                                    <span class="admin-badge badge-client" style="font-size:12px;font-weight:700;">CLIENT</span>
+                                </div>
+                            @endif
 
                             @if($project->client->phone)
                                 <div>
@@ -243,7 +256,11 @@
                                 </div>
                             @endif
                         </div>
-                        <a href="{{ route('admin.clients.show', $project->client) }}" class="quick-action" style="margin-top:16px;text-align:center;"><i class="fa-solid fa-arrow-right" style="margin-right:4px;"></i> Voir le profil prospect</a>
+                        @if($project->client->isClient())
+                            <a href="{{ route('admin.client-clients.show', $project->client) }}" class="quick-action" style="margin-top:16px;text-align:center;"><i class="fa-solid fa-arrow-right" style="margin-right:4px;"></i> Voir le profil client</a>
+                        @else
+                            <a href="{{ route('admin.clients.show', $project->client) }}" class="quick-action" style="margin-top:16px;text-align:center;"><i class="fa-solid fa-arrow-right" style="margin-right:4px;"></i> Voir le profil prospect</a>
+                        @endif
                     @else
                         <p style="color:var(--muted);font-size:14px;">Prospect inconnu</p>
                     @endif

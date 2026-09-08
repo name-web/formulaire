@@ -6,7 +6,7 @@
                 <span></span>
                 Détail
             </div>
-            <h1>{{ $client->name }}</h1>
+            <h1 class="client-name-is-client">{{ $client->name }}</h1>
             <p>{{ $client->phone }}</p>
         </div>
         <a href="{{ route('admin.client-clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
@@ -18,8 +18,8 @@
         <div style="display:flex;flex-direction:column;gap:18px;">
             <div class="card">
                 <div class="side-section">
-                    <div class="side-heading">
-                        <i class="fa-solid fa-user" style="color:var(--yellow);margin-right:5px;"></i>
+                    <div class="side-heading side-heading-client">
+                        <i class="fa-solid fa-user" style="color:currentColor;margin-right:5px;"></i>
                         Informations
                     </div>
                     <div style="display:flex;flex-direction:column;gap:14px;">
@@ -30,7 +30,7 @@
 
                         <div>
                             <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Statut</div>
-                            <span class="admin-badge" style="background:#16a34a;color:#fff;font-size:12px;font-weight:700;">CLIENT</span>
+                            <span class="admin-badge badge-client" style="font-size:12px;font-weight:700;">CLIENT</span>
                         </div>
 
                         @if($client->phone)
@@ -76,7 +76,7 @@
                 <div class="card-header">
                     <div>
                         <div class="card-title">
-                            <i class="fa-solid fa-folder-open" style="color:var(--yellow);margin-right:6px;"></i>
+                            <i class="fa-solid fa-folder-open" style="color:#16a34a;margin-right:6px;"></i>
                             Projets
                         </div>
                         <div class="card-subtitle">{{ $client->projects->count() }} projet{{ $client->projects->count() > 1 ? 's' : '' }}</div>
@@ -96,8 +96,8 @@
                                 $sc = \App\Models\Project::getStatusConfig($project->status);
                             @endphp
                             <a href="{{ route('admin.projects.show', $project) }}" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
-                                <div style="width:40px;height:40px;border-radius:6px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                    <i class="fa-solid fa-folder" style="color:var(--black);font-size:14px;"></i>
+                                <div style="width:40px;height:40px;border-radius:6px;background:#16a34a;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fa-solid fa-folder" style="color:#fff;font-size:14px;"></i>
                                 </div>
                                 <div style="flex:1;min-width:0;overflow:hidden;">
                                     <div style="font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;">Projet {{ $project->id }}</div>
