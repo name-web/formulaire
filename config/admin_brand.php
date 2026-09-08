@@ -41,6 +41,12 @@ return [
             'label' => 'Clients',
         ],
         [
+            'route' => 'admin.comments.index',
+            'route_pattern' => 'admin.comments.*',
+            'icon' => 'fa-solid fa-comments',
+            'label' => 'Commentaires',
+        ],
+        [
             'route' => 'admin.questions.index',
             'route_pattern' => 'admin.questions.*',
             'icon' => 'fa-solid fa-circle-question',

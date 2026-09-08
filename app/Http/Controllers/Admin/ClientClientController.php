@@ -30,7 +30,7 @@ class ClientClientController extends Controller
 
     public function show(Client $client): View
     {
-        $client->load('projects');
+        $client->load(['projects', 'comments.user']);
 
         return view('admin.client-clients.show', compact('client'));
     }
