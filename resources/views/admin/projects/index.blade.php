@@ -21,11 +21,11 @@
     <section class="stats" style="grid-template-columns:1fr;min-height:auto;">
         <div class="stat" style="border-right:0;min-height:auto;">
             <form method="GET" class="search-form" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-                <div style="flex:1;min-width:200px;">
+                <div style="flex:1;min-width:0;">
                     <label class="admin-label">Recherche</label>
                     <input type="text" name="search" class="admin-input" placeholder="Prospect, projet..." value="{{ request('search') }}">
                 </div>
-                <div style="min-width:140px;">
+                <div style="flex:0 1 140px;min-width:0;">
                     <label class="admin-label">Statut</label>
                     <select name="status" class="admin-input">
                         <option value="">Tous les statuts</option>
@@ -36,7 +36,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div style="min-width:140px;">
+                <div style="flex:0 1 140px;min-width:0;">
                     <label class="admin-label">Type</label>
                     <select name="type" class="admin-input">
                         <option value="">Tous les types</option>
@@ -45,11 +45,11 @@
                         @endforeach
                     </select>
                 </div>
-                <div style="min-width:130px;">
+                <div style="flex:0 1 130px;min-width:0;">
                     <label class="admin-label">Date début</label>
                     <input type="date" name="date_from" class="admin-input" value="{{ request('date_from') }}">
                 </div>
-                <div style="min-width:130px;">
+                <div style="flex:0 1 130px;min-width:0;">
                     <label class="admin-label">Date fin</label>
                     <input type="date" name="date_to" class="admin-input" value="{{ request('date_to') }}">
                 </div>
@@ -95,7 +95,7 @@
 
                 @foreach($projects as $project)
                     <div class="table-row" style="grid-template-columns:.5fr 1.4fr 1.2fr .6fr .7fr .8fr 52px;cursor:pointer;" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
-                        <div class="date" style="font-weight:700;">{{ $project->id }}</div>
+                        <div class="col-info" style="font-weight:700;" data-label="N°">{{ $project->id }}</div>
                         <div class="client">
                             <div class="client-avatar {{ ($project->client?->isClient()) ? 'client-avatar-is-client' : '' }}">{{ strtoupper(substr($project->client->name ?? '?', 0, 2)) }}</div>
                             <div>
@@ -114,7 +114,7 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="project">{{ $project->answers_count }} réponse{{ $project->answers_count > 1 ? 's' : '' }}</div>
+                        <div class="col-info" data-label="Réponses">{{ $project->answers_count }} réponse{{ $project->answers_count > 1 ? 's' : '' }}</div>
                         <div>
                             @php $sc = \App\Models\Project::getStatusConfig($project->status); @endphp
                             <span class="status {{ in_array($project->status, ['completed','submitted']) ? 'done' : '' }}">{{ $sc['label'] }}</span>

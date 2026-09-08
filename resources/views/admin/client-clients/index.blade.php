@@ -15,7 +15,7 @@
     <section class="stats" style="grid-template-columns:1fr;min-height:auto;">
         <div class="stat" style="border-right:0;min-height:auto;">
             <form method="GET" class="search-form" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-                <div style="flex:1;min-width:250px;">
+                <div style="flex:1;min-width:0;">
                     <label class="admin-label">Recherche</label>
                     <input type="text" name="search" class="admin-input" placeholder="Rechercher par nom, entreprise..." value="{{ request('search') }}">
                 </div>
@@ -63,9 +63,9 @@
                                 <div class="client-name client-name-is-client">{{ $client->name }}</div>
                             </div>
                         </div>
-                        <div class="project">{{ $client->company_name ?? '—' }}</div>
-                        <div class="date">{{ $client->city }}{{ $client->city && $client->country ? ', ' : '' }}{{ $client->country }}</div>
-                        <div><span class="admin-badge badge-client">{{ $client->projects_count }}</span></div>
+                        <div class="col-info" data-label="Entreprise">{{ $client->company_name ?? '—' }}</div>
+                        <div class="col-meta" data-label="Localisation">{{ $client->city }}{{ $client->city && $client->country ? ', ' : '' }}{{ $client->country }}</div>
+                        <div class="col-info" data-label="Projets"><span class="admin-badge badge-client">{{ $client->projects_count }}</span></div>
                         <div class="date">{{ $client->created_at->format('d/m/Y') }}</div>
                         <a href="{{ route('admin.client-clients.show', $client) }}" class="open" onclick="event.stopPropagation();">↗</a>
                     </div>

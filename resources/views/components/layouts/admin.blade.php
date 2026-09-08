@@ -269,6 +269,8 @@
 
         .project { color: #333; font-size: 14px; font-weight: 600; }
         .date { color: #888; font-size: 13px; }
+        .col-info { color: #333; font-size: 14px; font-weight: 600; }
+        .col-meta { color: #888; font-size: 13px; }
 
         .status {
             display: inline-flex; align-items: center; gap: 6px;
@@ -593,6 +595,8 @@
             .top-right .top-btn span { display: none; }
             .content { grid-template-columns: 1fr; }
             .content-reverse { grid-template-columns: 1fr; }
+            .content [style*="position:sticky"],
+            .content [style*="position: sticky"] { position: static !important; }
             .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
             .table-head, .table-row { min-width: 540px; }
             .form-grid { grid-template-columns: 1fr !important; }
@@ -604,6 +608,8 @@
             .search-form > div { min-width: 0 !important; width: 100%; }
             .search-form > div:last-child { flex-direction: row; }
             .modal-content { margin: 16px; max-height: calc(100vh - 32px); overflow-y: auto; }
+            #confirmOverlay { padding: 16px; }
+            #confirmBox { padding: 32px 28px !important; }
             .client-name, .project-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
             .error-box { word-break: break-word; }
             .card-header { height: auto; padding: 16px 18px; flex-wrap: wrap; gap: 10px; }
@@ -631,13 +637,17 @@
             .table-row > .client { flex: 1 1 100%; }
             .table-row > .project,
             .table-row > .date,
-            .table-row > .status {
+            .table-row > .status,
+            .table-row > .col-info,
+            .table-row > .col-meta {
                 display: flex; align-items: center; gap: 6px;
                 font-size: 12px; color: var(--muted);
                 flex: 0 0 auto;
             }
             .table-row > .project::before { content: "Projet :"; font-weight: 700; color: var(--text); }
             .table-row > .date::before { content: "Le"; font-weight: 600; }
+            .table-row > .col-info::before { content: attr(data-label); font-weight: 700; color: var(--text); }
+            .table-row > .col-meta::before { content: attr(data-label); font-weight: 600; }
             .table-row > .status { display: inline-flex; }
             .table-row > .open { grid-column: 2; grid-row: 1; position: absolute; right: 18px; top: 16px; }
             .table-row { position: relative; padding-right: 60px; }

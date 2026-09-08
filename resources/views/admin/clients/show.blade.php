@@ -124,7 +124,7 @@
     </section>
 
     {{-- Confirm modal --}}
-    <div id="confirmOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;">
+    <div id="confirmOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;">
         <div id="confirmBox" style="background:#fff;border-radius:12px;padding:48px 52px;max-width:560px;width:92%;box-shadow:0 20px 50px rgba(0,0,0,.18);transform:scale(.85);transition:transform .4s cubic-bezier(.175,.885,.32,1.275),opacity .3s ease;opacity:0;">
             <div id="confirmContent">
                 <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">

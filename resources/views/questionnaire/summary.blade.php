@@ -227,9 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <i class="fa-solid fa-arrow-left"></i> {{ __('Modifier') }}
                 </a>
                 <div style="display:inline-flex;">
-                    <form action="{{ route('questionnaire.submit') }}" method="POST">
+                    <form action="{{ route('questionnaire.submit') }}" method="POST" id="submitForm">
                         @csrf
-                        <button type="submit" class="btn-continue">
+                        <button type="submit" class="btn-continue" id="submitBtn">
                             {{ __('Envoyer ma demande') }} <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </form>
@@ -237,5 +237,88 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         </div>
     </main>
+
+    {{-- Success modal --}}
+    <div id="successOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;">
+        <div id="successBox" style="background:#fff;border-radius:12px;padding:48px 52px;max-width:560px;width:92%;box-shadow:0 20px 50px rgba(0,0,0,.25);transform:scale(.85);transition:transform .4s cubic-bezier(.175,.885,.32,1.275),opacity .3s ease;opacity:0;">
+            <div style="display:flex;flex-direction:column;align-items:center;padding:40px 0 24px;">
+                <svg id="checkSvg" width="120" height="120" viewBox="0 0 120 120" fill="none">
+                    <path id="checkPath" d="M24 62L48 86L96 30" stroke="#ffb703" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div id="successLabel" style="margin-top:24px;font-size:18px;font-weight:700;color:#071426;opacity:0;transform:translateY(6px);">Demande envoyée</div>
+                <div id="successSubLabel" style="margin-top:8px;font-size:14px;color:rgba(7,20,38,0.5);opacity:0;transform:translateY(6px);">Vous recevrez une réponse sous 24 à 48 heures</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var submitBtn = document.getElementById('submitBtn');
+        var submitForm = document.getElementById('submitForm');
+        var overlay = document.getElementById('successOverlay');
+        var box = document.getElementById('successBox');
+        var checkSvg = document.getElementById('checkSvg');
+        var checkPath = document.getElementById('checkPath');
+        var successLabel = document.getElementById('successLabel');
+        var successSubLabel = document.getElementById('successSubLabel');
+
+        if (!submitBtn || !submitForm) return;
+
+        submitForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            submitBtn.style.opacity = '.5';
+            submitBtn.style.pointerEvents = 'none';
+
+            overlay.style.opacity = '1';
+            overlay.style.pointerEvents = 'auto';
+            requestAnimationFrame(function() {
+                box.style.opacity = '1';
+                box.style.transform = 'scale(1)';
+            });
+
+            checkSvg.style.transform = 'scale(0)';
+            checkSvg.style.transition = 'none';
+
+            var pathLen = checkPath.getTotalLength();
+            checkPath.style.strokeDasharray = pathLen;
+            checkPath.style.strokeDashoffset = pathLen;
+            checkPath.style.transition = 'none';
+
+            successLabel.style.opacity = '0';
+            successLabel.style.transition = 'none';
+            successSubLabel.style.opacity = '0';
+            successSubLabel.style.transition = 'none';
+
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    checkSvg.style.transition = 'transform .4s cubic-bezier(.175,.885,.32,1.275)';
+                    checkSvg.style.transform = 'scale(1)';
+
+                    setTimeout(function() {
+                        checkPath.style.transition = 'stroke-dashoffset .55s cubic-bezier(.4,0,.2,1)';
+                        checkPath.style.strokeDashoffset = '0';
+                    }, 120);
+
+                    setTimeout(function() {
+                        successLabel.style.transition = 'all .3s ease';
+                        successLabel.style.opacity = '1';
+                        successLabel.style.transform = 'translateY(0)';
+                    }, 480);
+
+                    setTimeout(function() {
+                        successSubLabel.style.transition = 'all .3s ease';
+                        successSubLabel.style.opacity = '1';
+                        successSubLabel.style.transform = 'translateY(0)';
+                    }, 600);
+                });
+            });
+
+            setTimeout(function() {
+                submitForm.submit();
+            }, 1500);
+        });
+    });
+    </script>
 
 </x-layouts.app>
