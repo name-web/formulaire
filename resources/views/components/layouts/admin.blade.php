@@ -68,14 +68,16 @@
             width: 218px;
             background: var(--black); color: white;
             display: flex; flex-direction: column;
-            z-index: 200; overflow: hidden;
-            transform: translateX(0);
-            will-change: transform;
+            z-index: 200;
         }
 
         /* ── Overlay ── */
         .sidebar-overlay {
             display: none;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
         }
 
         .brand {
@@ -544,31 +546,36 @@
             transform: translateY(-6px) rotate(-45deg);
         }
 
-        /* ── Responsive ── */
+        /* ══════════════════════════════════════════════════════════════
+           RESPONSIVE — rebuilt from scratch
+           Breakpoints: 1050 / 1024 / 800 / 550
+           ══════════════════════════════════════════════════════════════ */
+
+        /* ── ≤1050px : tighten main padding, stack intro ── */
         @media (max-width: 1050px) {
-            .main { padding-left: 25px; padding-right: 25px; }
+            .main { padding-left: 24px; padding-right: 24px; }
             .intro { flex-direction: column; align-items: flex-start; gap: 14px; }
         }
-        /* ── Sidebar responsive: hidden on tablet/mobile ── */
+
+        /* ── ≤1024px : sidebar becomes off-canvas overlay ── */
         @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
                 width: 280px;
                 z-index: 300;
                 transition: transform .3s cubic-bezier(.4,0,.2,1);
-                will-change: transform;
             }
             .sidebar.open {
                 transform: translateX(0);
             }
             .sidebar-close { display: flex; }
+            .hamburger { display: flex; }
+            .topbar { z-index: 310; }
             .main {
                 margin-left: 0 !important;
                 padding-left: 16px !important;
                 padding-right: 16px !important;
             }
-            .topbar { z-index: 310; }
-            .hamburger { display: flex; }
             .sidebar-overlay {
                 display: block;
                 position: fixed; inset: 0;
@@ -586,53 +593,96 @@
             }
         }
 
+        /* ── ≤800px : tablet / small desktop ── */
         @media (max-width: 800px) {
+            /* Topbar */
+            .topbar { height: 56px; padding: 0 14px; }
+            .breadcrumb { font-size: 12px; }
+            .top-right .top-btn span { display: none; }
+
+            /* Intro */
+            .intro { padding: 22px 0 18px; }
+            .intro h1 { font-size: 28px; letter-spacing: -1px; }
+
+            /* Admin header / titles */
+            .admin-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .admin-title { font-size: 28px; letter-spacing: -1px; }
+
+            /* Stats strip: 2×2 grid */
             .stats { grid-template-columns: 1fr 1fr; gap: 0; }
             .stat { border-bottom: 1px solid var(--line); min-height: 100px; padding: 18px; }
             .stat:nth-child(2) { border-right: 0; }
             .stat:last-child { border-bottom: 0; }
             .stat-number { font-size: 32px; }
-            .top-right .top-btn span { display: none; }
+
+            /* Content grids: single column */
             .content { grid-template-columns: 1fr; }
             .content-reverse { grid-template-columns: 1fr; }
             .content [style*="position:sticky"],
             .content [style*="position: sticky"] { position: static !important; }
+
+            /* Tables: horizontal scroll wrapper */
             .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
             .table-head, .table-row { min-width: 540px; }
-            .form-grid { grid-template-columns: 1fr !important; }
-            .intro h1 { font-size: 28px; letter-spacing: -1px; }
-            .admin-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .admin-title { font-size: 28px; letter-spacing: -1px; }
-            .pagination { flex-wrap: wrap; gap: 4px; }
+
+            /* Card header */
+            .card-header { height: auto; padding: 16px 18px; flex-wrap: wrap; gap: 10px; }
+
+            /* Search / filter forms */
             .search-form { flex-direction: column; }
             .search-form > div { min-width: 0 !important; width: 100%; }
             .search-form > div:last-child { flex-direction: row; }
+            .form-grid { grid-template-columns: 1fr !important; }
+
+            /* Modals */
             .modal-content { margin: 16px; max-height: calc(100vh - 32px); overflow-y: auto; }
             #confirmOverlay { padding: 16px; }
             #confirmBox { padding: 32px 28px !important; }
+
+            /* Text overflow */
             .client-name, .project-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
             .error-box { word-break: break-word; }
-            .card-header { height: auto; padding: 16px 18px; flex-wrap: wrap; gap: 10px; }
-            .topbar { height: 56px; padding: 0 14px; }
-            .breadcrumb { font-size: 12px; }
-            .intro { padding: 22px 0 18px; }
-            .admin-btn { padding: 9px 14px; font-size: 13px; min-height: 40px; }
+
+            /* Pagination */
+            .pagination { flex-wrap: wrap; gap: 4px; }
+
+            /* Side sections */
             .side-section { padding: 18px; }
+
+            /* Cards */
             .stat-card { padding: 18px; }
             .stat-value { font-size: 28px; }
+
+            /* Empty state */
             .empty-state { padding: 40px 18px; }
+
+            /* Buttons */
+            .admin-btn { padding: 9px 14px; font-size: 13px; min-height: 40px; }
         }
+
+        /* ── ≤550px : mobile ── */
         @media (max-width: 550px) {
+            /* Topbar */
+            .topbar { height: 52px; padding: 0 12px; }
+            .breadcrumb { font-size: 11px; }
+
+            /* Intro */
+            .intro { padding: 18px 0 14px; }
+            .intro h1 { font-size: 24px; }
+            .intro p { font-size: 13px; }
+
+            /* Stats: single column */
             .stats { grid-template-columns: 1fr; }
             .stat { border-right: 0; border-bottom: 1px solid var(--line); }
             .stat:last-child { border-bottom: 0; }
             .stat-number { font-size: 30px; }
+
+            /* Tables: card layout on mobile */
             .table-head { display: none; }
             .table-row {
                 display: flex; flex-wrap: wrap; gap: 8px 12px;
                 padding: 16px 18px; min-height: auto;
-                grid-template-columns: 1fr 40px;
-                align-items: center;
+                position: relative; padding-right: 60px;
             }
             .table-row > .client { flex: 1 1 100%; }
             .table-row > .project,
@@ -649,28 +699,40 @@
             .table-row > .col-info::before { content: attr(data-label); font-weight: 700; color: var(--text); }
             .table-row > .col-meta::before { content: attr(data-label); font-weight: 600; }
             .table-row > .status { display: inline-flex; }
-            .table-row > .open { grid-column: 2; grid-row: 1; position: absolute; right: 18px; top: 16px; }
-            .table-row { position: relative; padding-right: 60px; }
-            .topbar { height: 52px; padding: 0 12px; }
-            .breadcrumb { font-size: 11px; }
-            .intro { padding: 18px 0 14px; }
-            .intro h1 { font-size: 24px; }
-            .intro p { font-size: 13px; }
-            .admin-btn { padding: 8px 12px; font-size: 13px; min-height: 40px; }
-            .side-section { padding: 16px; }
-            .stat-card { padding: 16px; }
-            .stat-value { font-size: 26px; }
+            .table-row > .open {
+                position: absolute; right: 18px; top: 16px;
+            }
+
+            /* Pagination */
             .pagination { justify-content: center; }
             .pagination a, .pagination span { min-width: 36px; height: 36px; padding: 0 10px; font-size: 12px; }
+
+            /* Cards */
             .card-title { font-size: 16px; }
             .card-subtitle { font-size: 12px; }
             .view-all { font-size: 12px; padding: 4px 8px; }
-            .quick-action { padding: 12px; font-size: 13px; }
+
+            /* Badges */
             .admin-badge { padding: 4px 10px; font-size: 12px; }
+
+            /* Buttons */
+            .admin-btn { padding: 8px 12px; font-size: 13px; min-height: 40px; }
             .top-btn { height: 36px; padding: 0 12px; font-size: 12px; }
             .top-btn.primary { height: 40px; }
+
+            /* Inputs */
             .admin-label { font-size: 11px; }
             .admin-input { height: 40px; font-size: 13px; }
+
+            /* Side sections */
+            .side-section { padding: 16px; }
+
+            /* Stat cards */
+            .stat-card { padding: 16px; }
+            .stat-value { font-size: 26px; }
+
+            /* Quick actions */
+            .quick-action { padding: 12px; font-size: 13px; }
         }
 
         /* ── Focus / Accessibility ── */
