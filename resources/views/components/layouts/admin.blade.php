@@ -491,7 +491,7 @@
         @media (max-width: 800px) {
             .sidebar {
                 transform: translateX(-100%);
-                width: 240px;
+                width: 260px;
                 transition: transform .35s cubic-bezier(.4,0,.2,1);
             }
             .sidebar.open {
@@ -499,32 +499,32 @@
             }
             .main {
                 margin-left: 0 !important;
-                padding-left: 18px !important;
-                padding-right: 18px !important;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
             }
             .hamburger { display: flex; }
-            .stats { grid-template-columns: 1fr 1fr; }
-            .stat { border-bottom: 1px solid var(--line); }
+            .stats { grid-template-columns: 1fr 1fr; gap: 0; }
+            .stat { border-bottom: 1px solid var(--line); min-height: 100px; padding: 18px; }
             .stat:nth-child(2) { border-right: 0; }
             .stat:last-child { border-bottom: 0; }
-            .stat-number { font-size: 34px; }
+            .stat-number { font-size: 32px; }
             .top-right .top-btn span { display: none; }
             .content { grid-template-columns: 1fr; }
             .content-reverse { grid-template-columns: 1fr; }
-            .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            .table-head, .table-row { min-width: 600px; }
+            .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
+            .table-head, .table-row { min-width: 540px; }
             .form-grid { grid-template-columns: 1fr !important; }
             .sidebar-overlay {
-                position: fixed; inset: 0; background: rgba(0,0,0,.45);
+                position: fixed; inset: 0; background: rgba(0,0,0,.5);
                 z-index: 99; pointer-events: none; opacity: 0;
-                transition: opacity .3s ease;
+                transition: opacity .3s ease; backdrop-filter: blur(2px);
             }
             .sidebar.open ~ .sidebar-overlay {
                 pointer-events: auto; opacity: 1;
             }
-            .intro h1 { font-size: 28px; }
+            .intro h1 { font-size: 28px; letter-spacing: -1px; }
             .admin-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .admin-title { font-size: 28px; }
+            .admin-title { font-size: 28px; letter-spacing: -1px; }
             .pagination { flex-wrap: wrap; gap: 4px; }
             .search-form { flex-direction: column; }
             .search-form > div { min-width: 0 !important; width: 100%; }
@@ -532,25 +532,61 @@
             .modal-content { margin: 16px; max-height: calc(100vh - 32px); overflow-y: auto; }
             .client-name, .project-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
             .error-box { word-break: break-word; }
+            .card-header { height: auto; padding: 16px 18px; flex-wrap: wrap; gap: 10px; }
+            .topbar { height: 56px; padding: 0 14px; }
+            .breadcrumb { font-size: 12px; }
+            .intro { padding: 22px 0 18px; }
+            .admin-btn { padding: 9px 14px; font-size: 13px; min-height: 40px; }
+            .side-section { padding: 18px; }
+            .stat-card { padding: 18px; }
+            .stat-value { font-size: 28px; }
+            .empty-state { padding: 40px 18px; }
         }
         @media (max-width: 550px) {
             .stats { grid-template-columns: 1fr; }
             .stat { border-right: 0; border-bottom: 1px solid var(--line); }
             .stat:last-child { border-bottom: 0; }
+            .stat-number { font-size: 30px; }
             .table-head { display: none; }
-            .table-row { grid-template-columns: 1fr 40px; padding: 15px 17px; }
-            .table-row > .project, .table-row > .date, .table-row > .status { display: none; }
-            .open { grid-column: 2; grid-row: 1; }
-            .topbar { height: 56px; padding: 0 12px; }
-            .breadcrumb { font-size: 12px; }
-            .intro { padding: 20px 0 16px; }
+            .table-row {
+                display: flex; flex-wrap: wrap; gap: 8px 12px;
+                padding: 16px 18px; min-height: auto;
+                grid-template-columns: 1fr 40px;
+                align-items: center;
+            }
+            .table-row > .client { flex: 1 1 100%; }
+            .table-row > .project,
+            .table-row > .date,
+            .table-row > .status {
+                display: flex; align-items: center; gap: 6px;
+                font-size: 12px; color: var(--muted);
+                flex: 0 0 auto;
+            }
+            .table-row > .project::before { content: "Projet :"; font-weight: 700; color: var(--text); }
+            .table-row > .date::before { content: "Le"; font-weight: 600; }
+            .table-row > .status { display: inline-flex; }
+            .table-row > .open { grid-column: 2; grid-row: 1; position: absolute; right: 18px; top: 16px; }
+            .table-row { position: relative; padding-right: 60px; }
+            .topbar { height: 52px; padding: 0 12px; }
+            .breadcrumb { font-size: 11px; }
+            .intro { padding: 18px 0 14px; }
             .intro h1 { font-size: 24px; }
-            .card-header { height: auto; padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
-            .admin-btn { padding: 8px 12px; font-size: 13px; }
+            .intro p { font-size: 13px; }
+            .admin-btn { padding: 8px 12px; font-size: 13px; min-height: 40px; }
             .side-section { padding: 16px; }
             .stat-card { padding: 16px; }
-            .stat-value { font-size: 28px; }
+            .stat-value { font-size: 26px; }
             .pagination { justify-content: center; }
+            .pagination a, .pagination span { min-width: 36px; height: 36px; padding: 0 10px; font-size: 12px; }
+            .card-title { font-size: 16px; }
+            .card-subtitle { font-size: 12px; }
+            .view-all { font-size: 12px; padding: 4px 8px; }
+            .quick-action { padding: 12px; font-size: 13px; }
+            .admin-badge { padding: 4px 10px; font-size: 12px; }
+            .top-btn { height: 36px; padding: 0 12px; font-size: 12px; }
+            .top-btn.primary { height: 40px; }
+            .admin-label { font-size: 11px; }
+            .admin-input { height: 40px; font-size: 13px; }
         }
 
         /* ── Hamburger animated icon ── */
@@ -563,6 +599,7 @@
             position: relative; z-index: 110;
         }
         .hamburger:hover { background: var(--line); }
+        .hamburger:active { transform: scale(.95); }
         .hamburger-bars {
             width: 20px; height: 14px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -584,6 +621,17 @@
             transform: translateY(-6px) rotate(-45deg);
         }
 
+        /* ── Focus / Accessibility ── */
+        .nav-item:focus-visible,
+        .admin-btn:focus-visible,
+        .top-btn:focus-visible,
+        .quick-action:focus-visible,
+        .pagination a:focus-visible {
+            outline: 2px solid var(--yellow);
+            outline-offset: 2px;
+        }
+
+        /* ── Touch targets (coarse pointer) ── */
         @media (pointer: coarse) {
             .nav-item { min-height: 48px; }
             .admin-btn { min-height: 44px; }
@@ -591,6 +639,16 @@
             .hamburger { min-width: 44px; min-height: 44px; }
             .open { min-width: 44px; min-height: 44px; }
             .pagination a, .pagination span { min-width: 44px; min-height: 44px; }
+            .admin-input { min-height: 44px; }
+        }
+
+        /* ── Reduced motion ── */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
