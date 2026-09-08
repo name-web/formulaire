@@ -64,12 +64,13 @@
 
         /* ── Sidebar ── */
         .sidebar {
-            position: fixed; top: 0; left: 0; bottom: 0; width: 218px;
-            height: 100vh; height: 100dvh;
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 218px;
             background: var(--black); color: white;
             display: flex; flex-direction: column;
             z-index: 200; overflow: hidden;
-            transition: transform .3s cubic-bezier(.4,0,.2,1);
+            transform: translateX(0);
+            will-change: transform;
         }
 
         /* ── Overlay ── */
@@ -552,6 +553,8 @@
                 transform: translateX(-100%);
                 width: 280px;
                 z-index: 300;
+                transition: transform .3s cubic-bezier(.4,0,.2,1);
+                will-change: transform;
             }
             .sidebar.open {
                 transform: translateX(0);
