@@ -503,6 +503,38 @@
             border-radius: 4px;
         }
 
+        /* ── Hamburger animated icon ── */
+        .hamburger {
+            display: none;
+            align-items: center; justify-content: center;
+            width: 44px; height: 44px; border: none; background: none;
+            color: var(--text); cursor: pointer;
+            border-radius: 6px; transition: background .2s;
+            position: relative; z-index: 110;
+        }
+        .hamburger:hover { background: var(--line); }
+        .hamburger:active { transform: scale(.95); }
+        .hamburger-bars {
+            width: 20px; height: 14px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative;
+        }
+        .hamburger-bars span {
+            display: block; width: 100%; height: 2px;
+            background: var(--text); border-radius: 2px;
+            transition: all .3s cubic-bezier(.4,0,.2,1);
+            transform-origin: center;
+        }
+        .hamburger.active .hamburger-bars span:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+        .hamburger.active .hamburger-bars span:nth-child(2) {
+            opacity: 0; transform: scaleX(0);
+        }
+        .hamburger.active .hamburger-bars span:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
         /* ── Responsive ── */
         @media (max-width: 1050px) {
             .main { padding-left: 25px; padding-right: 25px; }
@@ -613,38 +645,6 @@
             .top-btn.primary { height: 40px; }
             .admin-label { font-size: 11px; }
             .admin-input { height: 40px; font-size: 13px; }
-        }
-
-        /* ── Hamburger animated icon ── */
-        .hamburger {
-            display: none;
-            align-items: center; justify-content: center;
-            width: 44px; height: 44px; border: none; background: none;
-            color: var(--text); cursor: pointer;
-            border-radius: 6px; transition: background .2s;
-            position: relative; z-index: 110;
-        }
-        .hamburger:hover { background: var(--line); }
-        .hamburger:active { transform: scale(.95); }
-        .hamburger-bars {
-            width: 20px; height: 14px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            position: relative;
-        }
-        .hamburger-bars span {
-            display: block; width: 100%; height: 2px;
-            background: var(--text); border-radius: 2px;
-            transition: all .3s cubic-bezier(.4,0,.2,1);
-            transform-origin: center;
-        }
-        .hamburger.active .hamburger-bars span:nth-child(1) {
-            transform: translateY(6px) rotate(45deg);
-        }
-        .hamburger.active .hamburger-bars span:nth-child(2) {
-            opacity: 0; transform: scaleX(0);
-        }
-        .hamburger.active .hamburger-bars span:nth-child(3) {
-            transform: translateY(-6px) rotate(-45deg);
         }
 
         /* ── Focus / Accessibility ── */
