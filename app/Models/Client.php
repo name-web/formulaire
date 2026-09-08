@@ -31,6 +31,11 @@ class Client extends Model
         return $this->hasMany(Project::class);
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(ClientComment::class)->latest();
+    }
+
     public function scopeProspects(Builder $query): Builder
     {
         return $query->where('status', 'prospect');

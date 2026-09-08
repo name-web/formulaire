@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ClientClientController;
+use App\Http\Controllers\Admin\ClientCommentController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -65,6 +66,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::resource('clients', ClientController::class)->only(['index', 'show']);
     Route::patch('clients/{client}/convert', [ClientController::class, 'convert'])->name('clients.convert');
+    Route::post('clients/{client}/comments', [ClientCommentController::class, 'store'])->name('clients.comments.store');
+    Route::delete('clients/{client}/comments/{comment}', [ClientCommentController::class, 'destroy'])->name('clients.comments.destroy');
 
     Route::resource('client-clients', ClientClientController::class)->only(['index', 'show']);
 

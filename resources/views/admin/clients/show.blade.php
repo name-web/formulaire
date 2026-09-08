@@ -79,7 +79,7 @@
             </div>
         </div>
 
-        {{-- Right: Projects --}}
+        {{-- Right: Projects + Comments --}}
         <div style="display:flex;flex-direction:column;gap:18px;">
             <div class="card">
                 <div class="card-header">
@@ -115,6 +115,65 @@
                                 <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>
                                 <span class="date">{{ $project->created_at->format('d/m/Y') }}</span>
                             </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            {{-- Comments --}}
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">
+                            <i class="fa-solid fa-comments" style="color:var(--yellow);margin-right:6px;"></i>
+                            Commentaires de suivi
+                        </div>
+                        <div class="card-subtitle">{{ $client->comments->count() }} commentaire{{ $client->comments->count() > 1 ? 's' : '' }}</div>
+                    </div>
+                </div>
+
+                {{-- Add comment form --}}
+                <div style="padding:18px 22px;border-bottom:1px solid var(--line);">
+                    <form method="POST" action="/admin/clients/{{ $client->id }}/comments">
+                        @csrf
+                        <textarea name="content" class="admin-input" rows="3" placeholder="Ajouter un commentaire de suivi..." required style="height:auto;min-height:80px;padding:12px 16px;resize:vertical;">{{ old('content') }}</textarea>
+                        @error('content')<div style="color:#dc2626;font-size:12px;margin-top:4px;">{{ $message }}</div>@enderror
+                        <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+                            <button type="submit" class="admin-btn btn-primary btn-sm">
+                                <i class="fa-solid fa-paper-plane" style="font-size:11px;"></i> Ajouter le commentaire
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {{-- Comments timeline --}}
+                @if($client->comments->isEmpty())
+                    <div class="empty-state" style="padding:36px 22px;">
+                        <i class="fa-regular fa-comment-dots"></i>
+                        <p>Aucun commentaire pour le moment.</p>
+                    </div>
+                @else
+                    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:0;">
+                        @foreach($client->comments as $comment)
+                            <div style="display:flex;gap:12px;position:relative;padding-bottom:18px;{{ !$loop->last ? 'padding-left:14px;border-left:2px solid var(--line);margin-left:5px;' : 'padding-left:14px;margin-left:5px;'}}">
+                                <div style="position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--yellow);border:2px solid white;flex-shrink:0;z-index:1;"></div>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+                                        <span style="font-size:13px;font-weight:700;color:var(--black);">{{ $comment->user->name }}</span>
+                                        <span style="font-size:11px;color:var(--muted);">{{ $comment->created_at->format('d/m/Y à H:i') }}</span>
+                                        @if($comment->user_id === auth()->id())
+                                            <form method="POST" action="/admin/clients/{{ $client->id }}/comments/{{ $comment->id }}" style="margin-left:auto;" onsubmit="return confirm('Supprimer ce commentaire ?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 4px;transition:color .2s;" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='var(--muted)'">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                    <div style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;">{{ $comment->content }}</div>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 @endif
