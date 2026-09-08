@@ -807,12 +807,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 1024 && sidebar.classList.contains('open')) {
-            closeSidebar();
-        }
-    });
-
     document.querySelectorAll('.admin-table tr[onclick], .table-row[onclick]').forEach(function(row) {
         row.style.cursor = 'pointer';
         row.addEventListener('mouseenter', function() {
