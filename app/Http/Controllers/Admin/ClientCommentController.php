@@ -26,6 +26,8 @@ class ClientCommentController extends Controller
 
     public function destroy(Client $client, ClientComment $comment): RedirectResponse
     {
+        abort_unless($comment->client_id === $client->id, 404);
+
         if ($comment->user_id !== auth()->id()) {
             abort(403, 'Vous ne pouvez supprimer que vos propres commentaires.');
         }

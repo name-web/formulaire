@@ -16,7 +16,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $defaults = [
             'name' => 'Test',
-            'phone' => '+225000000',
+            'phone' => '+2250708091011',
         ];
 
         return PendingSubmission::create([
@@ -39,7 +39,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'phone' => '+225 07070707',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -51,7 +51,7 @@ class QuestionnaireRoutesTest extends TestCase
 
         $pending = PendingSubmission::first();
         $this->assertEquals('Jean Dupont', $pending->client_data['name']);
-        $this->assertEquals('+225 07070707', $pending->client_data['phone']);
+        $this->assertEquals('+2250708091011', $pending->client_data['phone']);
         $this->assertEquals(['site_vitrine'], $pending->project_data['project_types']);
     }
 
@@ -59,7 +59,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'phone' => '+225 07070707',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine', 'ecommerce', 'application_mobile'],
         ]);
 
@@ -73,7 +73,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $this->post(route('questionnaire.start'), [
             'name' => 'Test Vitrine',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -85,7 +85,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $this->post(route('questionnaire.start'), [
             'name' => 'Test E-commerce',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['ecommerce'],
         ]);
 
@@ -97,7 +97,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $this->post(route('questionnaire.start'), [
             'name' => 'Test Mobile',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['application_mobile'],
         ]);
 
@@ -109,7 +109,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $this->post(route('questionnaire.start'), [
             'name' => 'Test Logiciel',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['logiciel'],
         ]);
 
@@ -121,7 +121,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'phone' => '+225 07070707',
+            'phone' => '+2250708091011',
             'project_types' => [],
         ]);
 
@@ -132,7 +132,7 @@ class QuestionnaireRoutesTest extends TestCase
     {
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'phone' => '+225 07070707',
+            'phone' => '+2250708091011',
             'project_types' => ['invalid_type'],
         ]);
 

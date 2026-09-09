@@ -36,7 +36,7 @@ class UserQuestionnaireFlowTest extends TestCase
     {
         $response = $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -50,7 +50,7 @@ class UserQuestionnaireFlowTest extends TestCase
     {
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -62,7 +62,7 @@ class UserQuestionnaireFlowTest extends TestCase
     {
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -97,7 +97,7 @@ class UserQuestionnaireFlowTest extends TestCase
     {
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -110,7 +110,7 @@ class UserQuestionnaireFlowTest extends TestCase
         // Start
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 

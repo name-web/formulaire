@@ -177,6 +177,23 @@ class ClientCommentTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    public function test_comment_cannot_be_deleted_through_another_client_url(): void
+    {
+        $user = $this->createAdmin();
+        $clientA = $this->createProspect();
+        $clientB = $this->createProspect();
+        $comment = ClientComment::create([
+            'client_id' => $clientA->id,
+            'user_id' => $user->id,
+            'content' => 'Commentaire du client A.',
+        ]);
+
+        $response = $this->actingAs($user)->delete(route('admin.clients.comments.destroy', [$clientB, $comment]));
+
+        $response->assertStatus(404);
+        $this->assertDatabaseHas('client_comments', ['id' => $comment->id]);
+    }
+
     public function test_comment_belongs_to_client(): void
     {
         $user = $this->createAdmin();

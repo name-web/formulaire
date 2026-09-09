@@ -24,7 +24,7 @@ class PendingSubmissionFlowTest extends TestCase
     {
         $response = $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -42,7 +42,7 @@ class PendingSubmissionFlowTest extends TestCase
     {
         $response = $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -57,13 +57,13 @@ class PendingSubmissionFlowTest extends TestCase
     {
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
         $pending = PendingSubmission::first();
         $this->assertEquals('Jean Dupont', $pending->client_data['name']);
-        $this->assertEquals('+22501020304', $pending->client_data['phone']);
+        $this->assertEquals('+2250708091011', $pending->client_data['phone']);
         $this->assertEquals(['site_vitrine'], $pending->project_data['project_types']);
     }
 
@@ -356,7 +356,7 @@ class PendingSubmissionFlowTest extends TestCase
 
         $response = $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -375,7 +375,7 @@ class PendingSubmissionFlowTest extends TestCase
 
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -389,7 +389,7 @@ class PendingSubmissionFlowTest extends TestCase
         config(['geo.default_country' => null]);
 
         $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '+22501020304', 'country' => null],
+            'client_data' => ['name' => 'Test', 'phone' => '+2250708091011', 'country' => null],
             'project_data' => ['project_types' => ['site_vitrine']],
             'answers_data' => [],
             'files_data' => [],
@@ -408,7 +408,7 @@ class PendingSubmissionFlowTest extends TestCase
     public function test_submit_stores_detected_country_in_client(): void
     {
         $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Geo Test', 'phone' => '+22501020304', 'country' => 'France'],
+            'client_data' => ['name' => 'Geo Test', 'phone' => '+2250708091011', 'country' => 'France'],
             'project_data' => ['project_types' => ['site_vitrine']],
             'answers_data' => [],
             'files_data' => [],

@@ -47,6 +47,12 @@ return [
             'label' => 'Commentaires',
         ],
         [
+            'route' => 'admin.quotes.index',
+            'route_pattern' => 'admin.quotes.*',
+            'icon' => 'fa-solid fa-file-invoice-dollar',
+            'label' => 'Devis',
+        ],
+        [
             'route' => 'admin.questions.index',
             'route_pattern' => 'admin.questions.*',
             'icon' => 'fa-solid fa-circle-question',

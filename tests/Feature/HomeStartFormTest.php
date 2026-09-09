@@ -21,7 +21,7 @@ class HomeStartFormTest extends TestCase
     {
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'phone' => '+225 07070707',
+            'phone' => '+2250708091011',
             'project_types' => 'site_vitrine',
         ]);
 
@@ -33,7 +33,7 @@ class HomeStartFormTest extends TestCase
     {
         $response = $this->post(route('questionnaire.start'), [
             'name' => 'Jean Dupont',
-            'phone' => '+225 07070707',
+            'phone' => '+2250708091011',
             'project_types' => '["site_vitrine","ecommerce"]',
         ]);
 

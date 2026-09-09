@@ -34,7 +34,7 @@ class Phase5VerificationTest extends TestCase
     {
         $this->post('/questionnaire/start', [
             'name' => 'Jean Dupont',
-            'phone' => '+22501020304',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 
@@ -63,7 +63,7 @@ class Phase5VerificationTest extends TestCase
     {
         $this->post('/questionnaire/start', [
             'name' => 'Test',
-            'phone' => '+225000000',
+            'phone' => '+2250708091011',
             'project_types' => ['site_vitrine'],
         ]);
 

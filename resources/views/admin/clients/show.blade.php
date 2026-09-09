@@ -11,6 +11,7 @@
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
             @if($client->isProspect())
+                <a href="{{ route('admin.quotes.create', ['client_id' => $client->id]) }}" class="top-btn primary"><i class="fa-solid fa-file-invoice" style="margin-right:4px;"></i> Créer un devis</a>
                 <button type="button" class="top-btn primary" id="convertBtn" style="background:#176139;color:#fff;border:none;"><i class="fa-solid fa-check" style="margin-right:4px;"></i> Rendre client</button>
                 <form method="POST" action="{{ route('admin.clients.convert', $client) }}" id="convertForm" style="display:none;">
                     @csrf

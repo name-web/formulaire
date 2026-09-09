@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\ClientFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Client extends Model
 {
+    /** @use HasFactory<ClientFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'status',
@@ -34,6 +39,11 @@ class Client extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(ClientComment::class)->latest();
+    }
+
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class)->latest('issued_at');
     }
 
     public function scopeProspects(Builder $query): Builder

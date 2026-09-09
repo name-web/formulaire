@@ -9,7 +9,10 @@
             <h1 class="client-name-is-client">{{ $client->name }}</h1>
             <p>{{ $client->phone }}</p>
         </div>
-        <a href="{{ route('admin.client-clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
+        <div style="display:flex;gap:8px;align-items:center;">
+            <a href="{{ route('admin.quotes.create', ['client_id' => $client->id]) }}" class="top-btn primary"><i class="fa-solid fa-file-invoice" style="margin-right:4px;"></i> Créer un devis</a>
+            <a href="{{ route('admin.client-clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
+        </div>
     </section>
 
     <section class="content content-reverse" style="align-items:start;">

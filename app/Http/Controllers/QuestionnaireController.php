@@ -58,7 +58,7 @@ class QuestionnaireController extends Controller
         $projectTypes = $validated['project_types'];
 
         $clientData = collect($validated)
-            ->except(['project_types'])
+            ->except(['project_types', 'phone_country'])
             ->toArray();
 
         $clientData['country'] = $geoService->getCountry($request->ip());

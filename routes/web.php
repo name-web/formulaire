@@ -4,11 +4,13 @@ use App\Http\Controllers\Admin\ClientClientController;
 use App\Http\Controllers\Admin\ClientCommentController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\CompanySettingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\QuestionConditionController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\QuestionOptionController;
+use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\ImportController;
@@ -16,6 +18,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionnaireController;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
+
+require __DIR__.'/auth.php';
 
 Route::get('/', function () {
     return view('welcome');
@@ -74,6 +78,20 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::resource('client-clients', ClientClientController::class)->only(['index', 'show']);
 
+    Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
+    Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
+    Route::post('quotes', [QuoteController::class, 'store'])->name('quotes.store');
+    Route::get('quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+    Route::get('quotes/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
+    Route::patch('quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
+    Route::delete('quotes/{quote}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
+    Route::get('quotes/{quote}/preview', [QuoteController::class, 'preview'])->name('quotes.preview');
+    Route::get('quotes/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
+    Route::patch('quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->name('quotes.update-status');
+
+    Route::get('company-settings', [CompanySettingController::class, 'edit'])->name('company-settings.edit');
+    Route::patch('company-settings', [CompanySettingController::class, 'update'])->name('company-settings.update');
+
     Route::resource('users', UserController::class)->only(['index', 'store', 'update']);
     Route::patch('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
 
@@ -84,5 +102,3 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('questions/{question}/options', QuestionOptionController::class)->only(['store', 'update', 'destroy']);
     Route::resource('questions/{question}/conditions', QuestionConditionController::class)->only(['store', 'update', 'destroy']);
 });
-
-require __DIR__.'/auth.php';
