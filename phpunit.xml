@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         bootstrap="bootstrap/phpunit.php"
          colors="true"
 >
     <testsuites>
@@ -19,22 +19,48 @@
     </source>
     <php>
         <ini name="memory_limit" value="512M"/>
-        <env name="APP_ENV" value="testing"/>
-        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="mysql"/>
-        <env name="DB_HOST" value="127.0.0.1"/>
-        <env name="DB_PORT" value="3306"/>
-        <env name="DB_DATABASE" value="form_db_test"/>
-        <env name="DB_USERNAME" value="kamal"/>
-        <env name="DB_PASSWORD" value="kamal233.com"/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
-        <env name="PULSE_ENABLED" value="false"/>
-        <env name="TELESCOPE_ENABLED" value="false"/>
-        <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!--
+            Every value is declared twice on purpose:
+              - <server>      writes $_SERVER, which takes priority over
+                              OS-level environment variables in Laravel's Env
+                              reader (ServerConstAdapter is read first);
+              - <env force>   writes putenv() and $_ENV, for code that reads
+                              getenv() directly.
+            This keeps the test run deterministic even on machines that define
+            APP_*/DB_* variables globally.
+
+            Database credentials (DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD)
+            are intentionally NOT hardcoded here: they live in the git-ignored
+            .env.testing file (see .env.testing.example) and are applied by
+            bootstrap/testing-env.php.
+        -->
+        <server name="APP_ENV" value="testing"/>
+        <env name="APP_ENV" value="testing" force="true"/>
+        <server name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <server name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <server name="BROADCAST_CONNECTION" value="null"/>
+        <env name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <server name="CACHE_STORE" value="array"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
+        <server name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_CONNECTION" value="mysql" force="true"/>
+        <!-- The test database name is pinned (it is not a secret) so
+             RefreshDatabase can never run against a real database. -->
+        <server name="DB_DATABASE" value="form_db_test"/>
+        <env name="DB_DATABASE" value="form_db_test" force="true"/>
+        <server name="MAIL_MAILER" value="array"/>
+        <env name="MAIL_MAILER" value="array" force="true"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <server name="SESSION_DRIVER" value="array"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
+        <server name="PULSE_ENABLED" value="false"/>
+        <env name="PULSE_ENABLED" value="false" force="true"/>
+        <server name="TELESCOPE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false" force="true"/>
+        <server name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false" force="true"/>
     </php>
 </phpunit>
