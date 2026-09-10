@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'countriesnow' => [
+        // Optional absolute path to a CA bundle for the countries lookup API.
+        // Leave empty to use the system default CA store (verification is
+        // always enforced). Useful on Windows local environments.
+        'ca_bundle' => env('COUNTRIESNOW_CA_BUNDLE'),
+    ],
+
 ];

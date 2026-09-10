@@ -33,7 +33,7 @@ trait HasCountryData
         'Benin' => 'Bénin',
     ];
 
-    private function fetchAllCountryData(): array
+    protected function fetchAllCountryData(): array
     {
         return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
             $response = Http::timeout(30)
@@ -60,20 +60,59 @@ trait HasCountryData
         });
     }
 
-    private function sslOptions(): array
+    /**
+     * Guzzle options enforcing TLS certificate verification for the API calls.
+     *
+     * Verification is never disabled: when no CA bundle override applies, no
+     * `verify` option is set and Guzzle/cURL fall back to the default system
+     * CA store, which still performs full certificate verification.
+     */
+    protected function sslOptions(): array
     {
-        $caBundle = $this->findCaBundle();
+        $caBundle = $this->resolveCaBundle();
 
-        if ($caBundle) {
+        if (is_string($caBundle) && $caBundle !== '' && is_file($caBundle)) {
             return ['verify' => $caBundle];
         }
 
-        return ['verify' => false];
+        return [];
     }
 
-    private function findCaBundle(): ?string
+    /**
+     * The explicit CA bundle override (services.countriesnow.ca_bundle), or
+     * the first CA bundle auto-detected on this machine, or null when none
+     * can be found.
+     */
+    protected function resolveCaBundle(): ?string
     {
-        $candidates = [
+        $configured = config('services.countriesnow.ca_bundle');
+
+        if (is_string($configured) && $configured !== '') {
+            return $configured;
+        }
+
+        return $this->findCaBundle();
+    }
+
+    protected function findCaBundle(): ?string
+    {
+        foreach ($this->caBundleCandidates() as $path) {
+            if ($path && file_exists($path)) {
+                return $path;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Known CA bundle locations, probed in order.
+     *
+     * @return array<int, ?string>
+     */
+    protected function caBundleCandidates(): array
+    {
+        return [
             ini_get('openssl.cafile'),
             '/etc/ssl/certs/ca-certificates.crt',
             '/etc/pki/tls/certs/ca-bundle.crt',
@@ -81,13 +120,5 @@ trait HasCountryData
             'C:\\Program Files\\Git\\mingw64\\etc\\ssl\\certs\\ca-bundle.crt',
             'C:\\Program Files\\Common Files\\SSL\\cacert.pem',
         ];
-
-        foreach ($candidates as $path) {
-            if ($path && file_exists($path)) {
-                return $path;
-            }
-        }
-
-        return null;
     }
 }
