@@ -99,6 +99,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('questions/{question}/toggle', [QuestionController::class, 'toggleActive'])->name('questions.toggle');
     Route::resource('questions', QuestionController::class)->except(['show']);
 
-    Route::resource('questions/{question}/options', QuestionOptionController::class)->only(['store', 'update', 'destroy']);
-    Route::resource('questions/{question}/conditions', QuestionConditionController::class)->only(['store', 'update', 'destroy']);
+    // Nested resource names would contain the {question} segment
+    // (admin.questions.{question}.options.store) while the views call
+    // admin.questions.options.* / admin.questions.conditions.* — declared
+    // explicitly here so those names exist.
+    Route::post('questions/{question}/options', [QuestionOptionController::class, 'store'])->name('questions.options.store');
+    Route::patch('questions/{question}/options/{option}', [QuestionOptionController::class, 'update'])->name('questions.options.update');
+    Route::delete('questions/{question}/options/{option}', [QuestionOptionController::class, 'destroy'])->name('questions.options.destroy');
+    Route::post('questions/{question}/conditions', [QuestionConditionController::class, 'store'])->name('questions.conditions.store');
+    Route::patch('questions/{question}/conditions/{condition}', [QuestionConditionController::class, 'update'])->name('questions.conditions.update');
+    Route::delete('questions/{question}/conditions/{condition}', [QuestionConditionController::class, 'destroy'])->name('questions.conditions.destroy');
 });
