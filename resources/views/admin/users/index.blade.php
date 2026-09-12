@@ -74,13 +74,18 @@
                         </div>
                         <div class="date">{{ $user->created_at->format('d/m/Y') }}</div>
                         <div style="display:flex;gap:6px;">
-                            <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="admin-btn {{ $user->is_active ? 'btn-danger' : 'btn-primary' }} btn-sm" title="{{ $user->is_active ? 'Désactiver' : 'Activer' }}">
-                                    <i class="fa-solid {{ $user->is_active ? 'fa-ban' : 'fa-check' }}"></i>
-                                </button>
-                            </form>
+                            {{-- Un compte Super Admin ne se gère que depuis un compte Super Admin. --}}
+                            @if($user->isSuperAdmin() && !auth()->user()->isSuperAdmin())
+                                <i class="fa-solid fa-lock" title="Géré par un Super Administrateur" style="color:var(--muted);padding:6px;"></i>
+                            @else
+                                <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="admin-btn {{ $user->is_active ? 'btn-danger' : 'btn-primary' }} btn-sm" title="{{ $user->is_active ? 'Désactiver' : 'Activer' }}">
+                                        <i class="fa-solid {{ $user->is_active ? 'fa-ban' : 'fa-check' }}"></i>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 @endforeach
@@ -122,7 +127,7 @@
                 <div style="margin-bottom:24px;">
                     <label class="admin-label">Rôle</label>
                     <select name="role" class="admin-input">
-                        @foreach(config('user_roles.roles') as $key => $role)
+                        @foreach($assignableRoles as $key => $role)
                             <option value="{{ $key }}">{{ $role['label'] }}</option>
                         @endforeach
                     </select>

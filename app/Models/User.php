@@ -40,9 +40,30 @@ class User extends Authenticatable
         return $this->hasMany(ClientComment::class);
     }
 
+    /**
+     * Prospects and clients followed by this developer.
+     */
+    public function assignedClients(): HasMany
+    {
+        return $this->hasMany(Client::class, 'assigned_developer_id');
+    }
+
+    /**
+     * The general admin dashboard accepts administrators and super admins.
+     */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['admin', 'super_admin'], true);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isDeveloper(): bool
+    {
+        return $this->role === 'developer';
     }
 
     public function isActive(): bool

@@ -1,5 +1,15 @@
 <x-layouts.admin :title="'Prospect — ' . $client->name">
 
+@php
+    /*
+     * Cette fiche est partagée avec l'espace privé Super Admin, où elle sert de
+     * page d'observation. $context garde les liens et les actions dans l'espace
+     * depuis lequel la page a été ouverte (même convention que _board.blade.php).
+     */
+    $isSuperAdminContext = ($context ?? 'admin') === 'super_admin';
+    $backRoute = $isSuperAdminContext ? 'super_admin.prospects.index' : 'admin.clients.index';
+@endphp
+
     <section class="intro">
         <div>
             <div class="intro-label">
@@ -10,7 +20,8 @@
             <p>{{ $client->phone }}</p>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-            @if($client->isProspect())
+            {{-- Actions de gestion : uniquement dans le dashboard général. --}}
+            @if($client->isProspect() && ! $isSuperAdminContext)
                 <a href="{{ route('admin.quotes.create', ['client_id' => $client->id]) }}" class="top-btn primary"><i class="fa-solid fa-file-invoice" style="margin-right:4px;"></i> Créer un devis</a>
                 <button type="button" class="top-btn primary" id="convertBtn" style="background:#176139;color:#fff;border:none;"><i class="fa-solid fa-check" style="margin-right:4px;"></i> Rendre client</button>
                 <form method="POST" action="{{ route('admin.clients.convert', $client) }}" id="convertForm" style="display:none;">
@@ -18,7 +29,7 @@
                     @method('PATCH')
                 </form>
             @endif
-            <a href="{{ route('admin.clients.index') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
+            <a href="{{ route($backRoute) }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Retour</a>
         </div>
     </section>
 
@@ -104,8 +115,11 @@
                             @php
                                 $typeLabels = $project->type_labels;
                                 $sc = \App\Models\Project::getStatusConfig($project->status);
+                                // Le détail projet n'existe que dans le dashboard général :
+                                // depuis le Super Admin, la ligne reste consultative.
+                                $projectTag = $isSuperAdminContext ? 'div' : 'a';
                             @endphp
-                            <a href="{{ route('admin.projects.show', $project) }}" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
+                            <{{ $projectTag }} @if(! $isSuperAdminContext) href="{{ route('admin.projects.show', $project) }}" @endif style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
                                 <div style="width:40px;height:40px;border-radius:6px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <i class="fa-solid fa-folder" style="color:var(--black);font-size:14px;"></i>
                                 </div>
@@ -115,7 +129,7 @@
                                 </div>
                                 <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>
                                 <span class="date">{{ $project->created_at->format('d/m/Y') }}</span>
-                            </a>
+                            </{{ $projectTag }}>
                         @endforeach
                     </div>
                 @endif
@@ -133,19 +147,21 @@
                     </div>
                 </div>
 
-                {{-- Add comment form --}}
-                <div style="padding:18px 22px;border-bottom:1px solid var(--line);">
-                    <form method="POST" action="/admin/clients/{{ $client->id }}/comments">
-                        @csrf
-                        <textarea name="content" class="admin-input" rows="3" placeholder="Ajouter un commentaire de suivi..." required style="height:auto;min-height:80px;padding:12px 16px;resize:vertical;">{{ old('content') }}</textarea>
-                        @error('content')<div style="color:#dc2626;font-size:12px;margin-top:4px;">{{ $message }}</div>@enderror
-                        <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-                            <button type="submit" class="admin-btn btn-primary btn-sm">
-                                <i class="fa-solid fa-paper-plane" style="font-size:11px;"></i> Ajouter le commentaire
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                {{-- Add comment form : le Super Admin consulte l'historique sans l'alimenter. --}}
+                @unless($isSuperAdminContext)
+                    <div style="padding:18px 22px;border-bottom:1px solid var(--line);">
+                        <form method="POST" action="/admin/clients/{{ $client->id }}/comments">
+                            @csrf
+                            <textarea name="content" class="admin-input" rows="3" placeholder="Ajouter un commentaire de suivi..." required style="height:auto;min-height:80px;padding:12px 16px;resize:vertical;">{{ old('content') }}</textarea>
+                            @error('content')<div style="color:#dc2626;font-size:12px;margin-top:4px;">{{ $message }}</div>@enderror
+                            <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+                                <button type="submit" class="admin-btn btn-primary btn-sm">
+                                    <i class="fa-solid fa-paper-plane" style="font-size:11px;"></i> Ajouter le commentaire
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                @endunless
 
                 {{-- Comments timeline --}}
                 @if($client->comments->isEmpty())
@@ -162,7 +178,7 @@
                                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
                                         <span style="font-size:13px;font-weight:700;color:var(--black);">{{ $comment->user->name }}</span>
                                         <span style="font-size:11px;color:var(--muted);">{{ $comment->created_at->format('d/m/Y à H:i') }}</span>
-                                        @if($comment->user_id === auth()->id())
+                                        @if($comment->user_id === auth()->id() && ! $isSuperAdminContext)
                                             <form method="POST" action="/admin/clients/{{ $client->id }}/comments/{{ $comment->id }}" style="margin-left:auto;" onsubmit="return confirm('Supprimer ce commentaire ?');">
                                                 @csrf
                                                 @method('DELETE')

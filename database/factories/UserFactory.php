@@ -36,6 +36,26 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the user owns the private Super Admin space.
+     */
+    public function superAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'super_admin',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a developer with a private space.
+     */
+    public function developer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'developer',
+        ]);
+    }
+
+    /**
      * Indicate that the user is a non-admin.
      */
     public function regularUser(): static

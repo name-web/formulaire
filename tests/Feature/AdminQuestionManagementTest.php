@@ -16,7 +16,7 @@ class AdminQuestionManagementTest extends TestCase
         return User::create([
             'name' => 'Kamal',
             'email' => 'kamallareleve233@gmail.com',
-            'password' => 'Kamal222.com',
+            'password' => 'AdminTest2026!',
             'role' => 'admin',
             'is_active' => true,
         ]);

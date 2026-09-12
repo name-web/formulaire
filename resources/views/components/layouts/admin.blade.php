@@ -768,6 +768,16 @@
 </head>
 <body>
 
+@php
+    /*
+     * The general dashboard keeps config('admin_brand.nav_items') untouched.
+     * Each private space declares its own navigation in config/private_spaces.php.
+     */
+    $space = request()->routeIs('super_admin.*') ? 'super_admin' : (request()->routeIs('developer.*') ? 'developer' : null);
+    $spaceNavItems = $space ? config("private_spaces.{$space}.nav_items", []) : config('admin_brand.nav_items');
+    $spaceHeading = $space ? config("private_spaces.{$space}.heading", 'Administration') : 'Administration';
+@endphp
+
 <aside class="sidebar" id="adminSidebar">
     <button class="sidebar-close" id="sidebarClose" aria-label="Fermer le menu">
         <i class="fa-solid fa-xmark"></i>
@@ -779,8 +789,8 @@
     </div>
 
     <nav class="navigation">
-        <div class="nav-heading">Administration</div>
-        @foreach(config('admin_brand.nav_items') as $item)
+        <div class="nav-heading">{{ $spaceHeading }}</div>
+        @foreach($spaceNavItems as $item)
             <a href="{{ route($item['route']) }}" class="nav-item {{ request()->routeIs($item['route_pattern']) ? 'active' : '' }}">
                 <i class="{{ $item['icon'] }}"></i>
                 <span>{{ $item['label'] }}</span>

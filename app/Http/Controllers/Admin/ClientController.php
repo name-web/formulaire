@@ -33,7 +33,10 @@ class ClientController extends Controller
     {
         $client->load(['projects', 'comments.user']);
 
-        return view('admin.clients.show', compact('client'));
+        return view('admin.clients.show', [
+            'client' => $client,
+            'context' => 'admin',
+        ]);
     }
 
     public function convert(Client $client): RedirectResponse

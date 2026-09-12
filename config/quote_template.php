@@ -66,7 +66,7 @@ return [
             'type' => 'text',
             'title' => 'Analyse des produits & cible recommandée',
             'content' => [
-                'text' => 'Les produits de la marque s\'adressent à des besoins de santé courants et récurrents, ce qui en fait de bons candidats pour une communication ciblée sur les réseaux sociaux les plus utilisés en Côte d\'Ivoire.',
+                'text' => 'Les trois produits de la marque Santé Naturelle et Vie s\'adressent à des besoins de santé courants et récurrents, ce qui en fait de bons candidats pour une communication ciblée sur les réseaux sociaux les plus utilisés en Côte d\'Ivoire.',
             ],
         ],
         [

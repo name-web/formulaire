@@ -14,9 +14,19 @@ return [
 
     'roles' => [
 
+        'super_admin' => [
+            'label' => 'Super Administrateur',
+            'class' => 'badge-admin',
+        ],
+
         'admin' => [
             'label' => 'Administrateur',
             'class' => 'badge-admin',
+        ],
+
+        'developer' => [
+            'label' => 'Développeur',
+            'class' => 'badge-user',
         ],
 
         'user' => [

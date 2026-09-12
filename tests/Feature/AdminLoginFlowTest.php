@@ -16,7 +16,7 @@ class AdminLoginFlowTest extends TestCase
         return User::create([
             'name' => 'Kamal',
             'email' => 'kamallareleve233@gmail.com',
-            'password' => 'Kamal222.com',
+            'password' => 'AdminTest2026!',
             'role' => 'admin',
             'is_active' => true,
         ]);
@@ -35,7 +35,7 @@ class AdminLoginFlowTest extends TestCase
 
         $response = $this->post('/login', [
             'email' => 'kamallareleve233@gmail.com',
-            'password' => 'Kamal222.com',
+            'password' => 'AdminTest2026!',
         ]);
 
         $this->assertAuthenticatedAs($user);
@@ -116,7 +116,7 @@ class AdminLoginFlowTest extends TestCase
 
         $response = $this->post('/login', [
             'email' => 'kamallareleve233@gmail.com',
-            'password' => 'Kamal222.com',
+            'password' => 'AdminTest2026!',
         ]);
 
         $this->assertAuthenticatedAs($user);
@@ -130,7 +130,7 @@ class AdminLoginFlowTest extends TestCase
 
         $this->post('/login', [
             'email' => 'kamallareleve233@gmail.com',
-            'password' => 'Kamal222.com',
+            'password' => 'AdminTest2026!',
         ])->assertRedirect(route('admin.dashboard'));
 
         $this->assertAuthenticatedAs($user);
@@ -157,7 +157,7 @@ class AdminLoginFlowTest extends TestCase
         // 3. POST login with correct credentials → redirected to admin dashboard
         $this->post('/login', [
             'email' => 'kamallareleve233@gmail.com',
-            'password' => 'Kamal222.com',
+            'password' => 'AdminTest2026!',
         ])->assertRedirect(route('admin.dashboard'));
 
         // 4. Now authenticated → can access /admin

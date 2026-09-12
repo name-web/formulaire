@@ -24,8 +24,9 @@ class UserController extends Controller
         }
 
         $users = $query->latest()->paginate(10)->withQueryString();
+        $assignableRoles = $this->assignableRoles();
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'assignableRoles'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -34,7 +35,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => ['required', 'in:'.implode(',', array_keys(config('user_roles.roles')))],
+            'role' => ['required', 'in:'.implode(',', array_keys($this->assignableRoles()))],
         ]);
 
         $validated['is_active'] = true;
@@ -46,10 +47,12 @@ class UserController extends Controller
 
     public function update(Request $request, User $user): RedirectResponse
     {
+        $this->ensureSuperAdminAccountIsManagedByASuperAdmin($user);
+
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
-            'role' => ['sometimes', 'in:'.implode(',', array_keys(config('user_roles.roles')))],
+            'role' => ['sometimes', 'in:'.implode(',', array_keys($this->assignableRoles()))],
         ]);
 
         $user->update($validated);
@@ -59,6 +62,8 @@ class UserController extends Controller
 
     public function toggleActive(User $user): RedirectResponse
     {
+        $this->ensureSuperAdminAccountIsManagedByASuperAdmin($user);
+
         if ($user->id === auth()->id()) {
             return redirect()->route('admin.users.index')->with('error', 'Vous ne pouvez pas désactiver votre propre compte.');
         }
@@ -68,5 +73,35 @@ class UserController extends Controller
         $status = $user->is_active ? 'activé' : 'désactivé';
 
         return redirect()->route('admin.users.index')->with('success', "Utilisateur {$status}.");
+    }
+
+    /**
+     * Roles the current user may assign. Only a Super Admin can grant the
+     * Super Admin role, so a general administrator can never escalate.
+     *
+     * @return array<string, array{label: string, class: string}>
+     */
+    private function assignableRoles(): array
+    {
+        $roles = config('user_roles.roles', []);
+
+        if (auth()->user()?->isSuperAdmin()) {
+            return $roles;
+        }
+
+        unset($roles['super_admin']);
+
+        return $roles;
+    }
+
+    /**
+     * A Super Admin account is only manageable by a Super Admin: a general
+     * administrator must not be able to demote, rename or deactivate it.
+     */
+    private function ensureSuperAdminAccountIsManagedByASuperAdmin(User $user): void
+    {
+        if ($user->isSuperAdmin() && ! auth()->user()?->isSuperAdmin()) {
+            abort(403, 'Seul un Super Administrateur peut gérer un compte Super Administrateur.');
+        }
     }
 }

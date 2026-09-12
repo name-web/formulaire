@@ -254,6 +254,76 @@ class QuoteManagementTest extends TestCase
         $this->assertNull($quote->sections()->first()->content);
     }
 
+    // ── Analyse des produits & cible recommandée ──
+
+    public function test_create_form_prefills_analysis_section_with_template_text(): void
+    {
+        $response = $this->actingAs($this->admin)->get('/admin/quotes/create?client_id='.$this->client->id);
+
+        $response->assertOk();
+        // Section dédiée, éditable, préremplie avec le texte du modèle.
+        $response->assertSee('ANALYSE DES PRODUITS');
+        $response->assertSee('name="sections[0][content][text]"', false);
+        $response->assertSee('de la marque Santé Naturelle et Vie', false);
+    }
+
+    public function test_analysis_text_is_persisted_as_text_section(): void
+    {
+        $this->actingAs($this->admin)->post('/admin/quotes', $this->validPayload([
+            'sections' => [
+                ['type' => 'text', 'title' => 'Analyse des produits & cible recommandée', 'content' => ['text' => 'Analyse personnalisée du devis']],
+            ],
+        ]));
+
+        $quote = Quote::latest('id')->first();
+
+        $this->assertDatabaseHas('quote_sections', [
+            'quote_id' => $quote->id,
+            'type' => 'text',
+            'title' => 'Analyse des produits & cible recommandée',
+        ]);
+        $this->assertSame('Analyse personnalisée du devis', $quote->sections()->first()->content['text']);
+    }
+
+    public function test_edit_form_restores_saved_analysis_text(): void
+    {
+        $quote = Quote::factory()->for($this->client)->create();
+        $section = $quote->sections()->create([
+            'type' => 'text',
+            'title' => 'Analyse des produits & cible recommandée',
+            'content' => ['text' => 'Analyse sauvegardée du devis'],
+            'sort_order' => 0,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get("/admin/quotes/{$quote->id}/edit");
+
+        $response->assertOk();
+        // Valeur sauvegardée restaurée, pas le texte du modèle.
+        $response->assertSee('Analyse sauvegardée du devis', false);
+        $response->assertSee('name="sections[0][id]" value="'.$section->id.'"', false);
+    }
+
+    public function test_analysis_section_is_updated_in_place_on_edit(): void
+    {
+        $quote = Quote::factory()->for($this->client)->create();
+        $section = $quote->sections()->create([
+            'type' => 'text',
+            'title' => 'Analyse des produits & cible recommandée',
+            'content' => ['text' => 'Ancien texte'],
+            'sort_order' => 0,
+        ]);
+
+        $this->actingAs($this->admin)->patch("/admin/quotes/{$quote->id}", $this->validPayload([
+            'sections' => [
+                ['id' => $section->id, 'type' => 'text', 'title' => 'Analyse des produits & cible recommandée', 'content' => ['text' => 'Nouveau texte']],
+            ],
+        ]));
+
+        $quote->refresh();
+        $this->assertSame(1, $quote->sections()->count());
+        $this->assertSame('Nouveau texte', $quote->sections()->first()->content['text']);
+    }
+
     // ── Champs personnalisés ──
 
     public function test_custom_fields_are_saved(): void

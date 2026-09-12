@@ -12,10 +12,16 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\QuestionOptionController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\DeveloperAuthenticatedSessionController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\Developer\DashboardController as DeveloperDashboardController;
+use App\Http\Controllers\Developer\ProspectController as DeveloperProspectController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionnaireController;
+use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
+use App\Http\Controllers\SuperAdmin\DeveloperController as SuperAdminDeveloperController;
+use App\Http\Controllers\SuperAdmin\ProspectController as SuperAdminProspectController;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
@@ -109,4 +115,51 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('questions/{question}/conditions', [QuestionConditionController::class, 'store'])->name('questions.conditions.store');
     Route::patch('questions/{question}/conditions/{condition}', [QuestionConditionController::class, 'update'])->name('questions.conditions.update');
     Route::delete('questions/{question}/conditions/{condition}', [QuestionConditionController::class, 'destroy'])->name('questions.conditions.destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Private Super Admin space
+|--------------------------------------------------------------------------
+|
+| Reachable through its own URL only: no entry is added to the general
+| dashboard sidebar (config/admin_brand.php stays untouched).
+|
+*/
+Route::prefix('super-admin')->name('super_admin.')->middleware(['auth', 'super_admin'])->group(function () {
+    Route::get('/', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('developers', [SuperAdminDeveloperController::class, 'index'])->name('developers.index');
+    Route::post('developers', [SuperAdminDeveloperController::class, 'store'])->name('developers.store');
+    Route::get('developers/{developer}', [SuperAdminDeveloperController::class, 'show'])->name('developers.show');
+
+    Route::get('prospects', [SuperAdminProspectController::class, 'index'])->name('prospects.index');
+    Route::get('prospects/{client}', [SuperAdminProspectController::class, 'show'])->name('prospects.show');
+    Route::patch('prospects/{client}/assignment', [SuperAdminProspectController::class, 'updateAssignment'])->name('prospects.assignment.update');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Private developer space
+|--------------------------------------------------------------------------
+|
+| Developers sign in with their name on their own login screen and only
+| ever see the prospects assigned to them.
+|
+*/
+Route::get('developer/login', [DeveloperAuthenticatedSessionController::class, 'create'])->name('developer.login');
+Route::post('developer/login', [DeveloperAuthenticatedSessionController::class, 'store']);
+
+/*
+ * The `developer` middleware handles authentication itself so that a guest
+ * landing on /developer is sent to the developer login, never to /login.
+ */
+Route::prefix('developer')->name('developer.')->middleware('developer')->group(function () {
+    Route::get('/', [DeveloperDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('prospects', [DeveloperProspectController::class, 'index'])->name('prospects.index');
+    Route::get('prospects/{client}', [DeveloperProspectController::class, 'show'])->name('prospects.show');
+    Route::post('prospects/{client}/comments', [DeveloperProspectController::class, 'storeComment'])->name('prospects.comments.store');
+    Route::patch('prospects/{client}/follow-up', [DeveloperProspectController::class, 'updateFollowUp'])->name('prospects.follow-up.update');
+    Route::patch('prospects/{client}/convert', [DeveloperProspectController::class, 'convert'])->name('prospects.convert');
 });

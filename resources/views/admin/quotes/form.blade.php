@@ -6,12 +6,24 @@
     // Priorité aux old() (erreurs de validation) ; sinon données existantes ;
     // sinon modèle par défaut (devis.html) pour un nouveau devis.
     $existingItems = old('items', $quote->exists ? $quote->items->map(fn ($i) => $i->only(['designation', 'description', 'quantity', 'unit_price']))->values()->all() : $templateItems);
-    $existingSections = old('sections', $quote->exists ? $quote->sections->map(fn ($s) => ['type' => $s->type, 'title' => $s->title, 'content' => $s->content])->values()->all() : $templateSections);
+    $existingSections = collect(old('sections', $quote->exists ? $quote->sections->map(fn ($s) => ['id' => $s->id, 'type' => $s->type, 'title' => $s->title, 'content' => $s->content])->values()->all() : $templateSections));
     $existingFields = old('custom_fields', $quote->exists ? $quote->customFields->map(fn ($f) => $f->only(['name', 'type', 'value']))->values()->all() : []);
     $existingPrestations = old('prestations', $quote->exists ? ($quote->prestations ?? []) : $templatePrestations);
     if (is_string($existingPrestations)) {
         $existingPrestations = json_decode($existingPrestations, true) ?: []; // old() renvoie la chaîne JSON de l'input caché
     }
+
+    // Texte d'analyse : priorité à old() (erreur de validation), puis à la
+    // valeur sauvegardée du devis, sinon texte par défaut du modèle.
+    $analysisTitle = 'Analyse des produits & cible recommandée';
+    $analysisDefault = (string) data_get(
+        collect($templateSections ?? [])->first(fn ($s) => is_array($s) && ($s['type'] ?? null) === \App\Models\QuoteSection::TYPE_TEXT),
+        'content.text',
+        ''
+    );
+    $savedAnalysis = $existingSections->first(fn ($s) => is_array($s) && ($s['type'] ?? null) === \App\Models\QuoteSection::TYPE_TEXT && ($s['title'] ?? null) === $analysisTitle);
+    $analysisValue = old('sections.0.content.text', $quote->exists && $savedAnalysis !== null ? (string) data_get($savedAnalysis, 'content.text', '') : $analysisDefault);
+    $analysisSectionId = old('sections.0.id', $quote->exists && $savedAnalysis !== null ? ($savedAnalysis['id'] ?? null) : null);
 @endphp
 
     <section class="intro">
@@ -103,6 +115,25 @@
                 <div id="prestationsList"></div>
                 <button type="button" id="addPrestationBtn" class="admin-btn btn-secondary" style="margin-top:4px;"><i class="fa-solid fa-plus"></i> Ajouter une ligne</button>
                 <input type="hidden" name="prestations" id="prestationsData" value="">
+            </div>
+        </div>
+
+        {{-- ANALYSE DES PRODUITS & CIBLE RECOMMANDÉE --}}
+        <div class="admin-card" style="margin-bottom:18px;">
+            <div class="card-header">
+                <div>
+                    <div class="card-title"><i class="fa-solid fa-bullseye" style="color:var(--yellow);margin-right:6px;"></i> ANALYSE DES PRODUITS & CIBLE RECOMMANDÉE</div>
+                    <div class="card-subtitle">Texte entièrement éditable — sauvegardé avec le devis.</div>
+                </div>
+            </div>
+            <div style="padding:22px;">
+                @if($analysisSectionId)
+                    <input type="hidden" name="sections[0][id]" value="{{ $analysisSectionId }}">
+                @endif
+                <input type="hidden" name="sections[0][type]" value="{{ \App\Models\QuoteSection::TYPE_TEXT }}">
+                <input type="hidden" name="sections[0][title]" value="{{ $analysisTitle }}">
+                <textarea id="analysisText" name="sections[0][content][text]" class="admin-input" rows="5" placeholder="{{ $analysisTitle }}">{{ $analysisValue }}</textarea>
+                @error('sections.0.content.text')<div style="color:#dc2626;font-size:12px;margin-top:8px;">{{ $message }}</div>@enderror
             </div>
         </div>
 
@@ -393,6 +424,14 @@
         // ── Init prestations ──
         syncPrestations();
         renderPrestations();
+
+        // ── Analyse des produits & cible recommandée ──
+        // Une analyse vidée n'enregistre pas de section vide dans le devis.
+        document.getElementById('quoteForm').addEventListener('submit', function() {
+            if (document.getElementById('analysisText').value.trim() === '') {
+                this.querySelectorAll('[name^="sections[0]"]').forEach(function(el) { el.disabled = true; });
+            }
+        });
     });
     </script>
 
