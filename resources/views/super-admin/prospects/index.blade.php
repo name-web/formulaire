@@ -7,7 +7,7 @@
                 Super Admin
             </div>
             <h1>Prospects & attribution</h1>
-            <p>Attribuez ou réattribuez chaque prospect à un développeur.</p>
+            <p>Attribuez ou réattribuez chaque prospect à un développeur ou un commercial.</p>
         </div>
         <a href="{{ route('super_admin.dashboard') }}" class="top-btn"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Vue globale</a>
     </section>
@@ -37,9 +37,18 @@
                         @endforeach
                     </select>
                 </div>
+                <div style="min-width:180px;">
+                    <label class="admin-label" for="prospect-commercial">Commercial</label>
+                    <select id="prospect-commercial" name="commercial" class="admin-input">
+                        <option value="">Tous</option>
+                        @foreach($commercials as $commercial)
+                            <option value="{{ $commercial->id }}" @selected((string) request('commercial') === (string) $commercial->id)>{{ $commercial->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div style="display:flex;gap:8px;">
                     <button type="submit" class="admin-btn btn-primary"><i class="fa-solid fa-search"></i> Filtrer</button>
-                    @if(request()->hasAny(['search', 'status', 'developer']))
+                    @if(request()->hasAny(['search', 'status', 'developer', 'commercial']))
                         <a href="{{ route('super_admin.prospects.index') }}" class="admin-btn btn-secondary"><i class="fa-solid fa-xmark"></i></a>
                     @endif
                 </div>
@@ -64,18 +73,19 @@
                 </div>
             @else
                 <div class="table-wrap">
-                    <div class="table-head" style="grid-template-columns:1.2fr 1fr .6fr 1.3fr 1fr .7fr 52px;">
+                    <div class="table-head" style="grid-template-columns:1.2fr 1fr .6fr 1.1fr 1.1fr 1fr .7fr 52px;">
                         <div>Prospect</div>
                         <div>Entreprise</div>
                         <div>Statut</div>
-                        <div>Développeur responsable</div>
+                        <div>Développeur</div>
+                        <div>Commercial</div>
                         <div>Prochaine action</div>
                         <div>Dernier suivi</div>
                         <div></div>
                     </div>
 
                     @foreach($clients as $client)
-                        <div class="table-row" style="grid-template-columns:1.2fr 1fr .6fr 1.3fr 1fr .7fr 52px;">
+                        <div class="table-row" style="grid-template-columns:1.2fr 1fr .6fr 1.1fr 1.1fr 1fr .7fr 52px;">
                             <div class="client">
                                 <div class="client-avatar {{ $client->isClient() ? 'client-avatar-is-client' : '' }}">{{ strtoupper(substr($client->name, 0, 2)) }}</div>
                                 <div>
@@ -95,12 +105,29 @@
                                     @csrf
                                     @method('PATCH')
                                     <select name="assigned_developer_id" class="admin-input" style="height:34px;padding:0 30px 0 12px;font-size:13px;" aria-label="Développeur responsable">
-                                        <option value="">Non attribué</option>
+                                        <option value="">Aucun</option>
                                         @foreach($developers as $developer)
                                             <option value="{{ $developer->id }}" @selected($client->assigned_developer_id === $developer->id)>{{ $developer->name }}</option>
                                         @endforeach
                                     </select>
-                                    <button type="submit" class="admin-btn btn-primary btn-sm" style="padding:6px 10px;" title="Enregistrer l'attribution">
+                                    <input type="hidden" name="assigned_commercial_id" value="{{ $client->assigned_commercial_id }}">
+                                    <button type="submit" class="admin-btn btn-primary btn-sm" style="padding:6px 10px;" title="Enregistrer">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <div data-label="Commercial">
+                                <form method="POST" action="{{ route('super_admin.prospects.assignment.update', $client) }}" style="display:flex;gap:6px;align-items:center;">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select name="assigned_commercial_id" class="admin-input" style="height:34px;padding:0 30px 0 12px;font-size:13px;" aria-label="Commercial responsable">
+                                        <option value="">Aucun</option>
+                                        @foreach($commercials as $commercial)
+                                            <option value="{{ $commercial->id }}" @selected($client->assigned_commercial_id === $commercial->id)>{{ $commercial->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="hidden" name="assigned_developer_id" value="{{ $client->assigned_developer_id }}">
+                                    <button type="submit" class="admin-btn btn-primary btn-sm" style="padding:6px 10px;" title="Enregistrer">
                                         <i class="fa-solid fa-check"></i>
                                     </button>
                                 </form>

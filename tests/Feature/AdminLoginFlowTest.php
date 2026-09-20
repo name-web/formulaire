@@ -138,7 +138,7 @@ class AdminLoginFlowTest extends TestCase
         $this->get('/admin')->assertOk();
         $this->get('/admin/projects')->assertOk();
         $this->get('/admin/clients')->assertOk();
-        $this->get('/admin/questions')->assertOk();
+        $this->get('/admin/quotes')->assertOk();
         $this->get('/admin/users')->assertOk();
 
         $this->assertAuthenticatedAs($user);
@@ -169,8 +169,8 @@ class AdminLoginFlowTest extends TestCase
         // 6. Can access /admin/clients
         $this->get('/admin/clients')->assertStatus(200);
 
-        // 7. Can access /admin/questions
-        $this->get('/admin/questions')->assertStatus(200);
+        // 7. Can access /admin/quotes
+        $this->get('/admin/quotes')->assertStatus(200);
 
         // 8. Can access /admin/users
         $this->get('/admin/users')->assertStatus(200);
@@ -190,10 +190,10 @@ class AdminLoginFlowTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_admin_questions_index(): void
+    public function test_admin_quotes_index(): void
     {
         $user = $this->createAdmin();
-        $response = $this->actingAs($user)->get('/admin/questions');
+        $response = $this->actingAs($user)->get('/admin/quotes');
         $response->assertStatus(200);
     }
 
@@ -204,10 +204,10 @@ class AdminLoginFlowTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_admin_questions_create(): void
+    public function test_admin_quotes_create(): void
     {
         $user = $this->createAdmin();
-        $response = $this->actingAs($user)->get('/admin/questions/create');
+        $response = $this->actingAs($user)->get('/admin/quotes/create');
         $response->assertStatus(200);
     }
 }

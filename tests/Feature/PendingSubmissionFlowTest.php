@@ -2,425 +2,174 @@
 
 namespace Tests\Feature;
 
-use App\Models\Answer;
 use App\Models\Client;
 use App\Models\PendingSubmission;
 use App\Models\Project;
-use App\Models\Question;
+use App\Models\Quote;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Le brouillon PendingSubmission reste le mécanisme de collecte, comme pour
+ * l'ancien questionnaire : seul le contenu des réponses change.
+ */
 class PendingSubmissionFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
+    private function startDraft(): void
     {
-        parent::setUp();
-        $this->seed();
+        $this->post('/questionnaire/start', [
+            'nom' => 'Jean Dupont',
+            'tel' => '+2250708091011',
+            'email' => 'jean@exemple.com',
+        ]);
     }
 
     public function test_start_creates_pending_submission_and_not_client_or_project(): void
     {
         $response = $this->post('/questionnaire/start', [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
+            'nom' => 'Jean Dupont',
+            'tel' => '+2250708091011',
+            'email' => 'jean@exemple.com',
         ]);
 
-        $response->assertRedirect('/questionnaire/wizard');
+        $response->assertRedirect(route('questionnaire.step', 2));
 
-        $this->assertDatabaseHas('pending_submissions', [
-            'status' => 'collecting',
-        ]);
-
+        $this->assertDatabaseHas('pending_submissions', ['status' => 'collecting']);
         $this->assertDatabaseCount('clients', 0);
         $this->assertDatabaseCount('projects', 0);
     }
 
     public function test_start_stores_pending_submission_uuid_in_session(): void
     {
-        $response = $this->post('/questionnaire/start', [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
-        ]);
+        $this->startDraft();
 
-        $response->assertRedirect('/questionnaire/wizard');
+        $pending = PendingSubmission::firstOrFail();
 
-        $pending = PendingSubmission::first();
-        $this->assertNotNull($pending);
-        $this->assertEquals(session('pending_submission_uuid'), $pending->uuid);
+        $this->assertSame($pending->uuid, (string) session('devis_pending_uuid'));
     }
 
     public function test_start_stores_client_data_in_pending_submission(): void
     {
         $this->post('/questionnaire/start', [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
+            'nom' => 'Jean Dupont',
+            'entreprise' => 'Quincaillerie Yop',
+            'ville' => 'Abidjan',
+            'tel' => '0708091011',
+            'email' => 'jean@exemple.com',
         ]);
 
-        $pending = PendingSubmission::first();
-        $this->assertEquals('Jean Dupont', $pending->client_data['name']);
-        $this->assertEquals('+2250708091011', $pending->client_data['phone']);
-        $this->assertEquals(['site_vitrine'], $pending->project_data['project_types']);
-    }
+        $pending = PendingSubmission::firstOrFail();
 
-    public function test_wizard_requires_pending_submission_in_session(): void
-    {
-        $response = $this->get('/questionnaire/wizard');
-
-        $response->assertStatus(404);
-    }
-
-    public function test_wizard_displays_questions_for_pending_submission(): void
-    {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '123'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $response = $this->get('/questionnaire/wizard');
-
-        $response->assertOk();
-    }
-
-    public function test_submit_wizard_saves_answers_to_pending_submission(): void
-    {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '123'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $question = Question::where('type', 'textarea')->first();
-
-        $response = $this->post('/questionnaire/wizard', [
-            'answers' => [
-                $question->id => [
-                    'value' => 'Ma réponse de test',
-                ],
-            ],
-        ]);
-
-        $response->assertRedirect('/questionnaire/summary');
-
-        $pending->refresh();
-        $this->assertArrayHasKey((string) $question->id, $pending->answers_data);
-        $this->assertEquals('Ma réponse de test', $pending->answers_data[$question->id]['text_value']);
-    }
-
-    public function test_submit_creates_client_and_project_directly(): void
-    {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Jean Dupont', 'phone' => '+22501020304'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $response = $this->post('/questionnaire/submit');
-
-        $response->assertRedirect('/questionnaire/thankyou');
-
-        $this->assertDatabaseHas('clients', ['name' => 'Jean Dupont']);
-        $this->assertDatabaseHas('projects', ['status' => 'submitted']);
-
-        $pending->refresh();
-        $this->assertEquals('imported', $pending->status);
-        $this->assertNotNull($pending->imported_at);
-    }
-
-    public function test_submit_creates_answers_and_answer_options(): void
-    {
-        $textareaQuestion = Question::where('type', 'textarea')->first();
-        $selectQuestion = Question::where('type', 'select')->first();
-
-        $answersData = [];
-        if ($textareaQuestion) {
-            $answersData[(string) $textareaQuestion->id] = [
-                'question_id' => $textareaQuestion->id,
-                'text_value' => 'Réponse texte test',
-                'option_ids' => [],
-            ];
-        }
-        if ($selectQuestion) {
-            $firstOption = $selectQuestion->options()->first();
-            if ($firstOption) {
-                $answersData[(string) $selectQuestion->id] = [
-                    'question_id' => $selectQuestion->id,
-                    'text_value' => null,
-                    'option_ids' => [$firstOption->id],
-                ];
-            }
-        }
-
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '+22501020304'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => $answersData,
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $this->post('/questionnaire/submit');
-
-        $project = Project::first();
-        $this->assertNotNull($project);
-
-        if ($textareaQuestion) {
-            $this->assertDatabaseHas('answers', [
-                'project_id' => $project->id,
-                'question_id' => $textareaQuestion->id,
-                'text_value' => 'Réponse texte test',
-            ]);
-        }
-
-        if ($selectQuestion) {
-            $answer = Answer::where('project_id', $project->id)
-                ->where('question_id', $selectQuestion->id)
-                ->first();
-            $this->assertNotNull($answer);
-
-            $firstOption = $selectQuestion->options()->first();
-            if ($firstOption) {
-                $this->assertDatabaseHas('answer_options', [
-                    'answer_id' => $answer->id,
-                    'question_option_id' => $firstOption->id,
-                ]);
-            }
-        }
-    }
-
-    public function test_submit_preserves_other_value(): void
-    {
-        $selectQuestion = Question::where('type', 'select')->first();
-        if (! $selectQuestion) {
-            $this->markTestSkipped('No select question found');
-        }
-
-        $otherOption = $selectQuestion->options()->where('value', 'autre')->first();
-        if (! $otherOption) {
-            $this->markTestSkipped('No "autre" option found for select question');
-        }
-
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '+22501020304'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [
-                (string) $selectQuestion->id => [
-                    'question_id' => $selectQuestion->id,
-                    'text_value' => null,
-                    'option_ids' => [$otherOption->id],
-                    'other_value' => 'Ma réponse personnalisée',
-                ],
-            ],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $this->post('/questionnaire/submit');
-
-        $project = Project::first();
-        $answer = Answer::where('project_id', $project->id)
-            ->where('question_id', $selectQuestion->id)
-            ->first();
-
-        $this->assertNotNull($answer);
-        $this->assertEquals('Ma réponse personnalisée', $answer->other_value);
-    }
-
-    public function test_submit_uses_submission_service(): void
-    {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Service Test', 'phone' => '+22501020304'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $this->post('/questionnaire/submit');
-
-        // Verify the SubmissionService was used (client found by phone)
-        $this->assertDatabaseHas('clients', [
-            'name' => 'Service Test',
-            'phone' => '+22501020304',
-        ]);
-
-        // Verify project is immediately submitted
-        $project = Project::first();
-        $this->assertNotNull($project);
-        $this->assertEquals('submitted', $project->status);
-        $this->assertNotNull($project->submitted_at);
-        $this->assertEquals(['site_vitrine'], $project->project_type);
-    }
-
-    public function test_submit_clears_session(): void
-    {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '+22501020304'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $response = $this->post('/questionnaire/submit');
-
-        $response->assertRedirect('/questionnaire/thankyou');
-
-        $session = $this->app['session.store'];
-        $this->assertNull($session->get('pending_submission_uuid'));
-        $this->assertNull($session->get('project_type'));
-    }
-
-    public function test_submit_skips_already_imported(): void
-    {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '+22501020304'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'imported',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $this->post('/questionnaire/submit');
-
-        $this->assertDatabaseCount('clients', 0);
-        $this->assertDatabaseCount('projects', 0);
-    }
-
-    public function test_cannot_access_wizard_with_invalid_uuid(): void
-    {
-        session(['pending_submission_uuid' => 'invalid-uuid']);
-
-        $response = $this->get('/questionnaire/wizard');
-
-        $response->assertStatus(404);
-    }
-
-    public function test_pending_submission_has_uuid(): void
-    {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '123'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        $this->assertNotNull($pending->uuid);
-        $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $pending->uuid);
-    }
-
-    public function test_pending_submission_default_status_is_collecting(): void
-    {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '123'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        $this->assertEquals('collecting', $pending->status);
+        $this->assertSame('Jean Dupont', $pending->client_data['name']);
+        $this->assertSame('Quincaillerie Yop', $pending->client_data['company_name']);
+        $this->assertSame('Abidjan', $pending->client_data['city']);
+        $this->assertSame('+2250708091011', $pending->client_data['phone']);
+        $this->assertSame('jean@exemple.com', $pending->client_data['email']);
     }
 
     public function test_start_stores_country_from_ip_geolocation(): void
     {
-        config(['geo.database_path' => database_path('geoip/GeoLite2-Country.mmdb')]);
-
-        $response = $this->post('/questionnaire/start', [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
-        ]);
-
-        $response->assertRedirect('/questionnaire/wizard');
-
-        $pending = PendingSubmission::first();
-        $this->assertNotNull($pending);
-        // country key should exist in client_data (value may be null if no .mmdb)
-        $this->assertArrayHasKey('country', $pending->client_data);
-    }
-
-    public function test_start_country_is_null_when_geolocation_fails(): void
-    {
-        config(['geo.database_path' => '/nonexistent/path.mmdb']);
-        config(['geo.default_country' => null]);
-
         $this->post('/questionnaire/start', [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
+            'nom' => 'Jean Dupont',
+            'tel' => '+2250708091011',
+            'email' => 'jean@exemple.com',
         ]);
 
-        $pending = PendingSubmission::first();
-        $this->assertNull($pending->client_data['country'] ?? null);
+        // La valeur peut être nulle sans base GeoIP : la clé doit exister.
+        $this->assertArrayHasKey('country', PendingSubmission::firstOrFail()->client_data);
     }
 
-    public function test_submit_stores_country_in_client(): void
+    public function test_step_page_requires_pending_submission_in_session(): void
     {
-        config(['geo.database_path' => '/nonexistent/path.mmdb']);
-        config(['geo.default_country' => null]);
-
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Test', 'phone' => '+2250708091011', 'country' => null],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
-        ]);
-
-        session(['pending_submission_uuid' => $pending->uuid]);
-
-        $this->post('/questionnaire/submit');
-
-        $client = Client::where('name', 'Test')->first();
-        $this->assertNotNull($client);
-        $this->assertNull($client->country);
+        $this->get('/questionnaire/step/2')
+            ->assertRedirect(route('questionnaire.index'));
     }
 
-    public function test_submit_stores_detected_country_in_client(): void
+    public function test_each_step_stores_its_answers_in_the_pending_submission(): void
     {
-        $pending = PendingSubmission::create([
-            'client_data' => ['name' => 'Geo Test', 'phone' => '+2250708091011', 'country' => 'France'],
-            'project_data' => ['project_types' => ['site_vitrine']],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
+        $this->startDraft();
+
+        $this->post('/questionnaire/step/2', ['type' => 'logiciel']);
+        $this->post('/questionnaire/step/3', [
+            'modules' => ['stock', 'caisse'],
+            'postes' => 4,
+            'formation' => 2,
+            'reprise' => 'oui',
+        ]);
+        $this->post('/questionnaire/step/4', [
+            'domaine' => 'com',
+            'hebergement' => 'vps',
+            'emails' => 3,
+            'maintenance' => 'business',
         ]);
 
-        session(['pending_submission_uuid' => $pending->uuid]);
+        $answers = PendingSubmission::firstOrFail()->answers_data;
 
-        $this->post('/questionnaire/submit');
+        $this->assertSame('logiciel', $answers['type']);
+        $this->assertSame(['stock', 'caisse'], $answers['modules']);
+        $this->assertSame(4, $answers['postes']);
+        $this->assertSame('vps', $answers['hebergement']);
+        $this->assertSame('business', $answers['maintenance']);
 
-        $client = Client::where('name', 'Geo Test')->first();
-        $this->assertNotNull($client);
-        $this->assertEquals('France', $client->country);
+        // Rien n'est encore converti : les réponses n'existent que dans le brouillon.
+        $this->assertDatabaseCount('answers', 0);
+        $this->assertDatabaseCount('projects', 0);
+    }
+
+    public function test_last_step_converts_the_draft_into_business_records(): void
+    {
+        $this->startDraft();
+        $this->post('/questionnaire/step/2', ['type' => 'scolaire']);
+        $this->post('/questionnaire/step/3', [
+            'eleves' => 400,
+            'modules' => ['eleves', 'notes'],
+            'reprise' => 'non',
+        ]);
+        $this->post('/questionnaire/step/4', [
+            'domaine' => 'ci',
+            'hebergement' => 'vps',
+            'emails' => 2,
+            'maintenance' => 'essentiel',
+        ]);
+        $this->post('/questionnaire/step/5', [
+            'niveau' => 'STANDARD',
+            'delai' => 'accelere',
+        ])->assertRedirect(route('questionnaire.quote'));
+
+        $this->assertDatabaseCount('clients', 1);
+        $this->assertDatabaseCount('projects', 1);
+        $this->assertDatabaseCount('quotes', 1);
+
+        $project = Project::firstOrFail();
+        $this->assertSame(['scolaire'], $project->project_type);
+        $this->assertSame('v2', $project->form_version);
+        $this->assertSame(400, $project->form_data['eleves']);
+
+        // La livraison prioritaire majore le devis provisoire.
+        $this->assertGreaterThan(0, Quote::firstOrFail()->calculation['majoration']);
+    }
+
+    public function test_submit_is_idempotent_after_conversion(): void
+    {
+        $this->startDraft();
+        $this->post('/questionnaire/step/2', ['type' => 'site_vitrine']);
+        $this->post('/questionnaire/step/3', ['pages' => 5, 'contenus' => 'fournis']);
+        $this->post('/questionnaire/step/4', ['domaine' => 'aucun', 'hebergement' => 'aucun', 'emails' => 0, 'maintenance' => 'aucune']);
+        $this->post('/questionnaire/step/5', ['niveau' => 'STANDARD', 'delai' => 'normal']);
+
+        // Un rechargement de la page finale ne recrée aucun enregistrement.
+        $this->get('/questionnaire/quote')->assertOk();
+
+        $this->assertDatabaseCount('clients', 1);
+        $this->assertDatabaseCount('projects', 1);
+        $this->assertDatabaseCount('quotes', 1);
+        $this->assertSame('imported', PendingSubmission::firstOrFail()->status);
+
+        // La session de brouillon est consommée : retenter la dernière étape échoue.
+        $this->post('/questionnaire/step/5', ['niveau' => 'STANDARD'])->assertNotFound();
+        $this->assertDatabaseCount('projects', 1);
+        $this->assertSame(Client::query()->count(), 1);
     }
 }

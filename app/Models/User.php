@@ -41,11 +41,27 @@ class User extends Authenticatable
     }
 
     /**
+     * Activités du journal d'activité central dont cet utilisateur est l'auteur.
+     */
+    public function activities(): HasMany
+    {
+        return $this->hasMany(ClientActivity::class);
+    }
+
+    /**
      * Prospects and clients followed by this developer.
      */
     public function assignedClients(): HasMany
     {
         return $this->hasMany(Client::class, 'assigned_developer_id');
+    }
+
+    /**
+     * Prospects and clients assigned to this commercial.
+     */
+    public function assignedCommercialClients(): HasMany
+    {
+        return $this->hasMany(Client::class, 'assigned_commercial_id');
     }
 
     /**
@@ -64,6 +80,11 @@ class User extends Authenticatable
     public function isDeveloper(): bool
     {
         return $this->role === 'developer';
+    }
+
+    public function isCommercial(): bool
+    {
+        return $this->role === 'commercial';
     }
 
     public function isActive(): bool

@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Client;
-use App\Models\Question;
 use App\Models\Quote;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -223,54 +222,18 @@ class QuoteE2EFlowTest extends TestCase
         $this->assertSame('Devis '.$quote->number, $title);
     }
 
-    // ── 6. Questionnaire : création → modification → validation → suppression
+    // ── 6. L'ancien questionnaire n'est plus administrable
 
-    public function test_questionnaire_create_edit_validate_delete_flow(): void
+    public function test_legacy_questionnaire_admin_routes_are_removed(): void
     {
         $this->loginAdmin();
 
-        // Création
-        $createResponse = $this->post(route('admin.questions.store'), [
-            'title' => 'Critère de sélection du prestataire',
-            'type' => 'select',
-            'project_types' => ['site_vitrine'],
-            'sort_order' => 1,
-        ]);
-
-        $createResponse->assertRedirect(route('admin.questions.index'));
-        $question = Question::where('title', 'Critère de sélection du prestataire')->first();
-        $this->assertNotNull($question);
-
-        $this->assertSame('Critère de sélection du prestataire', $question->title);
-        $this->assertSame('select', $question->type);
-
-        // Modification
-        $editResponse = $this->patch(route('admin.questions.update', $question), [
-            'title' => 'Critère de sélection du prestataire — révisé',
-            'type' => 'select',
-        ]);
-
-        $editResponse->assertRedirect();
-        $question->refresh();
-        $this->assertSame('Critère de sélection du prestataire — révisé', $question->title);
-
-        // Validation : le bouton est un interrupteur, il inverse l'état courant
-        // (aucune valeur `is_active` n'est envoyée par la vue).
-        $this->assertTrue($question->is_active);
-
-        $this->patch(route('admin.questions.toggle', $question))
-            ->assertRedirect(route('admin.questions.index'));
-        $this->assertFalse($question->refresh()->is_active);
-
-        $this->patch(route('admin.questions.toggle', $question))
-            ->assertRedirect(route('admin.questions.index'));
-        $this->assertTrue($question->refresh()->is_active);
-
-        // Suppression
-        $deleteResponse = $this->delete(route('admin.questions.destroy', $question));
-        $deleteResponse->assertRedirect(route('admin.questions.index'));
-        // Le questionnaire utilise le soft delete : la question est archivée.
-        $this->assertSoftDeleted($question);
+        // Le nouveau formulaire de devis remplace l'ancien questionnaire : sa
+        // gestion (questions, options, conditions) n'a plus lieu d'être. Les
+        // données historiques restent stockées et consultables.
+        foreach (['admin.questions.index', 'admin.questions.store', 'admin.questions.options.store', 'admin.questions.conditions.store'] as $route) {
+            $this->assertFalse(app('router')->has($route), "La route {$route} ne doit plus exister.");
+        }
     }
 
     // ── 7. Déconnexion → reconnexion → session fonctionnelle ────────────────

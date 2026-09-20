@@ -56,6 +56,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the user is a commercial with a private space.
+     */
+    public function commercial(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'commercial',
+        ]);
+    }
+
+    /**
      * Indicate that the user is a non-admin.
      */
     public function regularUser(): static

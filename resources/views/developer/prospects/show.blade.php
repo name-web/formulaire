@@ -34,7 +34,7 @@
                     <div style="display:flex;flex-direction:column;gap:14px;">
                         <div>
                             <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Nom</div>
-                            <div style="color:var(--black);font-size:14px;font-weight:700;">{{ $prospect->name }}</div>
+                            <div style="color:var(--text);font-size:14px;font-weight:700;">{{ $prospect->name }}</div>
                         </div>
 
                         <div>
@@ -171,7 +171,7 @@
                                 <div style="position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--yellow);border:2px solid white;flex-shrink:0;z-index:1;"></div>
                                 <div style="flex:1;min-width:0;">
                                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
-                                        <span style="font-size:13px;font-weight:700;color:var(--black);">{{ $comment->user->name ?? '—' }}</span>
+                                        <span style="font-size:13px;font-weight:700;color:var(--text);">{{ $comment->user->name ?? '—' }}</span>
                                         <span style="font-size:11px;color:var(--muted);">{{ $comment->created_at->format('d/m/Y à H:i') }}</span>
                                     </div>
                                     <div style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;">{{ $comment->content }}</div>
@@ -205,10 +205,10 @@
                             @php $projectStatus = \App\Models\Project::getStatusConfig($project->status); @endphp
                             <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);min-width:0;">
                                 <div style="width:40px;height:40px;border-radius:6px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                    <i class="fa-solid fa-folder" style="color:var(--black);font-size:14px;"></i>
+                                    <i class="fa-solid fa-folder" style="color:var(--text);font-size:14px;"></i>
                                 </div>
                                 <div style="flex:1;min-width:0;overflow:hidden;">
-                                    <div style="font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;">Projet {{ $project->id }}</div>
+                                    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">Projet {{ $project->id }}</div>
                                     <div style="font-size:13px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $project->type_labels }}</div>
                                 </div>
                                 <span class="admin-badge {{ $projectStatus['class'] }}">{{ $projectStatus['label'] }}</span>

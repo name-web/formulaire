@@ -114,7 +114,8 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="col-info" data-label="Réponses">{{ $project->answers_count }} réponse{{ $project->answers_count > 1 ? 's' : '' }}</div>
+                        @php $answerCount = $project->display_answers_count ?? $project->answers_count; @endphp
+                        <div class="col-info" data-label="Réponses">{{ $answerCount }} réponse{{ $answerCount > 1 ? 's' : '' }}</div>
                         <div>
                             @php $sc = \App\Models\Project::getStatusConfig($project->status); @endphp
                             <span class="status {{ in_array($project->status, ['completed','submitted']) ? 'done' : '' }}">{{ $sc['label'] }}</span>

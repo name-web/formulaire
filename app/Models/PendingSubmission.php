@@ -36,7 +36,7 @@ class PendingSubmission extends Model
         parent::boot();
 
         static::creating(function (self $model) {
-            $model->uuid = $model->uuid ?? Str::uuid();
+            $model->uuid = $model->uuid ?? (string) Str::uuid();
         });
     }
 

@@ -10,7 +10,12 @@
             <h1>Tableau de bord</h1>
             <p>Suivez les demandes et les cahiers des charges.</p>
         </div>
-        <div style="color:var(--muted);font-size:13px;">{{ now()->translatedFormat('l d M Y') }}</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <a href="{{ route('admin.team-spaces') }}" class="top-btn primary" style="background:#071426;color:#fff;border:none;white-space:nowrap;">
+                <i class="fa-solid fa-users-gear" style="margin-right:6px;"></i> ESPACES ÉQUIPE
+            </a>
+            <div style="color:var(--muted);font-size:13px;">{{ now()->translatedFormat('l d M Y') }}</div>
+        </div>
     </section>
 
     {{-- Stats --}}
@@ -123,6 +128,25 @@
                             </div>
                         </a>
                     @endforeach
+                @endif
+            </div>
+
+            {{-- Activités récentes --}}
+            <div class="side-section">
+                <div class="side-heading">Activités récentes</div>
+                @if($recentActivities->isEmpty())
+                    <p style="color:var(--muted);font-size:13px;">Aucune activité enregistrée.</p>
+                @else
+                    @foreach($recentActivities as $activity)
+                        <a href="{{ route('admin.activities.index') }}" class="activity" style="text-decoration:none;">
+                            <div class="activity-dot"></div>
+                            <div style="min-width:0;">
+                                <div class="activity-title">{{ $activity->type_label }} · {{ $activity->client->name ?? '—' }}</div>
+                                <div class="activity-time">{{ $activity->description }} — {{ $activity->created_at->format('d/m/Y H:i') }}</div>
+                            </div>
+                        </a>
+                    @endforeach
+                    <a href="{{ route('admin.activities.index') }}" class="view-all" style="display:inline-block;margin-top:10px;">Voir toutes les activités →</a>
                 @endif
             </div>
 

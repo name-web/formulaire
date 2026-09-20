@@ -9,7 +9,14 @@ import { defineConfig, devices } from '@playwright/test';
  * (`channel: 'chrome'`), aucun téléchargement supplémentaire n'est nécessaire.
  */
 const PORT = Number(process.env.E2E_PORT ?? 8123);
-const BASE_URL = `http://127.0.0.1:${PORT}`;
+/*
+ * Le domaine des cookies de session est celui d'APP_URL / SESSION_DOMAIN
+ * (`.env.testing`) : si l'application est configurée sur « localhost », le
+ * navigateur n'acceptera jamais le cookie émis par « 127.0.0.1 ». L'hôte reste
+ * surchargeable pour pouvoir faire tourner la suite sur les deux. 
+ */
+const HOST = process.env.E2E_HOST ?? '127.0.0.1';
+const BASE_URL = `http://${HOST}:${PORT}`;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -34,7 +41,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `php artisan serve --host=127.0.0.1 --port=${PORT}`,
+    command: `php artisan serve --host=${HOST} --port=${PORT}`,
     url: `${BASE_URL}/up`,
     reuseExistingServer: false,
     timeout: 120_000,
@@ -42,6 +49,7 @@ export default defineConfig({
       ...process.env,
       APP_ENV: 'testing',
       APP_URL: BASE_URL,
+      SESSION_DOMAIN: HOST,
     },
   },
 });

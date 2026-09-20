@@ -7,24 +7,24 @@
     <title>{{ __('Connexion — DOMINIUM TECH') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
-            --blue: #ffb703; --blue-light: #ffc72c; --bg-dark: #071426;
-            --text-muted: rgba(255,255,255,0.48);
+            --yellow: #FFB900; --yellow-light: #FFC72C; --bg-dark: #071426;
+            --text-muted: rgba(255,255,255,0.48); --navy: #071426; --navy-2: #0b1b31;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'DM Sans', sans-serif; color: #fff;
-            background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
+            font-family: 'Inter', sans-serif; color: #fff;
+            background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,185,0,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
         }
         .bg-effects { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
         .orb { position: absolute; border-radius: 50%; filter: blur(90px); }
-        .orb-1 { width: 400px; height: 400px; top: -100px; right: -80px; background: radial-gradient(circle, rgba(255,183,3,0.2) 0%, transparent 70%); }
-        .orb-2 { width: 350px; height: 350px; bottom: -120px; left: 10%; background: radial-gradient(circle, rgba(255,183,3,0.15) 0%, transparent 70%); }
+        .orb-1 { width: 400px; height: 400px; top: -100px; right: -80px; background: radial-gradient(circle, rgba(255,185,0,0.2) 0%, transparent 70%); }
+        .orb-2 { width: 350px; height: 350px; bottom: -120px; left: 10%; background: radial-gradient(circle, rgba(255,185,0,0.15) 0%, transparent 70%); }
 
         .login-wrapper { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 20px; }
         .login-card {
@@ -34,8 +34,8 @@
             box-shadow: 0 35px 80px rgba(0,0,0,0.4);
         }
         .login-brand { text-align: center; margin-bottom: 36px; }
-        .login-brand img { height: 60px; width: auto; filter: drop-shadow(0 0 12px rgba(255,183,3,0.25)); }
-        .login-brand h1 { font-size: 16px; font-weight: 800; color: rgba(255,255,255,0.7); letter-spacing: 1px; margin-top: 10px; text-transform: uppercase; }
+        .login-brand img { height: 60px; width: auto; filter: drop-shadow(0 0 12px rgba(255,185,0,0.25)); }
+        .login-brand h1 { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; color: rgba(255,255,255,0.7); letter-spacing: 1px; margin-top: 10px; text-transform: uppercase; }
         .login-brand p { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
         .login-brand img { max-width: 100%; height: auto; }
 
@@ -54,19 +54,19 @@
             border-radius: 12px; color: white; font-size: 14px;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .form-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(255,183,3,0.12); }
+        .form-input:focus { outline: none; border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(255,185,0,0.12); }
         .form-input::placeholder { color: var(--text-muted); }
 
         .remember-row { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; }
-        .remember-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--blue); border-radius: 4px; }
+        .remember-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--yellow); border-radius: 4px; }
         .remember-row label { font-size: 13px; color: rgba(255,255,255,0.55); cursor: pointer; }
 
         .btn-login {
             width: 100%; height: 48px; border: none; border-radius: 12px;
-            background: var(--blue); color: white; font-size: 14px; font-weight: 800;
+            background: var(--yellow); color: var(--navy); font-size: 14px; font-weight: 800;
             cursor: pointer; transition: all 0.25s ease; position: relative; overflow: hidden;
         }
-        .btn-login:hover { background: var(--blue-light); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,183,3,0.25); }
+        .btn-login:hover { background: var(--yellow-light); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,185,0,0.25); }
         .btn-login:active { transform: translateY(0) scale(0.98); }
 
         .error-box { padding: 12px 16px; border-radius: 12px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.15); margin-bottom: 20px; }
@@ -75,7 +75,7 @@
 
         .forgot-link { text-align: center; margin-top: 20px; }
         .forgot-link a { font-size: 12px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
-        .forgot-link a:hover { color: var(--blue-light); }
+        .forgot-link a:hover { color: var(--yellow-light); }
     </style>
 </head>
 <body>

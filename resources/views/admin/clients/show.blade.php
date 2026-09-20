@@ -46,13 +46,26 @@
                     <div style="display:flex;flex-direction:column;gap:14px;">
                         <div>
                             <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Nom</div>
-                            <div style="color:var(--black);font-size:14px;font-weight:700;">{{ $client->name }}</div>
+                            <div style="color:var(--text);font-size:14px;font-weight:700;">{{ $client->name }}</div>
                         </div>
 
                         <div>
                             <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Statut</div>
                             <span class="admin-badge badge-pending" style="font-size:12px;font-weight:700;">PROSPECT</span>
                         </div>
+
+                        @if($client->assignedDeveloper)
+                            <div>
+                                <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Développeur</div>
+                                <div style="color:var(--text-muted);font-size:14px;">{{ $client->assignedDeveloper->name }}</div>
+                            </div>
+                        @endif
+                        @if($client->assignedCommercial)
+                            <div>
+                                <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Commercial</div>
+                                <div style="color:var(--text-muted);font-size:14px;">{{ $client->assignedCommercial->name }}</div>
+                            </div>
+                        @endif
 
                         @if($client->phone)
                             <div>
@@ -121,10 +134,10 @@
                             @endphp
                             <{{ $projectTag }} @if(! $isSuperAdminContext) href="{{ route('admin.projects.show', $project) }}" @endif style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
                                 <div style="width:40px;height:40px;border-radius:6px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                    <i class="fa-solid fa-folder" style="color:var(--black);font-size:14px;"></i>
+                                    <i class="fa-solid fa-folder" style="color:var(--text);font-size:14px;"></i>
                                 </div>
                                 <div style="flex:1;min-width:0;overflow:hidden;">
-                                    <div style="font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;">Projet {{ $project->id }}</div>
+                                    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">Projet {{ $project->id }}</div>
                                     <div style="font-size:13px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $typeLabels }}</div>
                                 </div>
                                 <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>
@@ -176,7 +189,7 @@
                                 <div style="position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--yellow);border:2px solid white;flex-shrink:0;z-index:1;"></div>
                                 <div style="flex:1;min-width:0;">
                                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
-                                        <span style="font-size:13px;font-weight:700;color:var(--black);">{{ $comment->user->name }}</span>
+                                        <span style="font-size:13px;font-weight:700;color:var(--text);">{{ $comment->user->name }}</span>
                                         <span style="font-size:11px;color:var(--muted);">{{ $comment->created_at->format('d/m/Y à H:i') }}</span>
                                         @if($comment->user_id === auth()->id() && ! $isSuperAdminContext)
                                             <form method="POST" action="/admin/clients/{{ $client->id }}/comments/{{ $comment->id }}" style="margin-left:auto;" onsubmit="return confirm('Supprimer ce commentaire ?');">
@@ -201,25 +214,25 @@
 
     {{-- Confirm modal --}}
     <div id="confirmOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;">
-        <div id="confirmBox" style="background:#fff;border-radius:12px;padding:48px 52px;max-width:560px;width:92%;box-shadow:0 20px 50px rgba(0,0,0,.18);transform:scale(.85);transition:transform .4s cubic-bezier(.175,.885,.32,1.275),opacity .3s ease;opacity:0;">
+        <div id="confirmBox" style="background:var(--bg-card);border:1px solid var(--line);border-radius:12px;padding:48px 52px;max-width:560px;width:92%;box-shadow:var(--shadow-lg);transform:scale(.85);transition:transform .4s cubic-bezier(.175,.885,.32,1.275),opacity .3s ease;opacity:0;">
             <div id="confirmContent">
                 <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
                     <div style="width:44px;height:44px;border-radius:50%;background:#17613910;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fa-solid fa-user-check" style="color:#176139;font-size:18px;"></i>
+                        <i class="fa-solid fa-user-check" style="color:#4ade80;font-size:18px;"></i>
                     </div>
-                    <div style="font-size:18px;font-weight:800;color:var(--black);">Rendre ce prospect client ?</div>
+                    <div style="font-size:18px;font-weight:800;color:var(--text);">Rendre ce prospect client ?</div>
                 </div>
-                <p style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:28px;">Cette action convertira <strong style="color:var(--black);">{{ $client->name }}</strong> en client. Le statut et l'identité visuelle seront mis à jour.</p>
+                <p style="color:var(--text-muted);font-size:14px;line-height:1.7;margin-bottom:28px;">Cette action convertira <strong style="color:var(--text);">{{ $client->name }}</strong> en client. Le statut et l'identité visuelle seront mis à jour.</p>
                 <div style="display:flex;gap:10px;justify-content:flex-end;">
-                    <button type="button" id="confirmCancel" style="padding:11px 22px;border-radius:5px;border:1px solid var(--line);background:white;color:#666;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;">Annuler</button>
-                    <button type="button" id="confirmOk" style="padding:11px 22px;border-radius:5px;border:none;background:#176139;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;">Confirmer</button>
+                    <button type="button" id="confirmCancel" style="padding:11px 22px;border-radius:var(--radius);border:1px solid var(--line);background:transparent;color:var(--text-muted);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;">Annuler</button>
+                    <button type="button" id="confirmOk" style="padding:11px 22px;border-radius:var(--radius);border:none;background:#176139;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;">Confirmer</button>
                 </div>
             </div>
             <div id="confirmSuccess" style="display:none;flex-direction:column;align-items:center;padding:40px 0 24px;">
                 <svg id="checkSvg" width="120" height="120" viewBox="0 0 120 120" fill="none">
                     <path id="checkPath" d="M24 62L48 86L96 30" stroke="#176139" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <div id="successLabel" style="margin-top:24px;font-size:16px;font-weight:700;color:var(--black);opacity:0;transform:translateY(6px);">Prospect converti en client</div>
+                <div id="successLabel" style="margin-top:24px;font-size:16px;font-weight:700;color:var(--text);opacity:0;transform:translateY(6px);">Prospect converti en client</div>
             </div>
         </div>
     </div>

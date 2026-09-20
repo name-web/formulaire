@@ -10,26 +10,39 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <style>
             :root {
-                --yellow: #ffb703;
-                --yellow-light: #ffc72c;
+                --yellow: #FFB900;
+                --yellow-light: #FFC72C;
+                --yellow-dim: rgba(255,185,0,.10);
                 --navy: #071426;
                 --navy-2: #0b1b31;
                 --blue: #122c4d;
                 --blue-light: #193b65;
+                --white: #FFFFFF;
+                --text: #e6edf5;
+                --muted: #91a1b5;
+                --line: rgba(255,255,255,.08);
             }
 
+            *, *::before, *::after { box-sizing: border-box; }
+
             body {
-                font-family: 'DM Sans', sans-serif;
-                background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: var(--navy);
                 min-height: 100vh;
-                color: #fff;
+                color: var(--white);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-family: 'Montserrat', 'Inter', sans-serif;
             }
         </style>
     </head>

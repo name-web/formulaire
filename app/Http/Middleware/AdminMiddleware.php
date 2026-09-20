@@ -23,7 +23,7 @@ class AdminMiddleware
         }
 
         if (! auth()->user()->isAdmin()) {
-            abort(403, 'Accès non autorisé.');
+            return response('Accès non autorisé.', Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

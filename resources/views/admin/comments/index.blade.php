@@ -81,12 +81,12 @@
                         <div style="display:flex;gap:14px;padding:18px 22px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s ease;" onclick="window.location='{{ $isProspect ? route('admin.clients.show', $comment->client) : route('admin.client-clients.show', $comment->client) }}'" onmouseover="this.style.background='#fffdf3'" onmouseout="this.style.background=''">
                             <div style="flex-shrink:0;padding-top:2px;">
                                 <div style="width:36px;height:36px;border-radius:50%;background:{{ $isProspect ? 'var(--yellow)' : '#176139' }};display:flex;align-items:center;justify-content:center;">
-                                    <span style="font-size:12px;font-weight:800;color:{{ $isProspect ? 'var(--black)' : '#fff' }};">{{ strtoupper(substr($comment->client->name, 0, 2)) }}</span>
+                                    <span style="font-size:12px;font-weight:800;color:{{ $isProspect ? 'var(--text)' : '#fff' }};">{{ strtoupper(substr($comment->client->name, 0, 2)) }}</span>
                                 </div>
                             </div>
                             <div style="flex:1;min-width:0;">
                                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
-                                    <span style="font-size:14px;font-weight:700;color:var(--black);">{{ $comment->client->name }}</span>
+                                    <span style="font-size:14px;font-weight:700;color:var(--text);">{{ $comment->client->name }}</span>
                                     <span class="admin-badge {{ $isProspect ? 'badge-pending' : 'badge-client' }}" style="font-size:10px;padding:2px 8px;">{{ $isProspect ? 'PROSPECT' : 'CLIENT' }}</span>
                                     <span style="font-size:12px;color:var(--muted);">par {{ $comment->user->name }}</span>
                                     <span style="font-size:12px;color:var(--muted);margin-left:auto;">{{ $comment->created_at->format('d/m/Y à H:i') }}</span>

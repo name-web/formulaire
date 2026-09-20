@@ -10,13 +10,21 @@ use Illuminate\Support\Facades\Storage;
 
 class PendingSubmissionService
 {
-    public function createDraft(array $clientData, string|array $projectTypes): PendingSubmission
+    public function createDraft(array $clientData, string|array $projectTypes, ?string $formVersion = null): PendingSubmission
     {
         $types = is_array($projectTypes) ? $projectTypes : [$projectTypes];
 
+        $projectData = ['project_types' => $types];
+
+        // Le nouveau formulaire marque son brouillon dès l'ouverture :
+        // un brouillon sans marque provient de l'ancien questionnaire.
+        if ($formVersion !== null) {
+            $projectData['form_version'] = $formVersion;
+        }
+
         return PendingSubmission::create([
             'client_data' => $clientData,
-            'project_data' => ['project_types' => $types],
+            'project_data' => $projectData,
             'answers_data' => [],
             'files_data' => [],
             'status' => 'collecting',

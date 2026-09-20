@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\CommercialMiddleware;
 use App\Http\Middleware\DeveloperMiddleware;
 use App\Http\Middleware\SuperAdminMiddleware;
 use Illuminate\Foundation\Application;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => AdminMiddleware::class,
             'super_admin' => SuperAdminMiddleware::class,
             'developer' => DeveloperMiddleware::class,
+            'commercial' => CommercialMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

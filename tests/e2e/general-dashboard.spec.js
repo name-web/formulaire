@@ -12,7 +12,7 @@ test('le dashboard général reste fonctionnel et n\'expose aucun espace privé'
   const sidebar = page.locator('#adminSidebar');
 
   // Le nom accessible des liens inclut l'icône Font Awesome : correspondance partielle.
-  for (const label of ['Dashboard', 'Projets', 'Prospects', 'Clients', 'Commentaires', 'Devis', 'Questions', 'Utilisateurs']) {
+  for (const label of ['Dashboard', 'Projets', 'Prospects', 'Clients', 'Commentaires', 'Devis', 'Utilisateurs']) {
     await expect(sidebar.getByRole('link', { name: label })).toBeVisible();
   }
 
@@ -20,7 +20,7 @@ test('le dashboard général reste fonctionnel et n\'expose aucun espace privé'
   await expect(sidebar.getByText('Vue globale')).toHaveCount(0);
   await expect(sidebar.getByText('Mes suivis')).toHaveCount(0);
 
-  for (const path of ['/admin/projects', '/admin/clients', '/admin/client-clients', '/admin/comments', '/admin/quotes', '/admin/users', '/admin/questions']) {
+  for (const path of ['/admin/projects', '/admin/clients', '/admin/client-clients', '/admin/comments', '/admin/quotes', '/admin/users']) {
     const response = await page.goto(path);
     expect(response.status(), `${path} doit répondre 200`).toBe(200);
   }

@@ -11,7 +11,7 @@ class SuperAdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (! auth()->check()) {
-            return redirect()->route('login');
+            return redirect()->route('super_admin.login');
         }
 
         if (! auth()->user()->isActive()) {
@@ -19,11 +19,11 @@ class SuperAdminMiddleware
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->with('error', 'Votre compte a été désactivé.');
+            return redirect()->route('super_admin.login')->with('error', 'Votre compte a été désactivé.');
         }
 
         if (! auth()->user()->isSuperAdmin()) {
-            abort(403, 'Accès réservé au Super Administrateur.');
+            return response('Accès réservé au Super Administrateur.', Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

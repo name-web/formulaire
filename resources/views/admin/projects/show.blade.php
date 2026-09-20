@@ -33,6 +33,65 @@
         {{-- Left: answers + files --}}
         <div style="display:flex;flex-direction:column;gap:18px;">
 
+            @if($formSections)
+
+                {{-- Réponses du nouveau formulaire (devis automatique) --}}
+                @foreach($formSections as $sectionLabel => $lines)
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <i class="fa-solid {{ \App\Models\Project::getSectionIcon($sectionLabel) }}" style="color:var(--yellow);margin-right:6px;"></i>
+                                    {{ $sectionLabel }}
+                                </div>
+                                <div class="card-subtitle">{{ count($lines) }} information{{ count($lines) > 1 ? 's' : '' }}</div>
+                            </div>
+                        </div>
+                        @foreach($lines as $line)
+                            <div style="padding:14px 22px;{{ ! $loop->last ? 'border-bottom:1px solid var(--line);' : '' }}">
+                                <div style="color:#000;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;">{{ $line['label'] }}</div>
+                                <div style="font-size:14px;color:#FFB900;font-weight:600;line-height:1.6;white-space:pre-wrap;word-break:break-word;">{{ $line['value'] }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
+
+                @if($provisionalQuote)
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <i class="fa-solid fa-file-invoice-dollar" style="color:var(--yellow);margin-right:6px;"></i>
+                                    Devis provisoire
+                                </div>
+                                <div class="card-subtitle">{{ $provisionalQuote->number }} — généré automatiquement</div>
+                            </div>
+                            <a href="{{ route('admin.quotes.show', $provisionalQuote) }}" class="top-btn">Ouvrir le devis</a>
+                        </div>
+                        <div style="padding:14px 22px;display:flex;gap:26px;flex-wrap:wrap;">
+                            <div>
+                                <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;">Net HT</div>
+                                <div style="font-weight:800;color:var(--text);">{{ number_format((int) ($provisionalQuote->calculation['net_ht'] ?? 0), 0, ',', ' ') }} FCFA</div>
+                            </div>
+                            <div>
+                                <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;">Total TTC</div>
+                                <div style="font-weight:800;color:var(--text);">{{ number_format((int) ($provisionalQuote->calculation['ttc'] ?? 0), 0, ',', ' ') }} FCFA</div>
+                            </div>
+                            <div>
+                                <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;">Frais annuels</div>
+                                <div style="font-weight:800;color:var(--text);">{{ number_format((int) ($provisionalQuote->calculation['recurrent_ttc'] ?? 0), 0, ',', ' ') }} FCFA</div>
+                            </div>
+                            <div>
+                                <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;">Délai estimé</div>
+                                <div style="font-weight:800;color:var(--text);">{{ $provisionalQuote->calculation['jours'] ?? 0 }} jours ouvrés</div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+            @endif
+
+            @unless($formSections)
             @if($answersPaginator->isEmpty())
                 <div class="card">
                     <div class="empty-state">
@@ -65,7 +124,7 @@
                             @endphp
                             <div style="padding:16px 22px;{{ !$loop->last ? 'border-bottom:1px solid var(--line);' : '' }}">
                                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                                    <div style="font-size:15px;font-weight:800;color:var(--black);">
+                                    <div style="font-size:15px;font-weight:800;color:#000;">
                                         {{ $question->title }}
                                         @if($question->is_required)
                                             <span style="color:var(--yellow);margin-left:3px;">*</span>
@@ -73,28 +132,28 @@
                                     </div>
                                     <span class="admin-badge badge-user">{{ $question->type }}</span>
                                 </div>
-                                <div style="font-size:14px;color:var(--text-muted);line-height:1.6;word-break:break-word;">
+                                <div style="font-size:14px;color:#FFB900;font-weight:600;line-height:1.6;word-break:break-word;">
                                     @if(!empty($displayValue))
                                         @if($question->type === 'multiselect' && count($selectValues) >= 1)
                                             <div style="display:flex;flex-wrap:wrap;gap:6px;">
                                                 @foreach($selectValues as $tag)
-                                                    <span class="admin-badge badge-in_progress">{{ $tag }}</span>
+                                                    <span style="display:inline-block;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:700;background:#FFB900;color:#071426;">{{ $tag }}</span>
                                                 @endforeach
                                             </div>
 
                                         @elseif($question->type === 'select')
-                                            <span class="admin-badge badge-pending">{{ $displayValue }}</span>
+                                            <span style="display:inline-block;padding:4px 10px;border-radius:4px;font-size:13px;font-weight:700;background:#FFB900;color:#071426;">{{ $displayValue }}</span>
 
                                         @elseif($question->type === 'yes_no')
                                             @php $yesVal = strtolower((string) $answer->text_value); @endphp
                                             @if($yesVal === 'yes' || $yesVal === 'oui')
-                                                <span style="display:inline-flex;align-items:center;gap:6px;color:var(--black);font-weight:600;"><i class="fa-solid fa-check-circle" style="color:var(--yellow);"></i> Oui</span>
+                                                <span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;"><i class="fa-solid fa-check-circle" style="color:#FFB900;"></i> Oui</span>
                                             @else
                                                 <span style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-weight:600;"><i class="fa-solid fa-times-circle"></i> Non</span>
                                             @endif
 
                                         @elseif($question->type === 'file' && $answer->file_path)
-                                            <a href="{{ asset('storage/' . $answer->file_path) }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:var(--yellow);text-decoration:none;font-weight:600;">
+                                            <a href="{{ asset('storage/' . $answer->file_path) }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#FFB900;text-decoration:none;font-weight:600;">
                                                 <i class="fa-solid fa-paperclip"></i> Fichier joint
                                             </a>
 
@@ -143,6 +202,7 @@
                     </div>
                 @endif
             @endif
+            @endunless
 
             {{-- Files --}}
             @if($project->files->isNotEmpty())
@@ -161,7 +221,7 @@
                             <a href="{{ asset('storage/' . $file->stored_path) }}" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:5px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
                                 <i class="fa-solid fa-file" style="color:var(--yellow);font-size:16px;flex-shrink:0;"></i>
                                 <div style="flex:1;min-width:0;">
-                                    <div style="font-size:14px;color:var(--black);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $file->original_name }}</div>
+                                    <div style="font-size:14px;color:var(--text);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $file->original_name }}</div>
                                     <div style="font-size:12px;color:var(--muted);">{{ $file->mime_type }} — {{ round($file->size / 1024) }} KB</div>
                                 </div>
                                 <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--muted);font-size:13px;"></i>
@@ -283,7 +343,7 @@
                             @if($typeData)
                                 <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:5px;border:1px solid var(--line);">
                                     <i class="{{ $typeData['icon'] }}" style="color:var(--yellow);font-size:14px;"></i>
-                                    <span style="font-size:14px;color:var(--black);font-weight:700;">{{ $typeData['label'] }}</span>
+                                    <span style="font-size:14px;color:var(--text);font-weight:700;">{{ $typeData['label'] }}</span>
                                 </div>
                             @else
                                 <span class="admin-badge badge-user">{{ $type }}</span>
@@ -308,7 +368,7 @@
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <span style="color:var(--muted);font-size:13px;">Réponses</span>
-                            <span style="color:var(--text-muted);font-size:14px;font-weight:700;">{{ $answersPaginator->total() }}</span>
+                            <span style="color:var(--text-muted);font-size:14px;font-weight:700;">{{ $formSections ? $formAnswerCount : $answersPaginator->total() }}</span>
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <span style="color:var(--muted);font-size:13px;">Fichiers</span>
@@ -316,7 +376,7 @@
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <span style="color:var(--muted);font-size:13px;">Sections</span>
-                            <span style="color:var(--text-muted);font-size:14px;font-weight:700;">{{ $groupedAnswers->count() }}</span>
+                            <span style="color:var(--text-muted);font-size:14px;font-weight:700;">{{ $formSections ? count($formSections) : $groupedAnswers->count() }}</span>
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <span style="color:var(--muted);font-size:13px;">Créé le</span>

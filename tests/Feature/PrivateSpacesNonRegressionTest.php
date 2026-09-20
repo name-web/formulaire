@@ -6,7 +6,6 @@ use App\Models\Client;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PrivateSpacesNonRegressionTest extends TestCase
@@ -31,7 +30,7 @@ class PrivateSpacesNonRegressionTest extends TestCase
 
         $response->assertOk();
 
-        foreach (['Dashboard', 'Projets', 'Prospects', 'Clients', 'Commentaires', 'Devis', 'Questions', 'Utilisateurs'] as $label) {
+        foreach (['Dashboard', 'Projets', 'Prospects', 'Clients', 'Commentaires', 'Devis', 'Utilisateurs'] as $label) {
             $response->assertSee($label);
         }
 
@@ -72,7 +71,7 @@ class PrivateSpacesNonRegressionTest extends TestCase
         $admin = $this->createAdmin();
         Client::factory()->create();
 
-        foreach (['/admin', '/admin/projects', '/admin/clients', '/admin/client-clients', '/admin/comments', '/admin/users', '/admin/questions'] as $url) {
+        foreach (['/admin', '/admin/projects', '/admin/clients', '/admin/client-clients', '/admin/comments', '/admin/users', '/admin/quotes'] as $url) {
             $this->actingAs($admin)->get($url)->assertOk();
         }
     }
@@ -89,7 +88,7 @@ class PrivateSpacesNonRegressionTest extends TestCase
         $this->actingAs($superAdmin)->get('/admin/users')->assertOk();
     }
 
-    public function test_super_admin_can_still_sign_in_through_the_general_login(): void
+    public function test_super_admin_is_rejected_from_general_login(): void
     {
         $superAdmin = User::factory()->superAdmin()->create([
             'email' => 'super@test.com',
@@ -99,10 +98,9 @@ class PrivateSpacesNonRegressionTest extends TestCase
         $this->post('/login', [
             'email' => 'super@test.com',
             'password' => $this->adminPassword,
-        ])->assertRedirect(route('admin.dashboard'));
+        ])->assertRedirect(route('login'));
 
-        $this->assertAuthenticatedAs($superAdmin);
-        $this->assertTrue(Hash::check($this->adminPassword, $superAdmin->fresh()->password));
+        $this->assertGuest();
     }
 
     public function test_general_dashboard_route_redirects_to_the_admin_dashboard(): void

@@ -47,16 +47,16 @@ return [
             'label' => 'Commentaires',
         ],
         [
+            'route' => 'admin.activities.index',
+            'route_pattern' => 'admin.activities.*',
+            'icon' => 'fa-solid fa-clock-rotate-left',
+            'label' => 'Activités',
+        ],
+        [
             'route' => 'admin.quotes.index',
             'route_pattern' => 'admin.quotes.*',
             'icon' => 'fa-solid fa-file-invoice-dollar',
             'label' => 'Devis',
-        ],
-        [
-            'route' => 'admin.questions.index',
-            'route_pattern' => 'admin.questions.*',
-            'icon' => 'fa-solid fa-circle-question',
-            'label' => 'Questions',
         ],
         [
             'route' => 'admin.users.index',

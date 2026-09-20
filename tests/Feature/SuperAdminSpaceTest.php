@@ -39,7 +39,7 @@ class SuperAdminSpaceTest extends TestCase
 
     public function test_guest_is_redirected_to_login(): void
     {
-        $this->get('/super-admin')->assertRedirect(route('login'));
+        $this->get('/super-admin')->assertRedirect(route('super_admin.login'));
     }
 
     public function test_non_super_admin_user_is_forbidden(): void
@@ -70,7 +70,7 @@ class SuperAdminSpaceTest extends TestCase
         $superAdmin = $this->createSuperAdmin();
         $superAdmin->update(['is_active' => false]);
 
-        $this->actingAs($superAdmin)->get('/super-admin')->assertRedirect(route('login'));
+        $this->actingAs($superAdmin)->get('/super-admin')->assertRedirect(route('super_admin.login'));
         $this->assertGuest();
     }
 
@@ -245,7 +245,7 @@ class SuperAdminSpaceTest extends TestCase
 
         $this->patch('/super-admin/prospects/'.$client->id.'/assignment', [
             'assigned_developer_id' => null,
-        ])->assertRedirect(route('login'));
+        ])->assertRedirect(route('super_admin.login'));
     }
 
     // ── Vision globale ──────────────────────────────────────────────────────

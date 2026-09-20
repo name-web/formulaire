@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Services\Activity\ActivityJournal;
+use App\Services\Devis\DevisAnswersPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
@@ -11,6 +13,11 @@ use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
+    public function __construct(
+        private DevisAnswersPresenter $answersPresenter,
+        private ActivityJournal $journal,
+    ) {}
+
     public function index(Request $request): View
     {
         $query = Project::with('client')->withCount('answers')
@@ -47,12 +54,54 @@ class ProjectController extends Controller
         $totalResults = $query->count();
         $projects = $query->latest()->paginate(10)->withQueryString();
 
+        /*
+         * Le compteur de réponses suit la génération du projet : nombre
+         * d'informations du nouveau formulaire, ou réponses historiques de
+         * l'ancien questionnaire.
+         */
+        $projects->getCollection()->transform(function (Project $project): Project {
+            $project->setAttribute('display_answers_count', $project->usesCurrentForm()
+                ? $this->answersPresenter->count($project->form_data ?? [])
+                : (int) $project->answers_count);
+
+            return $project;
+        });
+
         return view('admin.projects.index', compact('projects', 'totalResults'));
     }
 
     public function show(Request $request, Project $project): View
     {
         $project->load(['client', 'files', 'notes.user']);
+
+        /*
+         * Deux générations cohabitent :
+         *  - nouveau formulaire : réponses structurées dans form_data ;
+         *  - ancien questionnaire : réponses historiques questions / answers,
+         *    inchangées et toujours consultables.
+         */
+        if ($project->usesCurrentForm()) {
+            $answers = $project->form_data ?? [];
+            $formSections = $this->answersPresenter->sections($answers);
+
+            return view('admin.projects.show', [
+                'project' => $project,
+                'formSections' => $formSections,
+                'formAnswerCount' => $this->answersPresenter->count($answers),
+                'provisionalQuote' => $project->provisionalQuote,
+                'groupedAnswers' => collect(),
+                'answersPaginator' => new Paginator(
+                    collect(),
+                    0,
+                    10,
+                    1,
+                    [
+                        'path' => route('admin.projects.show', $project),
+                        'pageName' => 'answers_page',
+                    ]
+                ),
+            ]);
+        }
 
         $projectTypes = is_array($project->project_type) ? $project->project_type : [$project->project_type];
 
@@ -91,7 +140,14 @@ class ProjectController extends Controller
             ]
         );
 
-        return view('admin.projects.show', compact('project', 'groupedAnswers', 'answersPaginator'));
+        return view('admin.projects.show', [
+            'project' => $project,
+            'formSections' => null,
+            'formAnswerCount' => 0,
+            'provisionalQuote' => null,
+            'groupedAnswers' => $groupedAnswers,
+            'answersPaginator' => $answersPaginator,
+        ]);
     }
 
     public function updateStatus(Request $request, Project $project): RedirectResponse
@@ -100,7 +156,17 @@ class ProjectController extends Controller
             'status' => ['required', 'in:'.implode(',', array_keys(config('project_status.statuses')))],
         ]);
 
+        $previousStatus = $project->status;
+
         $project->update(['status' => $request->status]);
+
+        /*
+         * L'évolution d'un devis fait partie de la vie du prospect : elle est
+         * journalisée sur la fiche qui porte le projet, sans créer de doublon.
+         */
+        if ($project->client !== null && $previousStatus !== $project->status) {
+            $this->journal->projectStatusChanged($project->client, $request->user(), $project, $previousStatus, $project->status);
+        }
 
         return redirect()->route('admin.projects.show', $project)->with('success', 'Statut mis à jour.');
     }

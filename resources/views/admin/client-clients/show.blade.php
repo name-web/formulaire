@@ -28,7 +28,7 @@
                     <div style="display:flex;flex-direction:column;gap:14px;">
                         <div>
                             <div style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;">Nom</div>
-                            <div style="color:var(--black);font-size:14px;font-weight:700;">{{ $client->name }}</div>
+                            <div style="color:var(--text);font-size:14px;font-weight:700;">{{ $client->name }}</div>
                         </div>
 
                         <div>
@@ -103,7 +103,7 @@
                                     <i class="fa-solid fa-folder" style="color:#fff;font-size:14px;"></i>
                                 </div>
                                 <div style="flex:1;min-width:0;overflow:hidden;">
-                                    <div style="font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;">Projet {{ $project->id }}</div>
+                                    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">Projet {{ $project->id }}</div>
                                     <div style="font-size:13px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $typeLabels }}</div>
                                 </div>
                                 <span class="admin-badge {{ $sc['class'] }}">{{ $sc['label'] }}</span>
@@ -153,7 +153,7 @@
                                 <div style="position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;background:#176139;border:2px solid white;flex-shrink:0;z-index:1;"></div>
                                 <div style="flex:1;min-width:0;">
                                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
-                                        <span style="font-size:13px;font-weight:700;color:var(--black);">{{ $comment->user->name }}</span>
+                                        <span style="font-size:13px;font-weight:700;color:var(--text);">{{ $comment->user->name }}</span>
                                         <span style="font-size:11px;color:var(--muted);">{{ $comment->created_at->format('d/m/Y à H:i') }}</span>
                                         @if($comment->user_id === auth()->id())
                                             <form method="POST" action="/admin/clients/{{ $client->id }}/comments/{{ $comment->id }}" style="margin-left:auto;" onsubmit="return confirm('Supprimer ce commentaire ?');">

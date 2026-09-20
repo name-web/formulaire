@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\PendingSubmission;
-use App\Models\Question;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,147 +10,95 @@ class QuestionnaireValidationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createPending(array $clientData = [], array $projectTypes = ['site_vitrine']): PendingSubmission
+    private function startDraft(): void
     {
-        $defaults = [
-            'name' => 'Jean Test',
-            'phone' => '+225000000',
-        ];
-
-        return PendingSubmission::create([
-            'client_data' => array_merge($defaults, $clientData),
-            'project_data' => ['project_types' => $projectTypes],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
+        $this->post(route('questionnaire.start'), [
+            'nom' => 'Jean Dupont',
+            'tel' => '+2250708091011',
+            'email' => 'jean@exemple.com',
         ]);
     }
 
-    private function createSelectQuestion(array $attributes = []): Question
+    public function test_email_must_be_a_valid_address(): void
     {
-        return Question::create(array_merge([
-            'title' => 'Question select',
-            'type' => 'select',
-            'project_types' => ['site_vitrine'],
-            'is_required' => true,
-            'is_active' => true,
-            'sort_order' => 1,
-        ], $attributes));
+        $this->post(route('questionnaire.start'), [
+            'nom' => 'Jean Dupont',
+            'tel' => '+2250708091011',
+            'email' => 'pas-une-adresse',
+        ])->assertSessionHasErrors('email');
+
+        $this->assertDatabaseCount('pending_submissions', 0);
     }
 
-    public function test_wizard_ignores_options_from_other_questions(): void
+    public function test_project_type_must_be_offered_by_the_form(): void
     {
-        $pending = $this->createPending();
+        $this->startDraft();
 
-        $questionA = $this->createSelectQuestion(['title' => 'Q A', 'sort_order' => 1]);
-        $optionA = $questionA->options()->create(['label' => 'Opt A', 'value' => 'opt_a', 'sort_order' => 1, 'is_active' => true]);
-
-        $questionB = $this->createSelectQuestion(['title' => 'Q B', 'sort_order' => 2]);
-        $optionB = $questionB->options()->create(['label' => 'Opt B', 'value' => 'opt_b', 'sort_order' => 1, 'is_active' => true]);
-
-        $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.wizard.submit'), [
-            'answers' => [$questionA->id => ['option_ids' => [$optionB->id]]],
-        ])->assertRedirect(route('questionnaire.summary'));
-
-        $pending->refresh();
-        $this->assertArrayNotHasKey((string) $questionA->id, $pending->answers_data ?? []);
-
-        $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.wizard.submit'), [
-            'answers' => [$questionA->id => ['option_ids' => [$optionA->id]]],
-        ])->assertRedirect(route('questionnaire.summary'));
-
-        $pending->refresh();
-        $this->assertArrayHasKey((string) $questionA->id, $pending->answers_data);
-        $this->assertEquals([$optionA->id], $pending->answers_data[$questionA->id]['option_ids']);
+        $this->post(route('questionnaire.step', 2), ['type' => 'type_inconnu'])
+            ->assertSessionHasErrors('type');
     }
 
-    public function test_wizard_rejects_overlong_value(): void
+    public function test_module_must_belong_to_the_chosen_variant(): void
     {
-        $pending = $this->createPending();
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'logiciel']);
 
-        $question = Question::create([
-            'title' => 'Question texte',
-            'type' => 'textarea',
-            'project_types' => ['site_vitrine'],
-            'is_required' => true,
-            'is_active' => true,
-            'sort_order' => 1,
-        ]);
-
-        $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.wizard.submit'), [
-            'answers' => [$question->id => ['value' => str_repeat('a', 5001)]],
-        ])->assertSessionHasErrors();
-
-        $pending->refresh();
-        $this->assertEmpty($pending->answers_data);
+        $this->post(route('questionnaire.step', 3), [
+            'modules' => ['module_inconnu'],
+        ])->assertSessionHasErrors('modules.0');
     }
 
-    public function test_optional_select_with_autre_option_requires_precise_value(): void
+    public function test_module_from_another_variant_is_rejected(): void
     {
-        $pending = $this->createPending();
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'logiciel']);
 
-        $question = $this->createSelectQuestion(['is_required' => false]);
-        $autre = $question->options()->create(['label' => 'Autre', 'value' => 'autre', 'sort_order' => 1, 'is_active' => true]);
-
-        $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.step.store', 1), [
-            'option_ids' => [$autre->id],
-            'other_value' => '',
-        ])->assertSessionHasErrors('other_value');
-
-        $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.step.store', 1), [
-            'option_ids' => [$autre->id],
-            'other_value' => 'Ma précision',
-        ])->assertRedirect(route('questionnaire.summary'));
-
-        $pending->refresh();
-        $this->assertArrayHasKey((string) $question->id, $pending->answers_data);
-        $this->assertEquals('Ma précision', $pending->answers_data[$question->id]['other_value']);
+        // « notes » est un module de la plateforme scolaire, pas du logiciel de gestion.
+        $this->post(route('questionnaire.step', 3), [
+            'modules' => ['notes'],
+        ])->assertSessionHasErrors('modules.0');
     }
 
-    public function test_optional_select_accepts_empty_selection(): void
+    public function test_pages_must_be_at_least_one(): void
     {
-        $pending = $this->createPending();
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'site_vitrine']);
 
-        $question = $this->createSelectQuestion(['is_required' => false]);
-        $question->options()->create(['label' => 'Choix 1', 'value' => 'choix_1', 'sort_order' => 1, 'is_active' => true]);
-
-        $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.step.store', 1), [
-            'option_ids' => [''],
-        ])->assertSessionHasNoErrors();
+        $this->post(route('questionnaire.step', 3), [
+            'pages' => 0,
+        ])->assertSessionHasErrors('pages');
     }
 
-    public function test_start_is_rate_limited(): void
+    public function test_level_must_be_one_of_the_three_levels(): void
     {
-        $payload = [
-            'name' => 'Jean Rate',
-            'phone' => '+225000000',
-            'project_types' => ['site_vitrine'],
-        ];
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'site_vitrine']);
 
-        foreach (range(1, 5) as $i) {
-            $payload['phone'] = "+22500000{$i}";
-            $this->post(route('questionnaire.start'), $payload)->assertRedirect();
-        }
+        $this->post(route('questionnaire.step', 5), [
+            'niveau' => 'ULTIME',
+        ])->assertSessionHasErrors('niveau');
+    }
 
-        $payload['phone'] = '+225000006';
-        $this->post(route('questionnaire.start'), $payload)->assertStatus(429);
+    public function test_invalid_option_is_rejected(): void
+    {
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'site_vitrine']);
+
+        $this->post(route('questionnaire.step', 3), [
+            'pages' => 5,
+            'opt' => ['option_inconnue'],
+        ])->assertSessionHasErrors('opt.0');
+    }
+
+    public function test_invalid_data_does_not_overwrite_stored_answers(): void
+    {
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'site_vitrine']);
+        $this->post(route('questionnaire.step', 3), ['pages' => 9, 'contenus' => 'fournis']);
+
+        $this->post(route('questionnaire.step', 3), ['pages' => 0])
+            ->assertSessionHasErrors('pages');
+
+        $this->assertSame(9, PendingSubmission::first()->answers_data['pages']);
     }
 }

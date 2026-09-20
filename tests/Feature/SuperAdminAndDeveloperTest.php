@@ -268,7 +268,8 @@ class SuperAdminAndDeveloperTest extends TestCase
 
         $response = $this->get('/developer/login');
 
-        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertOk();
+        $response->assertSee('Espace développeur');
     }
 
     // ── Developer space ──────────────────────────────────────────────────
@@ -400,6 +401,33 @@ class SuperAdminAndDeveloperTest extends TestCase
 
     public function test_super_admin_space_requires_auth(): void
     {
-        $this->get('/super-admin')->assertRedirect(route('login'));
+        $this->get('/super-admin')->assertRedirect(route('super_admin.login'));
+    }
+
+    // ── ESPACE COMMERCIAL button ────────────────────────────────────────────
+
+    public function test_super_admin_dashboard_shows_espace_commercial_button(): void
+    {
+        $response = $this->actingAs($this->superAdmin)->get('/super-admin');
+
+        $response->assertOk();
+        $response->assertSee('ESPACE COMMERCIAL');
+        $response->assertSee(route('super_admin.commercials.index'));
+    }
+
+    public function test_espace_commercial_button_links_to_commercials_index(): void
+    {
+        $response = $this->actingAs($this->superAdmin)->get('/super-admin');
+
+        $response->assertOk();
+        $response->assertSee(route('super_admin.commercials.index'));
+    }
+
+    public function test_super_admin_can_click_espace_commercial_button(): void
+    {
+        $response = $this->actingAs($this->superAdmin)->get(route('super_admin.commercials.index'));
+
+        $response->assertOk();
+        $response->assertSee('Commerciaux');
     }
 }

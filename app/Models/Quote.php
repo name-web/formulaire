@@ -29,6 +29,7 @@ class Quote extends Model
     protected $fillable = [
         'number',
         'client_id',
+        'project_id',
         'sequence',
         'issued_at',
         'due_at',
@@ -37,6 +38,7 @@ class Quote extends Model
         'payment_terms',
         'notes',
         'prestations',
+        'calculation',
         'status',
         'subtotal',
         'discount',
@@ -52,12 +54,30 @@ class Quote extends Model
             'discount' => 'integer',
             'total' => 'integer',
             'prestations' => 'array',
+            'calculation' => 'array',
         ];
     }
 
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    /**
+     * Projet à l'origine du devis, renseigné pour les devis créés par le
+     * nouveau formulaire.
+     */
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    /**
+     * Le devis provient-il du nouveau formulaire (calcul conservé) ?
+     */
+    public function isFromForm(): bool
+    {
+        return ! empty($this->calculation);
     }
 
     public function customFields(): HasMany

@@ -9,35 +9,37 @@ class HomeStartFormTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_questionnaire_index_loads_with_project_types(): void
+    public function test_questionnaire_index_loads_with_the_new_form(): void
     {
         $response = $this->get(route('questionnaire.index'));
 
-        $response->assertStatus(200);
-        $response->assertSee('project_types');
+        $response->assertOk();
+        $response->assertSee('Recevez votre devis en 2 minutes');
+        $response->assertSee('name="nom"', false);
+        $response->assertSee('name="email"', false);
     }
 
-    public function test_start_accepts_project_type_string(): void
+    /**
+     * L'ancien formulaire soumettait un champ caché `project_types` : le
+     * nouveau parcours le remplace par une étape dédiée.
+     */
+    public function test_index_no_longer_exposes_the_legacy_project_types_field(): void
+    {
+        $response = $this->get(route('questionnaire.index'));
+
+        $response->assertOk();
+        $response->assertDontSee('name="project_types"', false);
+    }
+
+    public function test_start_accepts_coordinator_data(): void
     {
         $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => 'site_vitrine',
+            'nom' => 'Jean Dupont',
+            'tel' => '+2250708091011',
+            'email' => 'jean@exemple.com',
         ]);
 
         $response->assertSessionHasNoErrors();
-        $response->assertRedirect();
-    }
-
-    public function test_start_accepts_project_type_json_string(): void
-    {
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => '["site_vitrine","ecommerce"]',
-        ]);
-
-        $response->assertSessionHasNoErrors();
-        $response->assertRedirect();
+        $response->assertRedirect(route('questionnaire.step', 2));
     }
 }

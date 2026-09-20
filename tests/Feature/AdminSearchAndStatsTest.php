@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Models\Client;
-use App\Models\Question;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -66,23 +65,17 @@ class AdminSearchAndStatsTest extends TestCase
         $response->assertDontSee('Client A');
     }
 
-    public function test_questions_show_route_is_not_registered(): void
+    public function test_legacy_questionnaire_admin_routes_are_not_registered(): void
     {
         $admin = $this->createAdmin();
 
-        $question = Question::create([
-            'title' => 'Question test',
-            'type' => 'text',
-            'project_types' => ['site_vitrine'],
-            'is_required' => true,
-            'is_active' => true,
-        ]);
+        // L'ancien questionnaire n'est plus administrable : ses routes ont
+        // disparu au profit du nouveau formulaire de devis. Les tables
+        // historiques restent en place pour consulter les anciennes réponses.
+        $this->assertFalse(app('router')->has('admin.questions.index'));
+        $this->assertFalse(app('router')->has('admin.questions.options.store'));
 
-        // La route "show" n'est plus enregistrée : GET sur cette URL tombe sur
-        // la route PATCH update → 405 Method Not Allowed
-        $this->actingAs($admin)
-            ->get('/admin/questions/'.$question->id)
-            ->assertStatus(405);
+        $this->actingAs($admin)->get('/admin/questions')->assertNotFound();
     }
 
     public function test_projects_by_type_counts_each_project(): void
@@ -91,7 +84,7 @@ class AdminSearchAndStatsTest extends TestCase
         Client::create(['name' => 'B', 'phone' => '+22502222222'])->projects()->create(['project_type' => ['site_vitrine', 'ecommerce'], 'status' => 'submitted']);
         Client::create(['name' => 'C', 'phone' => '+22503333333'])->projects()->create(['project_type' => ['ecommerce'], 'status' => 'submitted']);
 
-        $controller = new DashboardController;
+        $controller = app(DashboardController::class);
         $method = new \ReflectionMethod($controller, 'getProjectsByType');
         $result = $method->invoke($controller);
 

@@ -7,14 +7,14 @@ import {
   UNASSIGNED_PROSPECT,
   isoDateInDays,
   signInAsDeveloper,
-  signInToGeneralDashboard,
+  signInAsSuperAdmin,
 } from './support.js';
 
 test.describe.configure({ mode: 'serial' });
 
 test('parcours complet : Super Admin → développeur → suivi → conversion', async ({ page, browser }) => {
   // ── 1. Connexion Super Admin ────────────────────────────────────────────
-  await signInToGeneralDashboard(page, SUPER_ADMIN);
+  await signInAsSuperAdmin(page, SUPER_ADMIN);
 
   // ── 2. Accès au dashboard Super Admin privé ─────────────────────────────
   await page.goto('/super-admin');
@@ -45,7 +45,11 @@ test('parcours complet : Super Admin → développeur → suivi → conversion',
     .locator('a.open').getAttribute('href')).split('/').pop();
 
   await unassignedRow().locator('select[name="assigned_developer_id"]').selectOption({ label: NEW_DEVELOPER });
-  await unassignedRow().locator('button[type="submit"]').click();
+  // La ligne porte deux formulaires (développeur et commercial) : on cible celui du développeur.
+  const developerForm = unassignedRow()
+    .locator('form')
+    .filter({ has: page.locator('select[name="assigned_developer_id"]') });
+  await developerForm.locator('button[type="submit"]').click();
 
   await expect(unassignedRow()).toContainText(NEW_DEVELOPER);
   await expect(unassignedRow().locator('select[name="assigned_developer_id"] option:checked')).toHaveText(NEW_DEVELOPER);

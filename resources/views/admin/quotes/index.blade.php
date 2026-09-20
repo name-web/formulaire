@@ -37,13 +37,13 @@
                 @foreach($quotes as $quote)
                     <a href="{{ route('admin.quotes.show', $quote) }}" style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:6px;border:1px solid var(--line);text-decoration:none;transition:all .2s;min-width:0;">
                         <div style="width:40px;height:40px;border-radius:6px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fa-solid fa-file-invoice" style="color:var(--black);font-size:14px;"></i>
+                            <i class="fa-solid fa-file-invoice" style="color:var(--text);font-size:14px;"></i>
                         </div>
                         <div style="flex:1;min-width:0;overflow:hidden;">
-                            <div style="font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;">{{ $quote->number }}</div>
+                            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">{{ $quote->number }}</div>
                             <div style="font-size:13px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $quote->subject }} — {{ $quote->client->name }}</div>
                         </div>
-                        <div style="font-size:14px;font-weight:700;color:var(--black);white-space:nowrap;">{{ number_format($quote->total, 0, ',', ' ') }} {{ \App\Models\CompanySetting::get()->currency }}</div>
+                        <div style="font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;">{{ number_format($quote->total, 0, ',', ' ') }} {{ \App\Models\CompanySetting::get()->currency }}</div>
                         <span class="admin-badge {{ $quote->status_class }}">{{ $quote->status_label }}</span>
                         <span class="date">{{ $quote->issued_at->format('d/m/Y') }}</span>
                     </a>

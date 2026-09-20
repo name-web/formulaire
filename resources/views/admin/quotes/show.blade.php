@@ -34,7 +34,7 @@
                 <div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;" class="form-grid">
                     <div>
                         <div class="admin-label">Client</div>
-                        <a href="{{ $quote->client->isClient() ? route('admin.client-clients.show', $quote->client) : route('admin.clients.show', $quote->client) }}" style="font-weight:700;color:var(--black);">{{ $quote->client->name }}</a>
+                        <a href="{{ $quote->client->isClient() ? route('admin.client-clients.show', $quote->client) : route('admin.clients.show', $quote->client) }}" style="font-weight:700;color:var(--text);">{{ $quote->client->name }}</a>
                     </div>
                     <div>
                         <div class="admin-label">Statut</div>
@@ -167,7 +167,7 @@
                             <span style="color:var(--muted);">Remise</span>
                             <strong>-{{ number_format($quote->discount, 0, ',', ' ') }}</strong>
                         </div>
-                        <div style="display:flex;justify-content:space-between;border-top:2px solid var(--black);padding-top:10px;font-size:18px;">
+                        <div style="display:flex;justify-content:space-between;border-top:2px solid var(--text);padding-top:10px;font-size:18px;">
                             <span style="font-weight:800;">TOTAL</span>
                             <strong>{{ number_format($quote->total, 0, ',', ' ') }} {{ \App\Models\CompanySetting::get()->currency }}</strong>
                         </div>

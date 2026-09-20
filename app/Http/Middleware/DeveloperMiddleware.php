@@ -11,8 +11,6 @@ class DeveloperMiddleware
     /**
      * Guards the developer space: guests are sent to the developer login,
      * deactivated accounts are logged out, and every other role is refused.
-     * It also authenticates the request, so the space stays independent from
-     * the general `auth` middleware (which redirects to /login).
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -29,7 +27,7 @@ class DeveloperMiddleware
         }
 
         if (! auth()->user()->isDeveloper()) {
-            abort(403, 'Accès réservé aux développeurs.');
+            return response('Accès réservé aux développeurs.', Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

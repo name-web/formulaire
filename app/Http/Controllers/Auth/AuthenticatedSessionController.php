@@ -34,6 +34,14 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('login')->with('error', 'Accès réservé aux administrateurs.');
         }
 
+        if ($user->isSuperAdmin()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->with('error', 'Veuillez utiliser votre espace dédié pour vous connecter.');
+        }
+
         if (! $user->isActive()) {
             Auth::logout();
             $request->session()->invalidate();

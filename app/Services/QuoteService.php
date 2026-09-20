@@ -51,6 +51,10 @@ class QuoteService
                 'number' => $numberData['number'],
                 'sequence' => $numberData['sequence'],
                 'client_id' => $client->id,
+                // Renseignés par le nouveau formulaire (devis provisoire) ;
+                // null pour les devis créés à la main dans l'administration.
+                'project_id' => $data['project_id'] ?? null,
+                'calculation' => $data['calculation'] ?? null,
                 'issued_at' => $data['issued_at'],
                 'due_at' => $data['due_at'] ?? null,
                 'subject' => $data['subject'],

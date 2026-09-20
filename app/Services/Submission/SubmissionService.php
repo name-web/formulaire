@@ -57,6 +57,7 @@ class SubmissionService
         if ($client) {
             $client->update(array_filter([
                 'name' => $clientData['name'] ?? null,
+                'email' => $clientData['email'] ?? null,
                 'phone' => $clientData['phone'] ?? null,
                 'company_name' => $clientData['company_name'] ?? null,
                 'whatsapp' => $clientData['whatsapp'] ?? null,
@@ -68,6 +69,7 @@ class SubmissionService
             $client = Client::create([
                 'name' => $clientData['name'] ?? '',
                 'status' => 'prospect',
+                'email' => $clientData['email'] ?? null,
                 'phone' => $clientData['phone'] ?? '',
                 'company_name' => $clientData['company_name'] ?? null,
                 'whatsapp' => $clientData['whatsapp'] ?? null,

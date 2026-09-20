@@ -67,6 +67,12 @@ return [
                 'icon' => 'fa-solid fa-user-clock',
                 'label' => 'Prospects & attribution',
             ],
+            [
+                'route' => 'super_admin.activities.index',
+                'route_pattern' => 'super_admin.activities.*',
+                'icon' => 'fa-solid fa-clock-rotate-left',
+                'label' => 'Activités',
+            ],
         ],
 
     ],
@@ -87,6 +93,33 @@ return [
                 'route_pattern' => 'developer.prospects.*',
                 'icon' => 'fa-solid fa-user-clock',
                 'label' => 'Mes prospects',
+            ],
+        ],
+
+    ],
+
+    'commercial' => [
+
+        'heading' => 'Commercial',
+
+        'nav_items' => [
+            [
+                'route' => 'commercial.dashboard',
+                'route_pattern' => 'commercial.dashboard',
+                'icon' => 'fa-solid fa-chart-line',
+                'label' => 'Tableau de bord',
+            ],
+            [
+                'route' => 'commercial.prospects.index',
+                'route_pattern' => 'commercial.prospects.*',
+                'icon' => 'fa-solid fa-handshake',
+                'label' => 'Prospects',
+            ],
+            [
+                'route' => 'commercial.converted.index',
+                'route_pattern' => 'commercial.converted.*',
+                'icon' => 'fa-solid fa-user-check',
+                'label' => 'Clients convertis',
             ],
         ],
 

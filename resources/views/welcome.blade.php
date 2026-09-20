@@ -7,7 +7,7 @@
     <title>DOMINIUM TECH — Agence digitale</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -17,15 +17,15 @@
             --navy-2: #0b1b31;
             --blue: #122c4d;
             --blue-light: #193b65;
-            --yellow: #ffb703;
-            --yellow-light: #ffc72c;
+            --yellow: #FFB900;
+            --yellow-light: #FFC72C;
             --white: #ffffff;
             --text: #e6edf5;
             --muted: #91a1b5;
             --line: rgba(255,255,255,.12);
         }
 
-        body { font-family: 'DM Sans', sans-serif; }
+        body { font-family: 'Inter', sans-serif; }
 
         /* =====================================================
            HERO SECTION
@@ -40,7 +40,7 @@
             padding: 130px 7% 120px;
             background:
                 radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%),
-                radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%),
+                radial-gradient(circle at 15% 20%, rgba(255,185,0,.04), transparent 30%),
                 linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);
         }
 
@@ -70,7 +70,7 @@
             height: 560px;
             right: -270px;
             top: -170px;
-            border: 1px solid rgba(255,183,3,.10);
+            border: 1px solid rgba(255,185,0,.10);
             border-radius: 50%;
         }
 
@@ -78,7 +78,7 @@
             content: "";
             position: absolute;
             inset: 45px;
-            border: 1px solid rgba(255,183,3,.06);
+            border: 1px solid rgba(255,185,0,.06);
             border-radius: 50%;
         }
 
@@ -88,7 +88,7 @@
             height: 1px;
             left: -60px;
             bottom: 150px;
-            background: linear-gradient(90deg, transparent, rgba(255,183,3,.5));
+            background: linear-gradient(90deg, transparent, rgba(255,185,0,.5));
         }
 
         /* =====================================================
@@ -130,7 +130,7 @@
 
         .hero-title {
             max-width: 700px;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-size: clamp(3.4rem, 5.5vw, 5.7rem);
             line-height: .98;
             font-weight: 800;
@@ -401,7 +401,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            border: 1px solid rgba(255,183,3,.7);
+            border: 1px solid rgba(255,185,0,.7);
             transform: rotate(45deg);
         }
 
@@ -600,8 +600,8 @@
         .hover\:text-yellow-300:hover { color: var(--yellow-light) !important; }
         .bg-yellow-500 { background-color: var(--yellow) !important; }
         .hover\:bg-yellow-400:hover { background-color: var(--yellow-light) !important; }
-        .bg-yellow-500\/10 { background-color: rgba(255,183,3,.10) !important; }
-        .hover\:shadow-yellow-500\/30 { --tw-shadow-color: rgba(255,183,3,.30); }
+        .bg-yellow-500\/10 { background-color: rgba(255,185,0,.10) !important; }
+        .hover\:shadow-yellow-500\/30 { --tw-shadow-color: rgba(255,185,0,.30); }
         .border-yellow-500 { border-color: var(--yellow) !important; }
 
         /* =====================================================
@@ -636,8 +636,8 @@
         .counter-animate:hover { transform: scale(1.05); }
 
         @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255,183,3,0); }
-            50% { box-shadow: 0 0 20px 4px rgba(255,183,3,0.15); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,185,0,0); }
+            50% { box-shadow: 0 0 20px 4px rgba(255,185,0,0.15); }
         }
         .glow-on-scroll.visible { animation: pulseGlow 2s ease-in-out 1; }
 
@@ -651,7 +651,7 @@
         #services h3,
         .step-card h3,
         .glow-on-scroll h2 {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-weight: 800;
         }
 
@@ -824,7 +824,7 @@
         =========================================== --}}
 
         <svg class="wave-decoration" viewBox="0 0 1440 180" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 125 C180 175, 350 170, 520 100 C680 35, 800 40, 950 105 C1100 170, 1260 175, 1440 70" stroke="#ffb703" stroke-width="4" fill="none"/>
+            <path d="M0 125 C180 175, 350 170, 520 100 C680 35, 800 40, 950 105 C1100 170, 1260 175, 1440 70" stroke="#FFB900" stroke-width="4" fill="none"/>
         </svg>
 
     </section>
@@ -833,7 +833,7 @@
     {{-- ============================================
          SERVICES
     ============================================ --}}
-    <section id="services" class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
+    <section id="services" class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,185,0,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50 Q25 30 50 50 T100 50' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 70 Q25 50 50 70 T100 70' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 30 Q25 10 50 30 T100 30' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E&quot;); background-size: 200px 100px;"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-10">
 
@@ -950,7 +950,7 @@
     {{-- ============================================
          HOW IT WORKS
     ============================================ --}}
-    <section class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
+    <section class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,185,0,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50 Q25 30 50 50 T100 50' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 70 Q25 50 50 70 T100 70' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 30 Q25 10 50 30 T100 30' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E&quot;); background-size: 200px 100px;"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-10">
 
@@ -1001,7 +1001,7 @@
     {{-- ============================================
          FINAL CTA
     ============================================ --}}
-    <section class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,183,3,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
+    <section class="py-24 sm:py-32 relative" style="background: radial-gradient(circle at 82% 45%, rgba(25, 59, 101, .35), transparent 38%), radial-gradient(circle at 15% 20%, rgba(255,185,0,.04), transparent 30%), linear-gradient(135deg, #071426 0%, #0b1b31 52%, #102b4c 100%);">
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50 Q25 30 50 50 T100 50' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 70 Q25 50 50 70 T100 70' fill='none' stroke='white' stroke-width='0.5'/%3E%3Cpath d='M0 30 Q25 10 50 30 T100 30' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E&quot;); background-size: 200px 100px;"></div>
         <div class="relative z-10 max-w-3xl mx-auto px-6 lg:px-10 text-center reveal-scale glow-on-scroll">
             <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">

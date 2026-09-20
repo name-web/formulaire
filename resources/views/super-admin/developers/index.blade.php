@@ -21,11 +21,11 @@
                     Mot de passe généré
                 </div>
                 <p style="color:var(--muted);font-size:14px;margin-bottom:14px;">
-                    Compte de <strong style="color:var(--black);">{{ session('generated_password_for') }}</strong> —
+                    Compte de <strong style="color:var(--text);">{{ session('generated_password_for') }}</strong> —
                     ce mot de passe n'est affiché qu'une seule fois, communiquez-le maintenant au développeur.
                 </p>
                 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                    <code id="generatedPassword" style="background:var(--black);color:var(--yellow);padding:12px 16px;border-radius:5px;font-size:15px;font-weight:700;letter-spacing:.5px;">{{ session('generated_password') }}</code>
+                    <code id="generatedPassword" style="background:var(--navy-2);color:var(--yellow);padding:12px 16px;border-radius:var(--radius);font-size:15px;font-weight:700;letter-spacing:.5px;">{{ session('generated_password') }}</code>
                     <button type="button" class="admin-btn btn-secondary btn-sm" id="copyPasswordBtn">
                         <i class="fa-regular fa-copy"></i> Copier
                     </button>

@@ -18,8 +18,8 @@ class DeveloperAuthenticatedSessionController extends Controller
      */
     public function create(): View|RedirectResponse
     {
-        if (auth()->check()) {
-            return redirect()->route(auth()->user()->isDeveloper() ? 'developer.dashboard' : 'admin.dashboard');
+        if (auth()->check() && auth()->user()->isDeveloper()) {
+            return redirect()->route('developer.dashboard');
         }
 
         return view('auth.developer-login');

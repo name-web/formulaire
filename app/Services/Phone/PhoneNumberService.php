@@ -60,6 +60,31 @@ class PhoneNumberService
     }
 
     /**
+     * Normalise un numéro écrit au format international, quel que soit son
+     * pays d'origine. Utile pour le formulaire de devis, qui ne demande pas
+     * la nationalité du client : un client étranger peut saisir +33... sans
+     * que le numéro soit comparé à un pays sélectionné.
+     */
+    public function normalizeToE164AnyRegion(string $number): ?string
+    {
+        if (! str_starts_with(ltrim($number), '+')) {
+            return null;
+        }
+
+        try {
+            $parsed = $this->util->parse($number, PhoneNumberUtil::UNKNOWN_REGION);
+        } catch (NumberParseException) {
+            return null;
+        }
+
+        if (! $this->util->isValidNumber($parsed)) {
+            return null;
+        }
+
+        return $this->util->format($parsed, PhoneNumberFormat::E164);
+    }
+
+    /**
      * Selectable countries for the form, with French name and dial code.
      * Region codes come from libphonenumber, French names from CLDR
      * (symfony/intl) — nothing is hardcoded in the app.

@@ -100,10 +100,10 @@
 
     {{-- Create User Modal --}}
     <div id="createUserModal" style="display:none;position:fixed;inset:0;z-index:999;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" onclick="if(event.target===this)this.style.display='none'">
-        <div class="modal-content" style="width:100%;max-width:480px;background:white;border:1px solid var(--line);border-radius:var(--radius);padding:36px;box-shadow:var(--shadow-lg);">
+        <div class="modal-content" style="width:100%;max-width:480px;background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:36px;box-shadow:var(--shadow-lg);">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
-                <h3 style="font-size:20px;font-weight:800;color:var(--black);">Nouvel utilisateur</h3>
-                <button onclick="document.getElementById('createUserModal').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;transition:transform .2s ease;" onmouseover="this.style.transform='rotate(90deg)'" onmouseout="this.style.transform='rotate(0)'"><i class="fa-solid fa-xmark"></i></button>
+                <h3 style="font-size:20px;font-weight:800;color:var(--text);">Nouvel utilisateur</h3>
+                <button onclick="document.getElementById('createUserModal').style.display='none'" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:20px;transition:transform .2s ease;" onmouseover="this.style.transform='rotate(90deg)'" onmouseout="this.style.transform='rotate(0)'"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form method="POST" action="{{ route('admin.users.store') }}">

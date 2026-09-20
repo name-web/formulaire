@@ -140,6 +140,64 @@
             @include('admin.quotes.partials.budget-table')
         @endif
 
+        {{-- ── Devis provisoire issu du nouveau formulaire ── --}}
+        @if($quote->isFromForm())
+            @php $calc = $quote->calculation; @endphp
+            <h2 class="section" style="color:{{ $secondaryColor }};">Détail du devis provisoire</h2>
+            <table style="border-collapse:collapse;width:100%;font-size:12px;margin-top:6px;">
+                <tbody>
+                    <tr>
+                        <td style="width:40%;padding:8px 12px;border:1px solid #DDD;"><strong>Niveau de finition</strong></td>
+                        <td style="padding:8px 12px;border:1px solid #DDD;">{{ config('devis.niveaux.'.($calc['niveau'] ?? ''), $calc['niveau'] ?? '—') }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px;border:1px solid #DDD;"><strong>Délai de réalisation estimé</strong></td>
+                        <td style="padding:8px 12px;border:1px solid #DDD;">{{ $calc['jours'] ?? 0 }} jours ouvrés@if(! empty($calc['accelere'])) — livraison prioritaire@endif</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px;border:1px solid #DDD;"><strong>Net commercial HT</strong></td>
+                        <td style="padding:8px 12px;border:1px solid #DDD;">{{ $fmt($calc['net_ht'] ?? 0) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px;border:1px solid #DDD;"><strong>TVA 18 %</strong></td>
+                        <td style="padding:8px 12px;border:1px solid #DDD;">{{ $fmt($calc['tva'] ?? 0) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px;border:1px solid #DDD;"><strong>Total TTC</strong></td>
+                        <td style="padding:8px 12px;border:1px solid #DDD;"><strong>{{ $fmt($calc['ttc'] ?? 0) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px;border:1px solid #DDD;"><strong>Échéancier de paiement</strong></td>
+                        <td style="padding:8px 12px;border:1px solid #DDD;">
+                            Signature 40 % : {{ $fmt($calc['acompte'] ?? 0) }} • Maquette 30 % : {{ $fmt($calc['deuxieme'] ?? 0) }} • Livraison 30 % : {{ $fmt($calc['solde'] ?? 0) }}
+                        </td>
+                    </tr>
+                    @if(! empty($calc['recurrentes']))
+                        <tr>
+                            <td style="padding:8px 12px;border:1px solid #DDD;"><strong>Frais annuels récurrents</strong></td>
+                            <td style="padding:8px 12px;border:1px solid #DDD;">{{ $fmt($calc['recurrent_ttc'] ?? 0) }} TTC par an</td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
+
+            @if(! empty($calc['recurrentes']))
+                <ul class="prestations">
+                    @foreach($calc['recurrentes'] as $recurrentLine)
+                        <li>
+                            {{ $recurrentLine['ref'] }} — {{ $recurrentLine['nom'] }}@if($recurrentLine['quantite'] > 1) × {{ $recurrentLine['quantite'] }}@endif :
+                            {{ $fmt($recurrentLine['quantite'] * $recurrentLine['prix_unitaire']) }}
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
+            @if(! empty($calc['message']))
+                <h2 class="section" style="color:{{ $secondaryColor }};">Message du client</h2>
+                <p class="body-text">{{ $calc['message'] }}</p>
+            @endif
+        @endif
+
         {{-- ── Modalités de paiement ── --}}
         @if($quote->payment_terms)
             <h2 class="section" style="color:{{ $secondaryColor }};">Modalités de paiement</h2>

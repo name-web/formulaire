@@ -27,7 +27,7 @@
             'title' => 'Prospects en cours',
             'icon' => 'fa-solid fa-user-clock',
             'badge' => 'badge-in_progress',
-            'dot' => 'var(--black)',
+            'dot' => 'var(--text)',
             'empty' => 'Aucun prospect en cours.',
         ],
         [

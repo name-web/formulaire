@@ -1,367 +1,343 @@
-<x-layouts.app :title="$question->title ?? 'Questionnaire'">
+<x-layouts.app :title="$stepTitle">
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">
-                <img src="{{ asset('IMAGES/Logo dominium.png') }}" alt="DOMINIUM">
-                <span>DOMINIUM TECH</span>
-            </div>
-            @if(!empty($project->project_type))
-                @php
-                    $types = is_array($project->project_type) ? $project->project_type : [$project->project_type];
-                    $typeLabels = collect($types)->map(fn($t) => config("project_types.types.{$t}.label", $t))->implode(', ');
-                @endphp
-                <div class="project-badge">
-                    <div class="project-badge-icon"><i class="fa-solid fa-building"></i></div>
-                    <div>
-                        <div class="project-badge-label">{{ __('Type de projet') }}</div>
-                        <div class="project-badge-value">{{ $typeLabels }}</div>
-                    </div>
-                </div>
-            @endif
+@include('questionnaire.partials.styles')
+@include('questionnaire.partials.sidebar', ['step' => $step, 'steps' => $steps, 'totalSteps' => $totalSteps])
+
+@php
+    /* Choix du type de projet, enrichis des icônes et couleurs DOMINIUM. */
+    $typeOptions = collect($formTypes)->map(fn ($key) => [
+        $key,
+        config("project_types.types.{$key}.label", $key),
+        config("project_types.types.{$key}.description"),
+        config("project_types.types.{$key}.icon"),
+        config("project_types.types.{$key}.color"),
+    ])->all();
+
+    $backRoute = $step === \App\Services\Devis\DevisFormService::STEP_PROJET
+        ? route('questionnaire.index')
+        : route('questionnaire.step', $step - 1);
+@endphp
+
+<main class="main-content">
+    <div class="content-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <button class="qm-hamburger" id="qmToggle" aria-label="Menu">
+                <div class="bars"><span></span><span></span><span></span></div>
+            </button>
+            <span class="eyebrow">DOMINIUM TECH</span>
         </div>
 
-        <div class="sidebar-label">{{ __('VOTRE PROGRESSION') }}</div>
+        @include('questionnaire.partials.errors')
 
-        <nav class="step-list">
-            @foreach($visibleQuestions as $i => $q)
-                @php
-                    $idx = $i + 1;
-                    $isAnswered = in_array($q->id, $answeredIds);
-                    $isCurrent = ($idx === $step);
-                    $state = $isCurrent ? 'active' : ($isAnswered ? 'done' : 'pending');
-                @endphp
-                <div class="step-item {{ $state }}">
-                    <div class="step-dot {{ $state }}">
-                        @if($state === 'done')
-                            <i class="fa-solid fa-check"></i>
-                        @else
-                            {{ str_pad($idx, 2, '0', STR_PAD_LEFT) }}
-                        @endif
-                    </div>
-                    <span class="step-label">{{ $q->title }}</span>
-                    @if($state === 'active')
-                        <i class="fa-solid fa-chevron-right step-arrow"></i>
-                    @endif
-                </div>
-            @endforeach
-        </nav>
-
-        <div class="progress-section">
-            <div class="progress-header">
-                <span class="progress-label">{{ __('Progression') }}</span>
-                <span class="progress-value">{{ $progress['percentage'] }}%</span>
+        <div class="top">
+            <div class="eyebrow">{{ __('PARLONS DE VOTRE PROJET') }}</div>
+            <div class="eyebrow muted">
+                {{ __('Étape :step sur :total', ['step' => $step, 'total' => $totalSteps]) }} — {{ $stepTitle }}
             </div>
-            <div class="progress-bar-track">
-                <div class="progress-bar-fill" style="width: {{ $progress['percentage'] }}%"></div>
-            </div>
-            <div class="progress-step-text">{{ __('Étape') }} <strong>{{ $step }}</strong> {{ __('sur') }} <strong>{{ $totalSteps }}</strong></div>
         </div>
-    </aside>
 
+        <form action="{{ route('questionnaire.step.store', $step) }}" method="POST" id="stepForm">
+            @csrf
 
-    <main class="main-content">
-        <div class="content-card anim-scale">
+            @if($step === \App\Services\Devis\DevisFormService::STEP_PROJET)
 
-            @if($errors->any())
-                <div class="error-box anim-up d1">
-                    <div class="error-header"><i class="fa-solid fa-circle-exclamation"></i><span>{{ __('Erreur') }}</span></div>
-                    @foreach($errors->all() as $error)
-                        <div class="error-msg">{{ $error }}</div>
-                    @endforeach
-                </div>
-            @endif
+                <h1 class="question-title compact">{{ __('De quoi avez-vous besoin ?') }}</h1>
+                <p class="question-desc">{{ __('Choisissez ce qui ressemble le plus à votre projet.') }}</p>
 
-            <div class="card-progress-top">
-                <div class="card-progress-top-fill" style="width: {{ $progress['percentage'] }}%"></div>
-            </div>
+                @include('questionnaire.partials.choices', [
+                    'name' => 'type',
+                    'options' => $typeOptions,
+                    'selected' => old('type', $answers['type']),
+                    'columns' => 2,
+                ])
 
-            <div class="top">
-                <div class="eyebrow">{{ __('PARLONS DE VOTRE PROJET') }}</div>
-                <div class="counter">{{ str_pad($step, 2, '0', STR_PAD_LEFT) }} / {{ str_pad($totalSteps, 2, '0', STR_PAD_LEFT) }}</div>
-            </div>
+            @elseif($step === \App\Services\Devis\DevisFormService::STEP_DETAIL)
 
-            <h1 class="question-title anim-up d1">
-                {{ $question->title }}
-                @if($question->is_required)<span class="req">*</span>@endif
-            </h1>
-            @if(!empty($question->description))
-                <p class="question-desc anim-up d2">{{ $question->description }}</p>
-            @endif
+                <h1 class="question-title compact">{{ __('Détail du besoin') }}</h1>
+                <p class="question-desc">{{ __('Précisez votre besoin : ces réponses déterminent les prestations de votre devis.') }}</p>
 
-            <form action="{{ route('questionnaire.step.store', $step) }}{{ ($isEditing ?? false) ? '?edit=1' : '' }}" method="POST" enctype="multipart/form-data" id="stepForm">
-                @csrf
-                @php $otherOption = null; @endphp
+                @if($variant === 'site')
 
-                @if($question->type === 'text')
-                    <div class="anim-up d2">
-                        <div class="input-icon-wrap">
-                            <i class="fa-solid fa-pen input-icon"></i>
-                            <input type="text" name="value" class="glass-input" placeholder="{{ $question->placeholder ?? __('Votre réponse…') }}" value="{{ old('value', $answer->text_value ?? '') }}" {{ $question->is_required ? 'required' : '' }}>
-                        </div>
-                        @if(!empty($question->help_text))
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:6px;">
-                                <i class="fa-solid fa-circle-info" style="font-size:10px;"></i> {{ $question->help_text }}
-                            </div>
-                        @endif
+                    @include('questionnaire.partials.field', [
+                        'name' => 'pages',
+                        'label' => __('Combien de pages ?'),
+                        'type' => 'number',
+                        'value' => old('pages', $answers['pages']),
+                        'hint' => __('Accueil, À propos, Services, Réalisations, Contact = 5 pages'),
+                        'icon' => 'fa-solid fa-file-lines',
+                        'min' => 1,
+                        'max' => 100,
+                    ])
+
+                    <div class="section-label">{{ __('Fonctions souhaitées') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'opt',
+                        'options' => $choices['options']['site'],
+                        'selected' => old('opt', $answers['opt']),
+                        'multiple' => true,
+                    ])
+
+                    <div class="section-label">{{ __('Les textes et photos') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'contenus',
+                        'options' => $choices['contenus'],
+                        'selected' => old('contenus', $answers['contenus']),
+                    ])
+
+                @elseif($variant === 'ecommerce')
+
+                    @include('questionnaire.partials.field', [
+                        'name' => 'produits',
+                        'label' => __('Combien de produits à mettre en ligne ?'),
+                        'type' => 'number',
+                        'value' => old('produits', $answers['produits']),
+                        'icon' => 'fa-solid fa-box',
+                        'min' => 1,
+                        'max' => 100000,
+                    ])
+
+                    @include('questionnaire.partials.field', [
+                        'name' => 'pages',
+                        'label' => __('Pages de présentation en plus de la boutique'),
+                        'type' => 'number',
+                        'value' => old('pages', $answers['pages']),
+                        'icon' => 'fa-solid fa-file-lines',
+                        'min' => 1,
+                        'max' => 100,
+                    ])
+
+                    <div class="section-label">{{ __('Moyens de paiement') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'paiement',
+                        'options' => $choices['paiement'],
+                        'selected' => old('paiement', $answers['paiement']),
+                    ])
+
+                    <div class="section-label">{{ __('Fonctions souhaitées') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'opt',
+                        'options' => $choices['options']['ecommerce'],
+                        'selected' => old('opt', $answers['opt']),
+                        'multiple' => true,
+                    ])
+
+                @elseif($variant === 'logiciel')
+
+                    <div class="section-label">{{ __('Quels modules ?') }}</div>
+                    <span class="form-hint">{{ __('Chaque module est facturé séparément.') }}</span>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'modules',
+                        'options' => $choices['modules']['logiciel'],
+                        'selected' => old('modules', $answers['modules']),
+                        'multiple' => true,
+                    ])
+
+                    <div class="field-grid">
+                        @include('questionnaire.partials.field', [
+                            'name' => 'postes',
+                            'label' => __('Sur combien de postes ?'),
+                            'type' => 'number',
+                            'value' => old('postes', $answers['postes']),
+                            'hint' => __('Nombre d’ordinateurs où le logiciel sera installé'),
+                            'icon' => 'fa-solid fa-desktop',
+                            'min' => 1,
+                            'max' => 1000,
+                        ])
+                        @include('questionnaire.partials.field', [
+                            'name' => 'formation',
+                            'label' => __('Jours de formation'),
+                            'type' => 'number',
+                            'value' => old('formation', $answers['formation']),
+                            'hint' => __('Groupes de 5 personnes maximum'),
+                            'icon' => 'fa-solid fa-chalkboard-user',
+                            'min' => 0,
+                            'max' => 365,
+                        ])
                     </div>
 
-                @elseif($question->type === 'textarea')
-                    <div class="anim-up d2">
-                        <div class="textarea-wrap">
-                            <textarea name="value" class="glass-input" rows="5" placeholder="{{ $question->placeholder ?? __('Décrivez en détail…') }}" {{ $question->is_required ? 'required' : '' }}>{{ old('value', $answer->text_value ?? '') }}</textarea>
-                            <span class="char-counter"><span class="current">0</span>/500</span>
-                        </div>
-                        @if(!empty($question->help_text))
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:6px;">
-                                <i class="fa-solid fa-circle-info" style="font-size:10px;"></i> {{ $question->help_text }}
-                            </div>
-                        @endif
-                    </div>
+                    <div class="section-label">{{ __('Vos données actuelles') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'reprise',
+                        'options' => $choices['reprise'],
+                        'selected' => old('reprise', $answers['reprise']),
+                    ])
 
-                @elseif($question->type === 'number')
-                    <div class="anim-up d2">
-                        <div class="input-icon-wrap">
-                            <i class="fa-solid fa-hashtag input-icon"></i>
-                            <input type="number" name="value" class="glass-input" placeholder="{{ $question->placeholder ?? '0' }}" value="{{ old('value', $answer->text_value ?? '') }}" {{ $question->is_required ? 'required' : '' }}>
-                        </div>
-                        @if(!empty($question->help_text))
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:6px;">
-                                <i class="fa-solid fa-circle-info" style="font-size:10px;"></i> {{ $question->help_text }}
-                            </div>
-                        @endif
-                    </div>
+                    <div class="section-label">{{ __('Accompagnement') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'opt',
+                        'options' => $choices['options']['logiciel'],
+                        'selected' => old('opt', $answers['opt']),
+                        'multiple' => true,
+                    ])
 
-                @elseif($question->type === 'date')
-                    <div class="anim-up d2">
-                        <div class="input-icon-wrap">
-                            <i class="fa-solid fa-calendar input-icon"></i>
-                            <input type="date" name="value" class="glass-input" value="{{ old('value', $answer->text_value ?? '') }}" {{ $question->is_required ? 'required' : '' }}>
-                        </div>
-                        @if(!empty($question->help_text))
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:6px;">
-                                <i class="fa-solid fa-circle-info" style="font-size:10px;"></i> {{ $question->help_text }}
-                            </div>
-                        @endif
-                    </div>
+                @elseif($variant === 'scolaire')
 
-                @elseif($question->type === 'yes_no')
-                    @php $currentVal = old('value', $answer->text_value ?? ''); @endphp
-                    <input type="hidden" name="value" id="yesnoHidden" value="{{ $currentVal }}">
-                    <div class="option-grid anim-up d2">
-                        <label class="opt-card yesno-card {{ $currentVal === 'yes' ? 'selected' : '' }}" data-group="value" data-value="yes">
-                            <div class="opt-check"><i class="fa-solid fa-check" style="font-size:10px;"></i></div>
-                            <div class="yesno-icon" style="background:rgba(255,183,3,0.12);color:#ffb703;">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                            <div class="opt-label">{{ __('Oui') }}</div>
-                        </label>
-                        <label class="opt-card yesno-card {{ $currentVal === 'no' ? 'selected' : '' }}" data-group="value" data-value="no">
-                            <div class="opt-check" style="background:#f87171;"><i class="fa-solid fa-xmark" style="font-size:10px;"></i></div>
-                            <div class="yesno-icon" style="background:rgba(255,183,3,0.12);color:#ffb703;">
-                                <i class="fa-solid fa-xmark"></i>
-                            </div>
-                            <div class="opt-label">{{ __('Non') }}</div>
-                        </label>
-                    </div>
+                    @include('questionnaire.partials.field', [
+                        'name' => 'eleves',
+                        'label' => __('Nombre d’élèves environ'),
+                        'type' => 'number',
+                        'value' => old('eleves', $answers['eleves']),
+                        'icon' => 'fa-solid fa-users',
+                        'min' => 0,
+                        'max' => 200000,
+                    ])
 
-                @elseif($question->type === 'select')
-                    @php
-                        $selectedId = old('option_ids.0');
-                        if($selectedId === null && $answer) {
-                            $selectedId = isset($answer->option_ids) ? ($answer->option_ids[0] ?? null) : ($answer->answerOptions->first()?->question_option_id ?? null);
-                        }
-                        $otherOption = $options->firstWhere('value', 'autre');
-                        $showOther = $selectedId && $otherOption && $selectedId == $otherOption->id;
-                    @endphp
-                    <div style="display:flex;flex-direction:column;gap:12px;" class="anim-up d2">
-                        <div class="input-icon-wrap">
-                            <i class="fa-solid fa-list input-icon"></i>
-                            <select name="option_ids[]" class="glass-input" style="appearance:none;" {{ $question->is_required ? 'required' : '' }}>
-                                <option value="">{{ __('— Sélectionnez —') }}</option>
-                                @foreach($options as $option)
-                                    <option value="{{ $option->id }}" {{ $selectedId == $option->id ? 'selected' : '' }}>{{ $option->label }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @if($otherOption)
-                            <div class="other-field" id="otherFieldSelect" style="display:{{ $showOther ? 'block' : 'none' }};">
-                                <div class="input-icon-wrap">
-                                    <i class="fa-solid fa-pen input-icon"></i>
-                                    <input type="text" name="other_value" class="glass-input" placeholder="{{ __('Précisez votre réponse…') }}" value="{{ old('other_value', $answer->other_value ?? '') }}">
-                                </div>
-                            </div>
-                        @endif
-                        @if(!empty($question->help_text))
-                            <div style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
-                                <i class="fa-solid fa-circle-info" style="font-size:10px;"></i> {{ $question->help_text }}
-                            </div>
-                        @endif
-                    </div>
+                    <div class="section-label">{{ __('Quels modules ?') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'modules',
+                        'options' => $choices['modules']['scolaire'],
+                        'selected' => old('modules', $answers['modules']),
+                        'multiple' => true,
+                    ])
 
-                @elseif($question->type === 'multiselect')
-                    @php
-                        $selectedValues = old('option_ids');
-                        if(!is_array($selectedValues) && $answer) {
-                            $selectedValues = isset($answer->option_ids) ? $answer->option_ids : ($answer->answerOptions->pluck('question_option_id')->toArray());
-                        }
-                        $selectedValues = $selectedValues ?? [];
-                        $otherOption = $options->firstWhere('value', 'autre');
-                        $showOther = $otherOption && in_array($otherOption->id, $selectedValues);
-                    @endphp
-                    <div style="display:flex;flex-direction:column;gap:12px;" class="anim-up d2">
-                        <div class="option-grid">
-                            @foreach($options as $option)
-                                @php $sel = in_array($option->id, $selectedValues); @endphp
-                                <label class="opt-card {{ $sel ? 'selected' : '' }}" data-group="option_ids[]" data-toggle="true" data-value="{{ $option->id }}">
-                                    <div class="opt-check"><i class="fa-solid fa-check" style="font-size:9px;"></i></div>
-                                    <div class="opt-label">{{ $option->label }}</div>
-                                    <input type="checkbox" name="option_ids[]" value="{{ $option->id }}" {{ $sel ? 'checked' : '' }} class="hidden">
-                                </label>
-                            @endforeach
-                        </div>
-                        @if($otherOption)
-                            <div class="other-field" id="otherFieldMulti" style="display:{{ $showOther ? 'block' : 'none' }};">
-                                <div class="input-icon-wrap">
-                                    <i class="fa-solid fa-pen input-icon"></i>
-                                    <input type="text" name="other_value" class="glass-input" placeholder="{{ __('Précisez votre réponse…') }}" value="{{ old('other_value', $answer->other_value ?? '') }}">
-                                </div>
-                            </div>
-                        @endif
-                        @if(!empty($question->help_text))
-                            <div style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
-                                <i class="fa-solid fa-circle-info" style="font-size:10px;"></i> {{ $question->help_text }}
-                            </div>
-                        @endif
-                    </div>
+                    <div class="section-label">{{ __('Vos données actuelles') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'reprise',
+                        'options' => $choices['reprise'],
+                        'selected' => old('reprise', $answers['reprise']),
+                    ])
 
-                @elseif($question->type === 'file')
-                    <div class="anim-up d2">
-                        <div class="dropzone" id="dropzone">
-                            <input type="file" name="file" id="fileInput" class="hidden">
-                            <div class="dropzone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                            <div class="dropzone-title">{{ __('Glissez-déposez votre fichier ici') }}</div>
-                            <div class="dropzone-sub">{{ __('ou cliquez pour parcourir') }}</div>
-                            <div class="dropzone-formats">
-                                <span class="format-tag">PNG</span>
-                                <span class="format-tag">JPG</span>
-                                <span class="format-tag">PDF</span>
-                                <span class="format-tag">DOC</span>
-                                <span class="format-tag">ZIP</span>
-                            </div>
-                        </div>
-                        <div id="fileList" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
-                        @if(!empty($answer) && !empty($answer->file_path))
-                            <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;margin-top:8px;border-radius:var(--radius-xs);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);">
-                                <i class="fa-solid fa-file-check" style="color:#ffb703;"></i>
-                                <span style="color:var(--text-secondary);">{{ __('Fichier déjà envoyé') }}</span>
-                            </div>
-                        @endif
-                        @if(!empty($question->help_text))
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:6px;">
-                                <i class="fa-solid fa-circle-info" style="font-size:10px;"></i> {{ $question->help_text }}
-                            </div>
-                        @endif
-                    </div>
+                @elseif($variant === 'mobile')
+
+                    <div class="section-label">{{ __('Sur quels téléphones ?') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'plateforme',
+                        'options' => $choices['plateforme'],
+                        'selected' => old('plateforme', $answers['plateforme']),
+                    ])
+
+                    @include('questionnaire.partials.field', [
+                        'name' => 'ecrans',
+                        'label' => __('Combien d’écrans ?'),
+                        'type' => 'number',
+                        'value' => old('ecrans', $answers['ecrans']),
+                        'hint' => __('Accueil, connexion, liste, détail, profil… comptez large'),
+                        'icon' => 'fa-solid fa-mobile-screen',
+                        'min' => 1,
+                        'max' => 500,
+                    ])
+
+                    <div class="section-label">{{ __('Fonctions souhaitées') }}</div>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'opt',
+                        'options' => $choices['options']['mobile'],
+                        'selected' => old('opt', $answers['opt']),
+                        'multiple' => true,
+                    ])
+
                 @endif
 
-                <div class="card-bottom anim-up d5">
-                    @if($step > 1)
-                        <a href="{{ route('questionnaire.step', $step - 1) }}{{ ($isEditing ?? false) ? '?edit=1' : '' }}" class="btn-back" style="text-decoration:none;">
-                            <i class="fa-solid fa-arrow-left"></i> {{ __('Retour') }}
-                        </a>
-                    @else
-                        <a href="{{ ($isEditing ?? false) ? route('questionnaire.summary') : route('questionnaire.index') }}" class="btn-back" style="text-decoration:none;">
-                            <i class="fa-solid fa-arrow-left"></i> {{ __('Retour') }}
-                        </a>
-                    @endif
-                    <button type="submit" class="btn-continue">
-                        {{ __('Continuer') }} <i class="fa-solid fa-arrow-right"></i>
-                    </button>
+                @if(in_array($variant, ['site', 'ecommerce', 'mobile'], true))
+                    <div class="section-label">{{ __('Identité visuelle') }}</div>
+                    <span class="form-hint">{{ __('Logo et couleurs de votre marque.') }}</span>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'identite',
+                        'options' => $choices['identite'],
+                        'selected' => old('identite', $answers['identite']),
+                    ])
+                @endif
+
+            @elseif($step === \App\Services\Devis\DevisFormService::STEP_HERBERGEMENT)
+
+                <h1 class="question-title compact">{{ __('Ce qui fait vivre votre outil') }}</h1>
+                <p class="question-desc">
+                    {{ __('Ces frais sont annuels et se renouvellent. Ils sont toujours présentés séparément du coût de création.') }}
+                </p>
+
+                @if($answers['type'] !== 'application_mobile')
+                    <div class="section-label">{{ __('Nom de domaine') }}</div>
+                    <span class="form-hint">{{ __('L’adresse de votre site sur internet.') }}</span>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'domaine',
+                        'options' => $choices['domaine'],
+                        'selected' => old('domaine', $answers['domaine']),
+                    ])
+
+                    <div class="section-label">{{ __('Hébergement') }}</div>
+                    <span class="form-hint">{{ __('L’espace où votre site est installé.') }}</span>
+                    @include('questionnaire.partials.choices', [
+                        'name' => 'hebergement',
+                        'options' => $choices['hebergement'],
+                        'selected' => old('hebergement', $answers['hebergement']),
+                    ])
+
+                    @include('questionnaire.partials.field', [
+                        'name' => 'emails',
+                        'label' => __('Adresses e-mail professionnelles'),
+                        'type' => 'number',
+                        'value' => old('emails', $answers['emails']),
+                        'hint' => __('Exemple : contact@votreentreprise.ci'),
+                        'icon' => 'fa-solid fa-at',
+                        'min' => 0,
+                        'max' => 10000,
+                    ])
+                @endif
+
+                <div class="section-label">{{ __('Suivi et maintenance') }}</div>
+                <span class="form-hint">{{ __('Mises à jour, sauvegardes, assistance.') }}</span>
+                @include('questionnaire.partials.choices', [
+                    'name' => 'maintenance',
+                    'options' => $choices['maintenance'],
+                    'selected' => old('maintenance', $answers['maintenance']),
+                ])
+
+                <div class="section-label">{{ __('Sécurité des données') }}</div>
+                @include('questionnaire.partials.choices', [
+                    'name' => 'opt',
+                    'options' => [['sauvegarde', 'Ajouter la sauvegarde externalisée quotidienne', 'Copie complète chaque jour, restauration testée']],
+                    'selected' => old('opt', $answers['opt']),
+                    'multiple' => true,
+                ])
+
+            @elseif($step === \App\Services\Devis\DevisFormService::STEP_NIVEAU)
+
+                <h1 class="question-title compact">{{ __('Quel niveau de finition ?') }}</h1>
+                <p class="question-desc">
+                    {{ __('Le même projet peut être réalisé à trois niveaux d’exigence. Le niveau Standard est celui que nous recommandons.') }}
+                </p>
+
+                @include('questionnaire.partials.choices', [
+                    'name' => 'niveau',
+                    'options' => $choices['niveau'],
+                    'selected' => old('niveau', $answers['niveau']),
+                ])
+
+                <div class="section-label">{{ __('Délai souhaité') }}</div>
+                @include('questionnaire.partials.choices', [
+                    'name' => 'delai',
+                    'options' => $choices['delai'],
+                    'selected' => old('delai', $answers['delai']),
+                ])
+
+                <div class="field-block">
+                    <label class="form-label" for="message">{{ __('Précisions sur votre projet') }}</label>
+                    <span class="form-hint">{{ __('Facultatif — tout ce qui nous aidera à affiner.') }}</span>
+                    <textarea id="message"
+                              name="message"
+                              class="glass-input no-icon"
+                              rows="3"
+                              placeholder="Exemple : je gère une quincaillerie à Yopougon, 4 vendeurs, je perds du stock.">{{ old('message', $answers['message']) }}</textarea>
                 </div>
-            </form>
-        </div>
-    </main>
 
+            @endif
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.opt-card[data-group="value"]').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.opt-card[data-group="value"]').forEach(c => {
-                    c.classList.remove('selected');
-                    const ch = c.querySelector('.opt-check');
-                    if(ch) { ch.style.opacity = '0'; ch.style.transform = 'scale(0)'; }
-                });
-                card.classList.add('selected');
-                const ch = card.querySelector('.opt-check');
-                if(ch) { ch.style.opacity = '1'; ch.style.transform = 'scale(1)'; }
-                const inp = document.getElementById('yesnoHidden');
-                if(inp) inp.value = card.dataset.value;
-            });
-        });
+            <div class="card-bottom">
+                <a href="{{ $backRoute }}" class="btn-back">
+                    <i class="fa-solid fa-arrow-left"></i> {{ __('Retour') }}
+                </a>
+                <div></div>
+                <button type="submit" class="btn-continue" style="margin-left:auto;">
+                    @if($step === \App\Services\Devis\DevisFormService::STEP_NIVEAU)
+                        {{ __('Voir mon devis') }} <i class="fa-solid fa-file-invoice"></i>
+                    @else
+                        {{ __('Continuer') }} <i class="fa-solid fa-arrow-right"></i>
+                    @endif
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
 
-        document.querySelectorAll('.opt-card[data-toggle="true"]').forEach(card => {
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-                card.classList.toggle('selected');
-                const cb = card.querySelector('input[type=checkbox]');
-                if(cb) cb.checked = card.classList.contains('selected');
-                const check = card.querySelector('.opt-check');
-                if(check) {
-                    check.style.opacity = card.classList.contains('selected') ? '1' : '0';
-                    check.style.transform = card.classList.contains('selected') ? 'scale(1)' : 'scale(0)';
-                }
-                const otherOption = @json($otherOption?->id);
-                if(parseInt(card.dataset.value) === otherOption) {
-                    const field = document.getElementById('otherFieldMulti');
-                    if(field) field.style.display = card.classList.contains('selected') ? 'block' : 'none';
-                }
-            });
-        });
+@include('questionnaire.partials.scripts')
 
-        const selectEl = document.querySelector('select[name="option_ids[]"]');
-        if(selectEl) {
-            const otherOption = @json($otherOption?->id);
-            selectEl.addEventListener('change', () => {
-                const field = document.getElementById('otherFieldSelect');
-                if(field) field.style.display = selectEl.value == otherOption ? 'block' : 'none';
-            });
-        }
-
-        document.querySelectorAll('.textarea-wrap textarea').forEach(ta => {
-            const counter = ta.parentElement.querySelector('.char-counter .current');
-            if(!counter) return;
-            const update = () => { counter.textContent = ta.value.length; };
-            ta.addEventListener('input', update);
-            update();
-        });
-
-        const dz = document.getElementById('dropzone');
-        const fi = document.getElementById('fileInput');
-        const fl = document.getElementById('fileList');
-        if(dz && fi) {
-            dz.addEventListener('click', () => fi.click());
-            dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
-            dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-            dz.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dz.classList.remove('drag-over');
-                fi.files = e.dataTransfer.files;
-                showFiles(fi.files);
-            });
-            fi.addEventListener('change', () => showFiles(fi.files));
-        }
-        function showFiles(files) {
-            if(!fl) return;
-            fl.innerHTML = '';
-            Array.from(files).forEach(f => {
-                const div = document.createElement('div');
-                div.style.cssText = 'padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);min-width:0;';
-                div.innerHTML = '<i class="fa-solid fa-file" style="color:#ffc72c;flex-shrink:0;"></i><span style="color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">' + f.name + '</span><span style="margin-left:auto;color:var(--text-muted);font-size:11px;flex-shrink:0;">' + (f.size/1024).toFixed(0) + ' KB</span>';
-                fl.appendChild(div);
-            });
-        }
-    });
-    </script>
 </x-layouts.app>

@@ -32,12 +32,12 @@
                     <label class="admin-label">Logo de l'entreprise</label>
                     @if($company->logo_path)
                         <div style="margin-bottom:8px;">
-                            <img src="{{ asset('storage/' . $company->logo_path) }}" alt="Logo actuel" style="max-height:60px;border-radius:8px;border:1px solid #e5e7eb;padding:4px;">
-                            <span style="font-size:11px;color:#888;margin-left:8px;">Logo actuel</span>
+                            <img src="{{ asset('storage/' . $company->logo_path) }}" alt="Logo actuel" style="max-height:60px;border-radius:8px;border:1px solid var(--line);padding:4px;">
+                            <span style="font-size:11px;color:var(--text-muted);margin-left:8px;">Logo actuel</span>
                         </div>
                     @endif
                     <input type="file" name="logo" accept="image/png,image/jpeg,image/svg+xml" class="admin-input" style="padding:8px;">
-                    <span style="font-size:11px;color:#888;">PNG, JPG ou SVG — max 2 Mo</span>
+                    <span style="font-size:11px;color:var(--text-muted);">PNG, JPG ou SVG — max 2 Mo</span>
                     @error('logo')<div style="color:#dc2626;font-size:12px;margin-top:4px;">{{ $message }}</div>@enderror
                 </div>
 
@@ -72,8 +72,8 @@
                 </div>
 
                 {{-- Couleurs --}}
-                <div style="grid-column:1/-1;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;">
-                    <h3 style="font-size:13px;font-weight:700;color:#374151;margin-bottom:12px;">Couleurs du devis</h3>
+                <div style="grid-column:1/-1;border-top:1px solid var(--line);padding-top:16px;margin-top:8px;">
+                    <h3 style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">Couleurs du devis</h3>
                 </div>
                 <div>
                     <label class="admin-label">Couleur principale (bandeau, accents)</label>
@@ -91,13 +91,13 @@
                 </div>
 
                 {{-- Règle de commission --}}
-                <div style="grid-column:1/-1;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;">
-                    <h3 style="font-size:13px;font-weight:700;color:#374151;margin-bottom:12px;">Règle de commission par défaut</h3>
+                <div style="grid-column:1/-1;border-top:1px solid var(--line);padding-top:16px;margin-top:8px;">
+                    <h3 style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">Règle de commission par défaut</h3>
                 </div>
                 <div>
                     <label class="admin-label">Seuil minimum (FCFA)</label>
                     <input type="number" name="commission_threshold" class="admin-input" value="{{ old('commission_threshold', $company->commission_threshold ?? 100000) }}" min="0">
-                    <span style="font-size:11px;color:#888;">Au-dessus de ce montant, le % s'applique</span>
+                    <span style="font-size:11px;color:var(--text-muted);">Au-dessus de ce montant, le % s'applique</span>
                 </div>
                 <div>
                     <label class="admin-label">Pourcentage (%)</label>

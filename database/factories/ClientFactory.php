@@ -29,4 +29,9 @@ class ClientFactory extends Factory
     {
         return $this->state(fn () => ['assigned_developer_id' => $developer->getKey()]);
     }
+
+    public function assignedToCommercial(User $commercial): static
+    {
+        return $this->state(fn () => ['assigned_commercial_id' => $commercial->getKey()]);
+    }
 }

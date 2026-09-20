@@ -3,8 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\PendingSubmission;
-use App\Models\Question;
-use App\Models\QuestionOption;
+use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,396 +11,163 @@ class QuestionnaireRoutesTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createPending(array $clientData = [], array $projectTypes = ['site_vitrine']): PendingSubmission
+    private function startDraft(): void
     {
-        $defaults = [
-            'name' => 'Test',
-            'phone' => '+2250708091011',
-        ];
-
-        return PendingSubmission::create([
-            'client_data' => array_merge($defaults, $clientData),
-            'project_data' => ['project_types' => $projectTypes],
-            'answers_data' => [],
-            'files_data' => [],
-            'status' => 'collecting',
+        $this->post(route('questionnaire.start'), [
+            'nom' => 'Jean Dupont',
+            'tel' => '+2250708091011',
+            'email' => 'jean@exemple.com',
         ]);
-    }
-
-    public function test_questionnaire_index_page_loads(): void
-    {
-        $response = $this->get(route('questionnaire.index'));
-
-        $response->assertStatus(200);
     }
 
     public function test_start_creates_pending_submission(): void
     {
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
-        ]);
-
-        $response->assertRedirect();
-
-        $this->assertDatabaseHas('pending_submissions', [
-            'status' => 'collecting',
-        ]);
+        $this->startDraft();
 
         $pending = PendingSubmission::first();
-        $this->assertEquals('Jean Dupont', $pending->client_data['name']);
-        $this->assertEquals('+2250708091011', $pending->client_data['phone']);
-        $this->assertEquals(['site_vitrine'], $pending->project_data['project_types']);
+
+        $this->assertNotNull($pending);
+        $this->assertSame('collecting', $pending->status);
+        $this->assertSame(Project::FORM_VERSION_CURRENT, $pending->project_data['form_version']);
     }
 
-    public function test_start_accepts_multiple_project_types(): void
+    public function test_step_page_redirects_without_a_draft(): void
     {
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine', 'ecommerce', 'application_mobile'],
-        ]);
+        $this->get(route('questionnaire.step', 2))
+            ->assertRedirect(route('questionnaire.index'));
+    }
 
-        $response->assertRedirect();
+    public function test_out_of_range_step_redirects_to_the_start(): void
+    {
+        $this->startDraft();
+
+        $this->get(route('questionnaire.step', 9))
+            ->assertRedirect(route('questionnaire.index'));
+    }
+
+    public function test_detail_step_redirects_to_the_project_step_without_a_type(): void
+    {
+        $this->startDraft();
+
+        $this->get(route('questionnaire.step', 3))
+            ->assertRedirect(route('questionnaire.step', 2));
+    }
+
+    public function test_project_type_choices_are_displayed(): void
+    {
+        $this->startDraft();
+
+        $this->get(route('questionnaire.step', 2))
+            ->assertOk()
+            ->assertSee('De quoi avez-vous besoin ?')
+            ->assertSee('value="site_vitrine"', false)
+            ->assertSee('value="ecommerce"', false)
+            ->assertSee('value="logiciel"', false)
+            ->assertSee('value="scolaire"', false)
+            ->assertSee('value="application_mobile"', false)
+            ->assertSee('value="refonte"', false);
+    }
+
+    /**
+     * Le numéro d'étape du parcours ne doit pas être confondu avec le pas
+     * (attribut HTML « step ») des champs numériques : un « step » erroné
+     * bloquerait la validation du navigateur et empêcherait l'envoi.
+     */
+    public function test_number_fields_do_not_inherit_the_current_step_attribute(): void
+    {
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'site_vitrine']);
+
+        $response = $this->get(route('questionnaire.step', 3));
+
+        $response->assertOk()->assertSee('id="pages"', false);
+
+        $this->assertDoesNotMatchRegularExpression(
+            '/id="pages"[^>]*\sstep="/',
+            $response->getContent(),
+        );
+    }
+
+    public function test_choosing_a_project_type_is_stored_in_the_draft(): void
+    {
+        $this->startDraft();
+
+        $this->post(route('questionnaire.step', 2), ['type' => 'ecommerce'])
+            ->assertRedirect(route('questionnaire.step', 3));
 
         $pending = PendingSubmission::first();
-        $this->assertEquals(['site_vitrine', 'ecommerce', 'application_mobile'], $pending->project_data['project_types']);
+
+        $this->assertSame('ecommerce', $pending->answers_data['type']);
+        $this->assertSame(['ecommerce'], $pending->project_data['project_types']);
     }
 
-    public function test_project_type_site_vitrine_stored_correctly(): void
+    public function test_detail_answers_are_stored_in_the_draft(): void
     {
-        $this->post(route('questionnaire.start'), [
-            'name' => 'Test Vitrine',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
-        ]);
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'site_vitrine']);
 
-        $pending = PendingSubmission::first();
-        $this->assertEquals(['site_vitrine'], $pending->project_data['project_types']);
+        $this->post(route('questionnaire.step', 3), [
+            'pages' => 7,
+            'identite' => 'logo',
+            'contenus' => 'rediger',
+            'opt' => ['blog', 'galerie'],
+        ])->assertRedirect(route('questionnaire.step', 4));
+
+        $answers = PendingSubmission::first()->answers_data;
+
+        $this->assertSame(7, $answers['pages']);
+        $this->assertSame('logo', $answers['identite']);
+        $this->assertSame('rediger', $answers['contenus']);
+        $this->assertSame(['blog', 'galerie'], $answers['opt']);
     }
 
-    public function test_project_type_ecommerce_stored_correctly(): void
+    public function test_hosting_step_keeps_type_options_and_adds_the_backup_option(): void
     {
-        $this->post(route('questionnaire.start'), [
-            'name' => 'Test E-commerce',
-            'phone' => '+2250708091011',
-            'project_types' => ['ecommerce'],
+        $this->startDraft();
+        $this->post(route('questionnaire.step', 2), ['type' => 'site_vitrine']);
+        $this->post(route('questionnaire.step', 3), [
+            'pages' => 5,
+            'contenus' => 'fournis',
+            'opt' => ['blog'],
         ]);
 
-        $pending = PendingSubmission::first();
-        $this->assertEquals(['ecommerce'], $pending->project_data['project_types']);
+        $this->post(route('questionnaire.step', 4), [
+            'domaine' => 'ci',
+            'hebergement' => 'vps',
+            'emails' => 2,
+            'maintenance' => 'business',
+            'opt' => ['sauvegarde'],
+        ])->assertRedirect(route('questionnaire.step', 5));
+
+        $answers = PendingSubmission::first()->answers_data;
+
+        $this->assertSame('ci', $answers['domaine']);
+        $this->assertSame('vps', $answers['hebergement']);
+        $this->assertSame(2, $answers['emails']);
+        $this->assertSame('business', $answers['maintenance']);
+
+        // Les options du type sont conservées, la sauvegarde s'y ajoute.
+        $this->assertContains('blog', $answers['opt']);
+        $this->assertContains('sauvegarde', $answers['opt']);
     }
 
-    public function test_project_type_application_mobile_stored_correctly(): void
+    public function test_quote_page_redirects_without_a_submitted_quote(): void
     {
-        $this->post(route('questionnaire.start'), [
-            'name' => 'Test Mobile',
-            'phone' => '+2250708091011',
-            'project_types' => ['application_mobile'],
-        ]);
-
-        $pending = PendingSubmission::first();
-        $this->assertEquals(['application_mobile'], $pending->project_data['project_types']);
+        $this->get(route('questionnaire.quote'))
+            ->assertRedirect(route('questionnaire.index'));
     }
 
-    public function test_project_type_logiciel_stored_correctly(): void
+    public function test_restart_clears_the_current_journey(): void
     {
-        $this->post(route('questionnaire.start'), [
-            'name' => 'Test Logiciel',
-            'phone' => '+2250708091011',
-            'project_types' => ['logiciel'],
-        ]);
+        $this->startDraft();
 
-        $pending = PendingSubmission::first();
-        $this->assertEquals(['logiciel'], $pending->project_data['project_types']);
-    }
+        $this->get(route('questionnaire.restart'))
+            ->assertRedirect(route('questionnaire.index'));
 
-    public function test_start_requires_at_least_one_project_type(): void
-    {
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => [],
-        ]);
+        $this->assertNull(session('devis_pending_uuid'));
 
-        $response->assertSessionHasErrors(['project_types']);
-    }
-
-    public function test_start_rejects_invalid_project_type(): void
-    {
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['invalid_type'],
-        ]);
-
-        $response->assertSessionHasErrors(['project_types.0']);
-    }
-
-    public function test_start_requires_phone(): void
-    {
-        $response = $this->post(route('questionnaire.start'), [
-            'name' => 'Jean Dupont',
-            'project_types' => ['site_vitrine'],
-        ]);
-
-        $response->assertSessionHasErrors(['phone']);
-    }
-
-    public function test_start_requires_name_and_phone(): void
-    {
-        $response = $this->post(route('questionnaire.start'), []);
-
-        $response->assertSessionHasErrors(['name', 'phone', 'project_types']);
-    }
-
-    public function test_step_page_loads_with_valid_session(): void
-    {
-        $pending = $this->createPending();
-
-        Question::create([
-            'title' => 'Quel type de projet ?',
-            'type' => 'select',
-            'project_types' => ['site_vitrine'],
-            'sort_order' => 1,
-        ]);
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->get(route('questionnaire.step', 1));
-
-        $response->assertStatus(200);
-    }
-
-    public function test_step_page_loads_with_multiple_project_types(): void
-    {
-        $pending = $this->createPending(projectTypes: ['site_vitrine', 'ecommerce']);
-
-        Question::create([
-            'title' => 'Question pour site vitrine',
-            'type' => 'text',
-            'project_types' => ['site_vitrine'],
-            'sort_order' => 1,
-        ]);
-
-        Question::create([
-            'title' => 'Question pour ecommerce',
-            'type' => 'text',
-            'project_types' => ['ecommerce'],
-            'sort_order' => 2,
-        ]);
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine', 'ecommerce'],
-        ])->get(route('questionnaire.step', 1));
-
-        $response->assertStatus(200);
-    }
-
-    public function test_step_page_returns_404_without_session(): void
-    {
-        $response = $this->get(route('questionnaire.step', 1));
-
-        $response->assertStatus(404);
-    }
-
-    public function test_store_answer_for_text_question(): void
-    {
-        $pending = $this->createPending();
-
-        $question = Question::create([
-            'title' => 'Décrivez votre projet',
-            'type' => 'textarea',
-            'project_types' => ['site_vitrine'],
-            'is_required' => true,
-            'sort_order' => 1,
-        ]);
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.step.store', 1), [
-            'value' => 'Je veux un site vitrine',
-        ]);
-
-        $response->assertRedirect();
-
-        $pending->refresh();
-        $this->assertEquals('Je veux un site vitrine', $pending->answers_data[$question->id]['text_value']);
-    }
-
-    public function test_store_answer_for_select_question(): void
-    {
-        $pending = $this->createPending();
-
-        $question = Question::create([
-            'title' => 'Quel type de projet ?',
-            'type' => 'select',
-            'project_types' => ['site_vitrine'],
-            'is_required' => true,
-            'sort_order' => 1,
-        ]);
-
-        $option = QuestionOption::create([
-            'question_id' => $question->id,
-            'label' => 'Vitrine',
-            'value' => 'vitrine',
-            'sort_order' => 1,
-        ]);
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.step.store', 1), [
-            'option_ids' => [$option->id],
-        ]);
-
-        $response->assertRedirect();
-
-        $pending->refresh();
-        $this->assertEquals([$option->id], $pending->answers_data[$question->id]['option_ids']);
-    }
-
-    public function test_store_answer_for_multiselect_with_other(): void
-    {
-        $pending = $this->createPending();
-
-        $question = Question::create([
-            'title' => 'Quelles pages souhaitez-vous ?',
-            'type' => 'multiselect',
-            'project_types' => ['site_vitrine'],
-            'is_required' => true,
-            'sort_order' => 1,
-        ]);
-
-        $option1 = QuestionOption::create([
-            'question_id' => $question->id,
-            'label' => 'Accueil',
-            'value' => 'accueil',
-            'sort_order' => 1,
-        ]);
-
-        $optionOther = QuestionOption::create([
-            'question_id' => $question->id,
-            'label' => 'Autre',
-            'value' => 'autre',
-            'sort_order' => 2,
-        ]);
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.step.store', 1), [
-            'option_ids' => [$option1->id, $optionOther->id],
-            'other_value' => 'Page portfolio',
-        ]);
-
-        $response->assertRedirect();
-
-        $pending->refresh();
-        $this->assertCount(2, $pending->answers_data[$question->id]['option_ids']);
-        $this->assertEquals('Page portfolio', $pending->answers_data[$question->id]['other_value']);
-    }
-
-    public function test_previous_route_redirects_correctly(): void
-    {
-        $pending = $this->createPending();
-
-        $question1 = Question::create([
-            'title' => 'Question 1',
-            'type' => 'text',
-            'project_types' => ['site_vitrine'],
-            'is_required' => true,
-            'sort_order' => 1,
-        ]);
-
-        Question::create([
-            'title' => 'Question 2',
-            'type' => 'text',
-            'project_types' => ['site_vitrine'],
-            'is_required' => true,
-            'sort_order' => 2,
-        ]);
-
-        $pending->update(['answers_data' => [
-            $question1->id => [
-                'question_id' => $question1->id,
-                'text_value' => 'Réponse 1',
-            ],
-        ]]);
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->get(route('questionnaire.previous'));
-
-        $response->assertRedirect();
-    }
-
-    public function test_summary_page_loads(): void
-    {
-        $pending = $this->createPending();
-
-        $question = Question::create([
-            'title' => 'Question 1',
-            'type' => 'text',
-            'project_types' => ['site_vitrine'],
-            'sort_order' => 1,
-        ]);
-
-        $pending->update(['answers_data' => [
-            $question->id => [
-                'question_id' => $question->id,
-                'text_value' => 'Réponse test',
-            ],
-        ]]);
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->get(route('questionnaire.summary'));
-
-        $response->assertStatus(200);
-    }
-
-    public function test_submit_changes_pending_status(): void
-    {
-        $pending = $this->createPending();
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.submit'));
-
-        $response->assertRedirect(route('questionnaire.thankyou'));
-
-        $pending->refresh();
-        $this->assertNotEquals('collecting', $pending->status);
-    }
-
-    public function test_submit_clears_session(): void
-    {
-        $pending = $this->createPending();
-
-        $response = $this->withSession([
-            'pending_submission_uuid' => $pending->uuid,
-            'project_type' => ['site_vitrine'],
-        ])->post(route('questionnaire.submit'));
-
-        $response->assertRedirect(route('questionnaire.thankyou'));
-
-        $session = $this->app['session.store'];
-        $this->assertNull($session->get('pending_submission_uuid'));
-        $this->assertNull($session->get('project_type'));
-    }
-
-    public function test_thankyou_page_loads(): void
-    {
-        $response = $this->get(route('questionnaire.thankyou'));
-
-        $response->assertStatus(200);
+        // Le brouillon quitté n'est pas converti.
+        $this->assertDatabaseCount('clients', 0);
+        $this->assertDatabaseCount('projects', 0);
     }
 }

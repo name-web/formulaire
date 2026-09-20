@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <div style="margin-top:12px;margin-bottom:18px;padding:12px 16px;background:#fafaf8;border:1px solid var(--line);border-radius:5px;font-size:13px;color:#555;line-height:1.6;">
+        <div style="margin-top:12px;margin-bottom:18px;padding:12px 16px;background:rgba(255,185,0,.06);border:1px solid var(--line);border-radius:var(--radius);font-size:13px;color:var(--text-muted);line-height:1.6;">
             <strong>Note :</strong> le taux de commission Dominium Tech appliqué est de 20 % du budget pour tout montant à partir de 100 000 FCFA, ou de 20 000 FCFA forfaitaires en dessous de ce seuil — ce qui correspond au présent budget de 50 000 FCFA.
         </div>
 
@@ -167,22 +167,22 @@
 
         function renderBudgetHead() {
             var thead = document.getElementById('budgetHead');
-            var html = '<tr style="background:#111;">';
+            var html = '<tr style="background:var(--navy-2);">';
             for (var i = 0; i < getColCount(); i++) {
                 var txt = i < 3 ? budgetHeaders[i] : esc(budgetExtraHeaders[i - 3]);
-                var style = 'padding:10px 14px;font-size:12px;font-weight:700;color:#fff;background:#111;text-transform:uppercase;letter-spacing:.7px;border:1px solid #333;';
+                var style = 'padding:10px 14px;font-size:12px;font-weight:700;color:var(--text-muted);background:var(--navy-2);text-transform:uppercase;letter-spacing:.7px;border:1px solid var(--line);';
                 if (i === 2) style += 'text-align:right;';
                 html += '<th contenteditable="true" data-col="' + i + '" style="' + style + '">' + txt + '</th>';
             }
-            html += '<th style="width:44px;border:1px solid #333;background:#111;"></th></tr>';
+            html += '<th style="width:44px;border:1px solid var(--line);background:var(--navy-2);"></th></tr>';
 
             if (budgetExtraHeaders.length > 0) {
-                html += '<tr style="background:#111;">';
-                html += '<th colspan="3" style="border:1px solid #333;background:#111;"></th>';
+                html += '<tr style="background:var(--navy-2);">';
+                html += '<th colspan="3" style="border:1px solid var(--line);background:var(--navy-2);"></th>';
                 for (var j = 0; j < budgetExtraHeaders.length; j++) {
-                    html += '<th style="border:1px solid #333;background:#111;text-align:center;padding:2px;"><button type="button" class="remove-col" data-col-index="' + j + '" title="Supprimer cette colonne" style="width:22px;height:22px;border:1px solid #555;background:#333;border-radius:3px;cursor:pointer;color:#fff;font-size:10px;"><i class="fa-solid fa-xmark"></i></button></th>';
+                    html += '<th style="border:1px solid var(--line);background:var(--navy-2);text-align:center;padding:2px;"><button type="button" class="remove-col" data-col-index="' + j + '" title="Supprimer cette colonne" style="width:22px;height:22px;border:1px solid var(--line);background:var(--bg-card);border-radius:var(--radius);cursor:pointer;color:var(--text-muted);font-size:10px;"><i class="fa-solid fa-xmark"></i></button></th>';
                 }
-                html += '<th style="border:1px solid #333;background:#111;"></th></tr>';
+                html += '<th style="border:1px solid var(--line);background:var(--navy-2);"></th></tr>';
             }
 
             thead.innerHTML = html;
@@ -213,7 +213,7 @@
         }
 
         function budgetInput(type, name, value, opts) {
-            var s = 'width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:0;background:white;color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;';
+            var s = 'width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:0;background:var(--bg-card);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;';
             if (type === 'number') s += 'text-align:right;';
             return '<input type="' + type + '" name="' + name + '" class="budget-cell-input item-amount" value="' + esc(value) + '" style="' + s + '"' + (opts || '') + '>';
         }
@@ -233,7 +233,7 @@
                 html += '<td style="padding:0;">' + budgetInput('text', 'items[0][extra][' + i + ']', extras[i] || '', '') + '</td>';
             }
 
-            html += '<td style="padding:4px;text-align:center;width:44px;border-left:1px solid var(--line);"><button type="button" class="remove-row" title="Supprimer" style="height:28px;border:1px solid var(--line);background:white;border-radius:4px;cursor:pointer;color:#999;font-size:12px;"><i class="fa-solid fa-trash-can"></i></button></td>';
+            html += '<td style="padding:4px;text-align:center;width:44px;border-left:1px solid var(--line);"><button type="button" class="remove-row" title="Supprimer" style="height:28px;border:1px solid var(--line);background:var(--bg-card);border-radius:var(--radius);cursor:pointer;color:var(--text-muted);font-size:12px;"><i class="fa-solid fa-trash-can"></i></button></td>';
 
             tr.innerHTML = html;
             itemsBody.appendChild(tr);
@@ -348,12 +348,12 @@
         }
 
         function presInput(value) {
-            var s = 'width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:0;background:white;color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;';
+            var s = 'width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:0;background:var(--bg-card);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;';
             return '<input type="text" class="pres-input" value="' + esc(value) + '" placeholder="Prestation" style="' + s + '">';
         }
 
         function presTool(icon, cls, title, disabled) {
-            return '<button type="button" class="' + cls + '" title="' + title + '"' + (disabled ? ' disabled style="opacity:.35;cursor:not-allowed;"' : ' style="width:26px;height:26px;border:1px solid var(--line);background:white;border-radius:4px;cursor:pointer;color:#666;font-size:11px;"') + '><i class="fa-solid ' + icon + '"></i></button>';
+            return '<button type="button" class="' + cls + '" title="' + title + '"' + (disabled ? ' disabled style="opacity:.35;cursor:not-allowed;"' : ' style="width:26px;height:26px;border:1px solid var(--line);background:var(--bg-card);border-radius:var(--radius);cursor:pointer;color:var(--text-muted);font-size:11px;"') + '><i class="fa-solid ' + icon + '"></i></button>';
         }
 
         function renderPrestations() {
@@ -363,7 +363,7 @@
                 row.dataset.index = idx;
                 row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px;';
                 row.innerHTML =
-                    '<span style="min-width:22px;font-size:12px;font-weight:700;color:#999;">' + (idx + 1) + '</span>' +
+                    '<span style="min-width:22px;font-size:12px;font-weight:700;color:var(--text-muted);">' + (idx + 1) + '</span>' +
                     '<div style="flex:1;">' + presInput(text) + '</div>' +
                     '<div style="display:flex;gap:4px;">' +
                         presTool('fa-arrow-up', 'move-prestation-up', 'Monter', idx === 0) +

@@ -6,12 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\Activity\ActivityFeedService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        private ActivityFeedService $activityFeed,
+    ) {}
+
     public function index(): View
     {
         $stats = [
@@ -43,6 +48,8 @@ class DashboardController extends Controller
 
         $submissionsByMonth = $this->getSubmissionsByMonth();
 
+        $recentActivities = $this->activityFeed->recent();
+
         return view('admin.dashboard', compact(
             'stats',
             'recentProjects',
@@ -50,6 +57,7 @@ class DashboardController extends Controller
             'projectsByType',
             'projectsByStatus',
             'submissionsByMonth',
+            'recentActivities',
         ));
     }
 

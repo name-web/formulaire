@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Client;
 use App\Models\PendingSubmission;
 use App\Models\Project;
-use App\Models\Question;
 use App\Services\ExternalSubmission\ExternalSubmissionService;
 use App\Services\Questionnaire\ProjectService;
 use App\Services\Questionnaire\QuestionnaireService;
@@ -33,9 +32,9 @@ class Phase5VerificationTest extends TestCase
     public function test_full_flow_start_to_submit_creates_all_entities(): void
     {
         $this->post('/questionnaire/start', [
-            'name' => 'Jean Dupont',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
+            'nom' => 'Jean Dupont',
+            'tel' => '+2250708091011',
+            'email' => 'jean@exemple.com',
         ]);
 
         $pending = PendingSubmission::first();
@@ -43,7 +42,10 @@ class Phase5VerificationTest extends TestCase
         $this->assertDatabaseCount('clients', 0);
         $this->assertDatabaseCount('projects', 0);
 
-        $this->post('/questionnaire/submit');
+        $this->post('/questionnaire/step/2', ['type' => 'site_vitrine']);
+        $this->post('/questionnaire/step/3', ['pages' => 5, 'contenus' => 'fournis']);
+        $this->post('/questionnaire/step/4', ['domaine' => 'com', 'hebergement' => 'mutualise', 'emails' => 2, 'maintenance' => 'essentiel']);
+        $this->post('/questionnaire/step/5', ['niveau' => 'STANDARD', 'delai' => 'normal']);
 
         $pending->refresh();
         $this->assertEquals('imported', $pending->status);
@@ -53,6 +55,7 @@ class Phase5VerificationTest extends TestCase
 
         $project = Project::first();
         $this->assertNotNull($project->submitted_at);
+        $this->assertSame('v2', $project->form_version);
     }
 
     // ──────────────────────────────────────────────
@@ -62,19 +65,13 @@ class Phase5VerificationTest extends TestCase
     public function test_no_client_or_project_during_collecting_phase(): void
     {
         $this->post('/questionnaire/start', [
-            'name' => 'Test',
-            'phone' => '+2250708091011',
-            'project_types' => ['site_vitrine'],
+            'nom' => 'Test',
+            'tel' => '+2250708091011',
+            'email' => 'test@exemple.com',
         ]);
 
-        $question = Question::where('type', 'textarea')->first();
-        if ($question) {
-            $this->post('/questionnaire/wizard', [
-                'answers' => [$question->id => ['value' => 'Réponse test']],
-            ]);
-        }
-
-        $this->get('/questionnaire/summary');
+        $this->post('/questionnaire/step/2', ['type' => 'site_vitrine']);
+        $this->post('/questionnaire/step/3', ['pages' => 5, 'contenus' => 'fournis']);
 
         $this->assertDatabaseCount('clients', 0);
         $this->assertDatabaseCount('projects', 0);

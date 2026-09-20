@@ -20,9 +20,11 @@ class Client extends Model
         'name',
         'status',
         'assigned_developer_id',
+        'assigned_commercial_id',
         'next_action',
         'next_action_date',
         'company_name',
+        'email',
         'phone',
         'whatsapp',
         'city',
@@ -48,6 +50,14 @@ class Client extends Model
         return $this->hasMany(ClientComment::class)->latest();
     }
 
+    /**
+     * Journal d'activité central de ce prospect / client.
+     */
+    public function activities(): HasMany
+    {
+        return $this->hasMany(ClientActivity::class);
+    }
+
     public function quotes(): HasMany
     {
         return $this->hasMany(Quote::class)->latest('issued_at');
@@ -59,6 +69,14 @@ class Client extends Model
     public function assignedDeveloper(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_developer_id');
+    }
+
+    /**
+     * The commercial in charge of this prospect.
+     */
+    public function assignedCommercial(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_commercial_id');
     }
 
     /**
@@ -82,6 +100,11 @@ class Client extends Model
     public function scopeAssignedTo(Builder $query, User|int $developer): Builder
     {
         return $query->where('assigned_developer_id', $developer instanceof User ? $developer->getKey() : $developer);
+    }
+
+    public function scopeAssignedToCommercial(Builder $query, User|int $commercial): Builder
+    {
+        return $query->where('assigned_commercial_id', $commercial instanceof User ? $commercial->getKey() : $commercial);
     }
 
     public function scopeFollowUpDueToday(Builder $query): Builder

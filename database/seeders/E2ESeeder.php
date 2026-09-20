@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Client;
 use App\Models\Project;
+use App\Models\Question;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use RuntimeException;
@@ -32,6 +33,16 @@ class E2ESeeder extends Seeder
     public const ASSIGNED_PROSPECT = 'E2E Prospect Dev Deux';
 
     public const UNASSIGNED_PROSPECT = 'E2E Prospect À Attribuer';
+
+    public const COMMERCIAL_NAME = 'E2E Commercial';
+
+    public const COMMERCIAL_PASSWORD = 'E2eCommercial2026!';
+
+    /** Prospect attribué au commercial : support du journal d'activité. */
+    public const COMMERCIAL_PROSPECT = 'E2E Prospect Commercial';
+
+    /** Prospect sans commercial : support de l'attribution par le Super Admin. */
+    public const ASSIGNABLE_PROSPECT = 'E2E Prospect Attribuable';
 
     public function run(): void
     {
@@ -69,6 +80,39 @@ class E2ESeeder extends Seeder
             ],
         );
 
+        $commercial = User::updateOrCreate(
+            ['email' => 'e2e-commercial@commercial.local'],
+            [
+                'name' => self::COMMERCIAL_NAME,
+                'password' => self::COMMERCIAL_PASSWORD,
+                'role' => 'commercial',
+                'is_active' => true,
+            ],
+        );
+
+        /*
+         * Ces deux prospects n'ont volontairement aucun projet : ils ne
+         * modifient donc pas les listes et statistiques existantes du dashboard
+         * général, qui ne montrent que les prospects ayant soumis une demande.
+         */
+        Client::updateOrCreate(
+            ['name' => self::COMMERCIAL_PROSPECT],
+            [
+                'status' => 'prospect',
+                'phone' => '+2250700000003',
+                'assigned_commercial_id' => $commercial->id,
+            ],
+        );
+
+        Client::updateOrCreate(
+            ['name' => self::ASSIGNABLE_PROSPECT],
+            [
+                'status' => 'prospect',
+                'phone' => '+2250700000004',
+                'assigned_commercial_id' => null,
+            ],
+        );
+
         $assigned = Client::updateOrCreate(
             ['name' => self::ASSIGNED_PROSPECT],
             [
@@ -87,14 +131,32 @@ class E2ESeeder extends Seeder
             ],
         );
 
+        // La question et sa réponse représentent un prospect historique, créé
+        // avec l'ancien questionnaire : son projet reste sur la génération
+        // « legacy » (form_version par défaut) et garde ses réponses en base.
+        $legacyQuestion = Question::create([
+            'title' => 'Quel budget avez-vous prévu ?',
+            'type' => 'text',
+            'project_types' => ['site_vitrine'],
+            'is_required' => true,
+            'sort_order' => 1,
+            'group_label' => 'Budget',
+            'is_active' => true,
+        ]);
+
         // Un projet soumis rend les fiches et le dashboard général représentatifs.
         foreach ([$assigned, $unassigned] as $client) {
             if ($client->projects()->doesntExist()) {
-                Project::create([
+                $project = Project::create([
                     'client_id' => $client->id,
                     'project_type' => ['site_vitrine'],
                     'status' => 'submitted',
                     'submitted_at' => now(),
+                ]);
+
+                $project->answers()->create([
+                    'question_id' => $legacyQuestion->id,
+                    'text_value' => '1 500 000 FCFA',
                 ]);
             }
         }
